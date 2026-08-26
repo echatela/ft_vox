@@ -1,0 +1,19 @@
+# --- Build ---
+/obj/
+*.o
+*.d
+
+# --- Binary ---
+/scop
+
+# --- Tools ---
+/compile_commands.json
+/.cache/
+
+# --- External ---
+/external/glfw/build
+
+# --- Debug ---
+vgcore.*
+core
+core.*

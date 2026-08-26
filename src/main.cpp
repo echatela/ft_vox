@@ -1,0 +1,17 @@
+#include <exception>
+#include <iostream>
+
+#include "app/application.hpp"
+
+int main()
+{
+	try
+	{
+		Application app;
+		app.run();
+	}
+	catch (const std::exception& e)
+	{
+		std::cerr << e.what() << std::endl;
+	}
+}
