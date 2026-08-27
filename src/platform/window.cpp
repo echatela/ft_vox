@@ -5,28 +5,6 @@
 
 #include <stdexcept>
 
-void Window::framebufferSizeCallback(GLFWwindow* window, int width, int height)
-{
-	Window* self = static_cast<Window*>(glfwGetWindowUserPointer(window));
-
-	glfwGetFramebufferSize(window, &width, &height);
-	if (self != nullptr)
-	{
-		self->_width = width;
-		self->_height = height;
-	}
-	glViewport(0, 0, width, height);
-}
-
-void Window::scrollCallback(GLFWwindow* window, double xoffset, double yoffset)
-{
-	(void)xoffset;
-	Window* self = static_cast<Window*>(glfwGetWindowUserPointer(window));
-
-	if (self != nullptr)
-		self->_scrollOffset += yoffset;
-}
-
 Window::Window()
 {
 	_window = glfwCreateWindow(800, 600, "Scop", NULL, NULL);
@@ -37,7 +15,7 @@ Window::Window()
 
 	glfwSetWindowUserPointer(_window, this);
 	glfwSetFramebufferSizeCallback(_window, framebufferSizeCallback);
-	glfwSetScrollCallback(_window, scrollCallback);
+	glfwSetCursorPosCallback(_window, cursorPosCallback);
 }
 
 Window::~Window()
@@ -78,9 +56,36 @@ bool Window::isKeyPressed(int key)
 	return glfwGetKey(_window, key) == GLFW_PRESS;
 }
 
-double Window::consumeScroll()
+void Window::consumeCursorOffset(float* offsetX, float* offsetY)
 {
-	double s = _scrollOffset;
-	_scrollOffset = 0.0;
-	return s;
+	*offsetX = _cursorOffsetX;
+	*offsetY = _cursorOffsetY;
+	_cursorOffsetX = 0.0f;
+	_cursorOffsetY = 0.0f;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+void Window::framebufferSizeCallback(GLFWwindow* window, int width, int height)
+{
+	Window* self = static_cast<Window*>(glfwGetWindowUserPointer(window));
+
+	glfwGetFramebufferSize(window, &width, &height);
+	if (self != nullptr)
+	{
+		self->_width = width;
+		self->_height = height;
+	}
+	glViewport(0, 0, width, height);
+}
+
+void Window::cursorPosCallback(GLFWwindow* window, double xpos, double ypos)
+{
+	Window* self = static_cast<Window*>(glfwGetWindowUserPointer(window));
+	self->_cursorOffsetX +=
+	    self->_cursorLastX >= 0.0f ? xpos - self->_cursorLastX : 0.0f;
+	self->_cursorOffsetY +=
+	    self->_cursorLastY >= 0.0f ? ypos - self->_cursorLastY : 0.0f;
+	self->_cursorLastX = xpos;
+	self->_cursorLastY = ypos;
 }

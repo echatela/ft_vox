@@ -9,7 +9,10 @@ class Window
 	int _width = 0;
 	int _height = 0;
 
-	double _scrollOffset = 0.0;
+	float _cursorLastX = -1.f;
+	float _cursorLastY = -1.f;
+	float _cursorOffsetX = 0.0f;
+	float _cursorOffsetY = 0.0f;
 
 public:
 	Window();
@@ -22,12 +25,11 @@ public:
 	void swapBuffers();
 	void pollEvents();
 
-	bool   isKeyPressed(int key);
-	double consumeScroll();
+	bool isKeyPressed(int key);
+	void consumeCursorOffset(float* offsetX, float* offsetY);
 
 private:
-	static void scrollCallback(GLFWwindow* window, double xoffset,
-	                           double yoffset);
+	static void cursorPosCallback(GLFWwindow* window, double xpos, double ypos);
 	static void framebufferSizeCallback(GLFWwindow* window, int width,
 	                                    int height);
 };

@@ -4,14 +4,18 @@
 #include "platform/glfw_context.hpp"
 #include "platform/window.hpp"
 #include "app/engine.hpp"
+#include "app/frame.hpp"
 
 class Application
 {
 	GlfwContext _glfw;
-	Window _window;
+	Window      _window;
 	GladContext _glad;
-	Engine _engine;
+	Engine      _engine;
 
 public:
 	void run();
+
+private:
+	void processInput(InputIntent& input);
 };
