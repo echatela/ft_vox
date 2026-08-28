@@ -16,6 +16,7 @@ AllowShortIfStatementsOnASingleLine: Never
 AllowShortLoopsOnASingleLine: false
 AllowShortBlocksOnASingleLine: Never
 AllowShortCaseLabelsOnASingleLine: false
+AlignConsecutiveDeclarations: Consecutive
 
 # --- Classes ---
 AccessModifierOffset: -4
@@ -32,7 +33,7 @@ SpaceBeforeParens: ControlStatements
 SpaceAfterCStyleCast: false
 
 # --- Includes ---
-SortIncludes: CaseSensitive
+SortIncludes: false
 IncludeBlocks: Preserve
 
 # --- Breathing --
