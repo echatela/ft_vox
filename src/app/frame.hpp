@@ -1,14 +1,13 @@
 #pragma once
 
-#include "math/vec3.hpp"
-#include "math/vec2.hpp"
+#include <glm/glm.hpp>
 
 struct InputIntent
 {
-	scm::Vec3 move;
-	bool      sprint = false;
+	glm::ivec3 move;
+	bool sprint = false;
 
-	scm::Vec2 look;
+	glm::vec2 look;
 };
 
 struct Frame

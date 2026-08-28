@@ -4,16 +4,8 @@
 *.d
 
 # --- Binary ---
-/scop
+/{{PROJECT}}
 
 # --- Tools ---
 /compile_commands.json
 /.cache/
-
-# --- External ---
-/external/glfw/build
-
-# --- Debug ---
-vgcore.*
-core
-core.*
