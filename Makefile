@@ -15,7 +15,7 @@ STB_DIR    := $(EXT_DIR)/stb_image
 CXXFLAGS   := -Wall -Wextra -Werror -std=$(CXXSTD) -MMD -MP
 CPPFLAGS   := -I$(SRC_DIR) -I$(GLAD_DIR)/include -I$(GLM_DIR) -I$(STB_DIR)
 LDFLAGS    :=
-LDLIBS     := -ldl -lpthread -lm -lglfw -lGL -lX11 -lXi
+LDLIBS     := -lglfw
 
 SRCS       := $(addprefix src/,main.cpp \
 		$(addprefix app/,application.cpp engine.cpp) \
