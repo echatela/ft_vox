@@ -12,7 +12,6 @@ Texture::Texture(const std::string& path)
 {
 	unsigned char* data;
 	int            width, height, nrChannels;
-	GLuint         channel;
 
 	glGenTextures(1, &_id);
 	glBindTexture(GL_TEXTURE_2D, _id);
@@ -24,22 +23,10 @@ Texture::Texture(const std::string& path)
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
 	stbi_set_flip_vertically_on_load(true);
-	data = stbi_load(path.c_str(), &width, &height, &nrChannels, 0);
+	data = stbi_load(path.c_str(), &width, &height, &nrChannels, 4);
 	if (!data)
 		throw std::runtime_error("texture: Failed to load image");
-	switch (nrChannels)
-	{
-	case 1:
-		channel = GL_RGB;
-		break;
-	case 2:
-		channel = GL_RGBA;
-		break;
-	default:
-		throw std::runtime_error("texture: Wrong image format");
-	}
-
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, channel,
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGBA,
 	             GL_UNSIGNED_BYTE, data);
 	glGenerateMipmap(GL_TEXTURE_2D);
 

@@ -4,19 +4,9 @@
 #include "glm/ext/matrix_float4x4.hpp"
 #include "glm/ext/vector_float3.hpp"
 
-enum CameraMovement
-{
-	kForward,
-	kBackward,
-	kLeft,
-	kRight,
-	kUp,
-	kDown
-};
-
 static constexpr float kYaw = -90.0f;
 static constexpr float kPitch = 0.0f;
-static constexpr float kSpeed = 2.5f;
+static constexpr float kSpeed = 5.0f;
 static constexpr float kSensitivity = 0.1f;
 static constexpr float kSprintMultiplier = 20.0f;
 
@@ -24,7 +14,6 @@ class Camera
 {
 	glm::vec3 _position;
 	glm::vec3 _front;
-	glm::vec3 _bodyFront;
 	glm::vec3 _up;
 	glm::vec3 _right;
 	glm::vec3 _worldUp;

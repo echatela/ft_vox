@@ -4,11 +4,15 @@
 
 struct InputIntent
 {
-	glm::vec3 move{0.0f};
-	bool      moved = false;
-	bool      sprint = false;
+	bool forward = false;
+	bool backward = false;
+	bool right = false;
+	bool left = false;
 
-	glm::vec2 look{0.0f};
+	bool sprint = false;
+
+	float xOffset = 0.0f;
+	float yOffset = 0.0f;
 };
 
 struct Frame

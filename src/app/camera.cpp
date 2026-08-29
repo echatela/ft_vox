@@ -26,19 +26,25 @@ glm::mat4 Camera::getViewMatrix() const
 
 void Camera::processInput(const InputIntent& input, float dt)
 {
-	if (input.moved)
-	{
-		float velocity = _movementSpeed * dt;
-		if (input.sprint)
-			velocity *= kSprintMultiplier;
+	float     velocity = _movementSpeed * dt;
+	glm::vec3 dir(0.0f);
 
-		_position += _bodyFront * velocity * input.move.z;
-		_position += _right * velocity * input.move.x;
-		_position += _worldUp * velocity * input.move.y;
-	}
+	if (input.sprint)
+		velocity *= kSprintMultiplier;
 
-	_yaw += input.look.x * kSensitivity;
-	_pitch += input.look.y * kSensitivity;
+	if (input.forward == true)
+		dir += _front;
+	if (input.backward == true)
+		dir -= _front;
+	if (input.right == true)
+		dir += _right;
+	if (input.left == true)
+		dir -= _right;
+	if (glm::length(dir) > 0.0001f)
+		_position += glm::normalize(dir) * velocity;
+
+	_yaw += input.xOffset * kSensitivity;
+	_pitch += input.yOffset * kSensitivity;
 
 	if (_pitch > 89.0f)
 		_pitch = 89.0f;
@@ -55,7 +61,6 @@ void Camera::updateVectors()
 	front.y = sin(glm::radians(_pitch));
 	front.z = sin(glm::radians(_yaw)) * cos(glm::radians(_pitch));
 	_front = glm::normalize(front);
-	_bodyFront = glm::normalize(glm::vec3(front.x, 0.0f, front.z));
-	_right = glm::normalize(glm::cross(_bodyFront, _worldUp));
+	_right = glm::normalize(glm::cross(_front, _worldUp));
 	_up = glm::normalize(glm::cross(_right, _front));
 }

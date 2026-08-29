@@ -16,8 +16,8 @@ struct State
 	glm::mat4 view;
 	glm::mat4 projection;
 
-	int width = 800;
-	int height = 600;
+	int width = kWidth;
+	int height = kHeight;
 
 	State()
 	    : model(1.0f),
