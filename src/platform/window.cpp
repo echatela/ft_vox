@@ -16,6 +16,8 @@ Window::Window()
 	glfwSetWindowUserPointer(_window, this);
 	glfwSetFramebufferSizeCallback(_window, framebufferSizeCallback);
 	glfwSetCursorPosCallback(_window, cursorPosCallback);
+
+	glfwSetInputMode(_window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 }
 
 Window::~Window()
@@ -35,10 +37,14 @@ void Window::setShouldClose()
 	glfwSetWindowShouldClose(_window, true);
 }
 
-void Window::getFramebufferSize(int* width, int* height) const
+int Window::getWidth() const
 {
-	*width = _width;
-	*height = _height;
+	return _width;
+}
+
+int Window::getHeight() const
+{
+	return _height;
 }
 
 void Window::swapBuffers()
@@ -82,10 +88,13 @@ void Window::framebufferSizeCallback(GLFWwindow* window, int width, int height)
 void Window::cursorPosCallback(GLFWwindow* window, double xpos, double ypos)
 {
 	Window* self = static_cast<Window*>(glfwGetWindowUserPointer(window));
-	self->_cursorOffsetX +=
-	    self->_cursorLastX >= 0.0f ? xpos - self->_cursorLastX : 0.0f;
-	self->_cursorOffsetY +=
-	    self->_cursorLastY >= 0.0f ? ypos - self->_cursorLastY : 0.0f;
+
+	if (self->_cursorInitialized)
+	{
+		self->_cursorOffsetX += static_cast<float>(xpos) - self->_cursorLastX;
+		self->_cursorOffsetY += self->_cursorLastY - static_cast<float>(ypos);
+	}
 	self->_cursorLastX = xpos;
 	self->_cursorLastY = ypos;
+	self->_cursorInitialized = true;
 }

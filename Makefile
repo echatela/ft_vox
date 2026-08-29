@@ -10,15 +10,17 @@ EXT_DIR    := external
 
 GLAD_DIR   := $(EXT_DIR)/glad
 GLM_DIR    := $(EXT_DIR)/glm
+STB_DIR    := $(EXT_DIR)/stb_image
 
 CXXFLAGS   := -Wall -Wextra -Werror -std=$(CXXSTD) -MMD -MP
-CPPFLAGS   := -I$(SRC_DIR) -I$(GLAD_DIR)/include -I$(GLM_DIR)
+CPPFLAGS   := -I$(SRC_DIR) -I$(GLAD_DIR)/include -I$(GLM_DIR) -I$(STB_DIR)
 LDFLAGS    :=
 LDLIBS     := -ldl -lpthread -lm -lglfw -lGL -lX11 -lXi
 
 SRCS       := $(addprefix src/,main.cpp \
-		$(addprefix app/,application.cpp engine.cpp) \
-		$(addprefix platform/,glfw_context.cpp window.cpp glad_context.cpp))
+		$(addprefix app/,application.cpp engine.cpp camera.cpp) \
+		$(addprefix platform/,glfw_context.cpp window.cpp glad_context.cpp) \
+		$(addprefix render/,shader.cpp texture.cpp))
 OBJS       := $(SRCS:$(SRC_DIR)/%.cpp=$(OBJ_DIR)/%.o)
 GLAD_OBJ   := $(OBJ_DIR)/glad.o
 DEPS       := $(OBJS:.o=.d)

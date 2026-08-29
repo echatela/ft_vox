@@ -9,4 +9,6 @@ GladContext::GladContext()
 {
 	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
 		throw std::runtime_error("Failed to initialize GLAD");
+
+	glEnable(GL_DEPTH_TEST);
 }

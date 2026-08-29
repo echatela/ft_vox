@@ -6,11 +6,12 @@ class Window
 {
 	GLFWwindow* _window;
 
-	int _width = 0;
-	int _height = 0;
+	int _width = 800;
+	int _height = 600;
 
-	float _cursorLastX = -1.f;
-	float _cursorLastY = -1.f;
+	bool  _cursorInitialized = false;
+	float _cursorLastX = 0.0f;
+	float _cursorLastY = 0.0f;
 	float _cursorOffsetX = 0.0f;
 	float _cursorOffsetY = 0.0f;
 
@@ -20,7 +21,9 @@ public:
 
 	bool shouldClose() const;
 	void setShouldClose();
-	void getFramebufferSize(int* width, int* height) const;
+
+	int getWidth() const;
+	int getHeight() const;
 
 	void swapBuffers();
 	void pollEvents();
