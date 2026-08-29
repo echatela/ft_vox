@@ -1,10 +1,11 @@
 #pragma once
 
-#include "app/camera.hpp"
+#include "world/camera.hpp"
 #include "app/frame.hpp"
 #include "glm/ext/matrix_float4x4.hpp"
 #include "render/shader.hpp"
 #include "render/texture.hpp"
+#include "world/chunk.hpp"
 
 static constexpr float kFov = 80.0f;
 static constexpr int kWidth = 800;
@@ -34,13 +35,11 @@ class Engine
 	State        _state;
 	unsigned int _vao;
 	Camera       _camera;
+	Chunk _chunk;
 
 public:
 	Engine();
 
 	void update(const Frame& frame);
 	void render();
-
-private:
-	void setupMesh();
 };

@@ -2,7 +2,7 @@ NAME       := ft_vox
 
 CXX        := c++
 CC         := cc
-CXXSTD     ?= c++17
+CXXSTD     ?= c++26
 
 SRC_DIR    := src
 OBJ_DIR    := obj
@@ -18,9 +18,10 @@ LDFLAGS    :=
 LDLIBS     := -ldl -lpthread -lm -lglfw -lGL -lX11 -lXi
 
 SRCS       := $(addprefix src/,main.cpp \
-		$(addprefix app/,application.cpp engine.cpp camera.cpp) \
+		$(addprefix app/,application.cpp engine.cpp) \
 		$(addprefix platform/,glfw_context.cpp window.cpp glad_context.cpp) \
-		$(addprefix render/,shader.cpp texture.cpp))
+		$(addprefix render/,shader.cpp texture.cpp) \
+		$(addprefix world/,camera.cpp chunk.cpp))
 OBJS       := $(SRCS:$(SRC_DIR)/%.cpp=$(OBJ_DIR)/%.o)
 GLAD_OBJ   := $(OBJ_DIR)/glad.o
 DEPS       := $(OBJS:.o=.d)

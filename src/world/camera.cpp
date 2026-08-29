@@ -1,4 +1,4 @@
-#include "app/camera.hpp"
+#include "world/camera.hpp"
 #include "app/frame.hpp"
 #include "glm/ext/matrix_transform.hpp"
 #include "glm/ext/vector_float3.hpp"
