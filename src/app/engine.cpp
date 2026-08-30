@@ -10,14 +10,14 @@
 #include <GLFW/glfw3.h>
 
 Engine::Engine()
-    : _texture("assets/stone.jpg"),
+    : _texture("assets/texture_base.jpg"),
       _shader("shaders/vert.glsl", "shaders/frag.glsl"),
       _camera(glm::vec3(0.0f, 0.0f, 3.0f))
 {
 	const float aspectRatio =
 	    static_cast<float>(_state.width) / static_cast<float>(_state.height);
 	_state.projection =
-	    glm::perspective(glm::radians(kFov), aspectRatio, 0.1f, 100.0f);
+	    glm::perspective(glm::radians(kFov), aspectRatio, kZNear, kZFar);
 }
 
 void Engine::update(const Frame& frame)
@@ -31,7 +31,7 @@ void Engine::update(const Frame& frame)
 		aspectRatio = static_cast<float>(_state.width) /
 		              static_cast<float>(_state.height);
 		_state.projection =
-		    glm::perspective(glm::radians(kFov), aspectRatio, 0.1f, 100.0f);
+		    glm::perspective(glm::radians(kFov), aspectRatio, kZNear, kZFar);
 	}
 
 	_camera.processInput(frame.input, frame.dt);
@@ -43,7 +43,7 @@ void Engine::render()
 	glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	_texture.bind();
+	_texture.bind(0);
 	_shader.use();
 
 	_shader.setMat4("projection", _state.projection);

@@ -33,8 +33,9 @@ Texture::Texture(const std::string& path)
 	stbi_image_free(data);
 }
 
-void Texture::bind()
+void	Texture::bind(unsigned int textureUnit) const
 {
+	glActiveTexture(GL_TEXTURE0 + textureUnit);
 	glBindTexture(GL_TEXTURE_2D, _id);
 }
 

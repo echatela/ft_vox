@@ -7,7 +7,18 @@
 
 Window::Window()
 {
-	_window = glfwCreateWindow(800, 600, "Scop", NULL, NULL);
+	GLFWmonitor* monitor;
+	const GLFWvidmode* mode;
+	
+	monitor = glfwGetPrimaryMonitor();
+	if (monitor == nullptr)
+		throw std::runtime_error("Failed to get GLFW monitor");
+
+	mode = glfwGetVideoMode(monitor);
+	if (mode == nullptr)
+		throw std::runtime_error("Failed to get GLFW monitor");
+
+	_window = glfwCreateWindow(mode->width, mode->height, "Scop", glfwGetPrimaryMonitor(), NULL);
 	if (_window == nullptr)
 		throw std::runtime_error("Failed to create GLFW window");
 

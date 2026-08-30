@@ -26,7 +26,8 @@ class Camera
 
 public:
 	Camera(glm::vec3 position = glm::vec3(0.0f, 0.0f, 0.0f),
-	       glm::vec3 worldUp = glm::vec3(0.0f, 1.0f, 0.0f), float yaw = kYaw,
+	       glm::vec3 worldUp = glm::vec3(0.0f, 1.0f, 0.0f),
+		   float yaw = kYaw,
 	       float pitch = kPitch);
 
 	glm::mat4 getViewMatrix() const;

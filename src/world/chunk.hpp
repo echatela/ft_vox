@@ -14,7 +14,7 @@ public:
 	Chunk();
 
 	void draw(Shader& shader) const;
-	bool at(int x, int y, int z) const;
+	// bool at(int x, int y, int z) const;
 
 private:
 	void drawCube(Shader& shader, int i) const;

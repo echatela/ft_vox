@@ -10,5 +10,5 @@ public:
 	Texture(const std::string& path);
 	~Texture();
 
-	void bind();
+	void	bind(unsigned int textureUnit) const;
 };

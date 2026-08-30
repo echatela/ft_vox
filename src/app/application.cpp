@@ -16,10 +16,10 @@ static double deltaTime()
 
 void Application::run()
 {
+	Frame frame;
+
 	while (_window.shouldClose() == false)
 	{
-		Frame frame;
-
 		_window.pollEvents();
 
 		frame.dt = deltaTime();
@@ -39,16 +39,11 @@ void Application::processInput(InputIntent& input)
 	if (_window.isKeyPressed(GLFW_KEY_ESCAPE) == true)
 		_window.setShouldClose();
 
-	if (_window.isKeyPressed(GLFW_KEY_W) == true)
-		input.forward = true;
-	if (_window.isKeyPressed(GLFW_KEY_S) == true)
-		input.backward = true;
-	if (_window.isKeyPressed(GLFW_KEY_D) == true)
-		input.right = true;
-	if (_window.isKeyPressed(GLFW_KEY_A) == true)
-		input.left = true;
-	if (_window.isKeyPressed(GLFW_KEY_LEFT_SHIFT) == true)
-		input.sprint = true;
+	input.forward = _window.isKeyPressed(GLFW_KEY_W);
+	input.backward = _window.isKeyPressed(GLFW_KEY_S);
+	input.right = _window.isKeyPressed(GLFW_KEY_D);
+	input.left = _window.isKeyPressed(GLFW_KEY_A);
+	input.sprint = _window.isKeyPressed(GLFW_KEY_LEFT_SHIFT);
 
 	_window.consumeCursorOffset(&input.xOffset, &input.yOffset);
 }

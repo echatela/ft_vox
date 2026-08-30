@@ -7,6 +7,8 @@
 #include "render/texture.hpp"
 #include "world/chunk.hpp"
 
+static constexpr float kZNear = 0.1f;
+static constexpr float kZFar = 1000.0f;
 static constexpr float kFov = 80.0f;
 static constexpr int kWidth = 800;
 static constexpr int kHeight = 600;
