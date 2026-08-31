@@ -20,7 +20,7 @@ LDLIBS     := -lglfw
 SRCS       := $(addprefix src/,main.cpp \
 		$(addprefix app/,application.cpp engine.cpp) \
 		$(addprefix platform/,glfw_context.cpp window.cpp glad_context.cpp) \
-		$(addprefix render/,shader.cpp texture.cpp) \
+		$(addprefix render/,shader.cpp texture.cpp mesh.cpp) \
 		$(addprefix world/,camera.cpp chunk.cpp))
 OBJS       := $(SRCS:$(SRC_DIR)/%.cpp=$(OBJ_DIR)/%.o)
 GLAD_OBJ   := $(OBJ_DIR)/glad.o
