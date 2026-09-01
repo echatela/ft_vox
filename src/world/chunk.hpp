@@ -1,5 +1,7 @@
 #pragma once
 
+#include "glm/ext/matrix_float4x4.hpp"
+#include "glm/fwd.hpp"
 #include "render/shader.hpp"
 #include <array>
 #include <cstdint>
@@ -25,16 +27,21 @@ class Chunk
 {
 	std::array<BlockId, kChunkSize> _voxels;
 
+	glm::vec3 _worldPos;
+	glm::mat4 _model;
+
 	unsigned int _vao;
 	unsigned int _vbo;
+	unsigned int _ebo;
 
-	std::vector<Vertex> _vertices;
+	std::vector<Vertex>       _vertices;
+	std::vector<unsigned int> _indices;
 
 public:
-	Chunk();
+	Chunk(const glm::vec3& worldPos = glm::vec3(0, 0, 0));
 
-	void draw(Shader& shader);
 	void build();
+	void draw(Shader& shader);
 	// bool at(int x, int y, int z) const;
 
 private:

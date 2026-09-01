@@ -7,6 +7,8 @@ uniform mat4 model;
 uniform mat4 view;
 uniform mat4 projection;
 
+out int vFace;
+
 const vec3 kCorners[6][4] = {
     {vec3(1, 0, 1), vec3(1, 0, 0), vec3(1, 1, 0), vec3(1, 1, 1)}, // +X
     {vec3(0, 0, 0), vec3(0, 0, 1), vec3(0, 1, 1), vec3(0, 1, 0)}, // -X
@@ -18,5 +20,7 @@ const vec3 kCorners[6][4] = {
 
 void main()
 {
-	gl_Position = model * view * projection * vec4(kCorners[aFace][aCorner], 1.0f);
+    vFace = aFace;
+	gl_Position = projection * view * model *
+        vec4(aPos + kCorners[aFace][aCorner], 1.0f);
 }

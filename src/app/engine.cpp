@@ -12,12 +12,14 @@
 Engine::Engine()
     : _texture("assets/texture_base.jpg"),
       _shader("shaders/vert.glsl", "shaders/frag.glsl"),
-      _camera(glm::vec3(0.0f, 0.0f, 3.0f))
+      _camera(glm::vec3(0.0f, 0.0f, -3.0f), glm::vec3(0.0f, 1.0f, 0.0f), 180.0f)
 {
 	const float aspectRatio =
 	    static_cast<float>(_state.width) / static_cast<float>(_state.height);
 	_state.projection =
 	    glm::perspective(glm::radians(kFov), aspectRatio, kZNear, kZFar);
+
+	_chunk.build();
 }
 
 void Engine::update(const Frame& frame)
