@@ -11,7 +11,8 @@
 Texture::Texture(const std::string& path)
 {
 	unsigned char* data;
-	int            width, height, nrChannels;
+
+	int width, height, nrChannels;
 
 	glGenTextures(1, &_id);
 	glBindTexture(GL_TEXTURE_2D, _id);
@@ -33,7 +34,7 @@ Texture::Texture(const std::string& path)
 	stbi_image_free(data);
 }
 
-void	Texture::bind(unsigned int textureUnit) const
+void Texture::bind(unsigned int textureUnit) const
 {
 	glActiveTexture(GL_TEXTURE0 + textureUnit);
 	glBindTexture(GL_TEXTURE_2D, _id);

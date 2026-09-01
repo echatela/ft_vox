@@ -1,16 +1,17 @@
 #version 460 core
-flat in int vFace;
+in vec2 TexCoord;
+flat in int id;
 
 out vec4 FragColor;
 
-const vec3 kFaceColor[6] = {
-    vec3(0.0f, 0.0f, 1.0f), vec3(0.0f, 1.0f,0.0f), vec3(1.0f,1.0f,1.0f),
-    vec3(1.0f,1.0f,0.0f), vec3(1.0f,0.0f,0.0f), vec3(1.0f,0.5f,0.0f)
-};
-
-uniform sampler2D myTexture;
+uniform sampler2D texture1;
+uniform sampler2D texture2;
 
 void main()
 {
-	FragColor = vec4(kFaceColor[vFace], 1.0f);
+    FragColor = vec4(1.0f,1.0f,1.0f,1.0f);
+    if (id == 1)
+        FragColor = texture(texture1, TexCoord);
+    if (id == 2)
+        FragColor = texture(texture2, TexCoord);
 }

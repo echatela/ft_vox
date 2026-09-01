@@ -6,16 +6,14 @@
 #include <cstdint>
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
-#include <iostream>
 #include <stdexcept>
 
 Chunk::Chunk(const glm::vec3& worldPos)
     : _worldPos(worldPos),
-      _model(1.0f),
-      _vertices(kChunkWidth * kChunkWidth),
-      _indices(kChunkWidth * kChunkWidth * 6)
+      _model(glm::translate(glm::mat4(1.0f), _worldPos))
 {
-	_model = glm::translate(_model, _worldPos);
+	_vertices.reserve(kChunkWidth * kChunkHeight);
+	_indices.reserve(kChunkWidth * kChunkWidth * 6);
 
 	_voxels.fill(kBlockNone);
 	for (int y = 0; y < kChunkHeight / 2; y++)
@@ -74,10 +72,11 @@ void Chunk::checkFace(uint8_t face, int x, int y, int z)
 	if (!isValid(cx, cy, cz) || !isBlock(cx, cy, cz))
 	{
 		const unsigned int base = static_cast<unsigned int>(_vertices.size());
-		glm::vec3          pos(x, y, z);
+		const BlockId      id = index(x, y, z);
+		const glm::vec3    pos(x, y, z);
 
 		for (uint8_t corner = 0; corner < 4; corner++)
-			_vertices.push_back({pos, face, corner});
+			_vertices.push_back({pos, face, corner, id});
 		for (int j = 0; j < 6; j++)
 			_indices.push_back(base + kQuadIndices[j]);
 	}
@@ -144,8 +143,12 @@ void Chunk::setupMesh()
 	glVertexAttribIPointer(1, 1, GL_UNSIGNED_BYTE, sizeof(Vertex),
 	                       (void*)offsetof(Vertex, face));
 	glEnableVertexAttribArray(1);
-	// iteration
+	// corner attribute
 	glVertexAttribIPointer(2, 1, GL_UNSIGNED_BYTE, sizeof(Vertex),
 	                       (void*)offsetof(Vertex, corner));
 	glEnableVertexAttribArray(2);
+	// id attribute
+	glVertexAttribIPointer(3, 1, GL_UNSIGNED_BYTE, sizeof(Vertex),
+	                       (void*)offsetof(Vertex, id));
+	glEnableVertexAttribArray(3);
 }

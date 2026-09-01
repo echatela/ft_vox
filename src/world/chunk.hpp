@@ -15,12 +15,14 @@ struct Vertex
 	glm::vec3 pos;
 	uint8_t   face;
 	uint8_t   corner;
+	uint8_t   id;
 };
 
-enum BlockId
+enum BlockId : uint8_t
 {
 	kBlockNone,
 	kBlockStone,
+	kBlockDirt,
 };
 
 enum Face : uint8_t
@@ -33,7 +35,6 @@ enum Face : uint8_t
 	kFaceBack,
 	kFaceCount
 };
-
 
 class Chunk
 {

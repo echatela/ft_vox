@@ -45,8 +45,9 @@ void Engine::render()
 	glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	_texture.bind(0);
 	_shader.use();
+	_texture.bind(0);
+	_shader.setInt("texture1", 0);
 
 	_shader.setMat4("projection", _state.projection);
 	_shader.setMat4("view", _state.view);
