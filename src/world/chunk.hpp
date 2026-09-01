@@ -20,9 +20,9 @@ struct Vertex
 
 enum BlockId : uint8_t
 {
-	kBlockNone,
 	kBlockStone,
 	kBlockDirt,
+	kBlockNone = 255
 };
 
 enum Face : uint8_t
@@ -57,13 +57,13 @@ public:
 	void draw(Shader& shader);
 
 private:
-	void checkCube(int x, int y, int z);
-	void checkFace(uint8_t face, int x, int y, int z);
+	void checkCube(const glm::ivec3& pos);
+	void checkFace(uint8_t face, const glm::ivec3& pos);
 	void setupMesh();
 
-	BlockId& index(int x, int y, int z);
-	BlockId  index(int x, int y, int z) const;
+	BlockId& index(const glm::ivec3& pos);
+	BlockId  index(const glm::ivec3& pos) const;
 
-	bool isValid(int x, int y, int z) const;
-	bool isBlock(int x, int y, int z) const;
+	bool isValid(const glm::ivec3& pos) const;
+	bool isBlock(const glm::ivec3& pos) const;
 };

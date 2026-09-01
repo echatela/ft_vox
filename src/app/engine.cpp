@@ -10,7 +10,7 @@
 #include <GLFW/glfw3.h>
 
 Engine::Engine()
-    : _texture("assets/texture_base.jpg"),
+    : _texture("assets/block/cobblestone.png"),
       _shader("shaders/vert.glsl", "shaders/frag.glsl"),
       _camera(glm::vec3(0.0f, 0.0f, -3.0f), glm::vec3(0.0f, 1.0f, 0.0f), 180.0f)
 {
