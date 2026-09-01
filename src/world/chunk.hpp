@@ -23,6 +23,18 @@ enum BlockId
 	kBlockStone,
 };
 
+enum Face : uint8_t
+{
+	kFaceRight,
+	kFaceLeft,
+	kFaceUp,
+	kFaceDown,
+	kFaceFront,
+	kFaceBack,
+	kFaceCount
+};
+
+
 class Chunk
 {
 	std::array<BlockId, kChunkSize> _voxels;
@@ -42,10 +54,15 @@ public:
 
 	void build();
 	void draw(Shader& shader);
-	// bool at(int x, int y, int z) const;
 
 private:
-	void checkCube(const glm::vec3& pos);
-	void checkFace(uint8_t face, const glm::vec3& pos);
+	void checkCube(int x, int y, int z);
+	void checkFace(uint8_t face, int x, int y, int z);
 	void setupMesh();
+
+	BlockId& index(int x, int y, int z);
+	BlockId  index(int x, int y, int z) const;
+
+	bool isValid(int x, int y, int z) const;
+	bool isBlock(int x, int y, int z) const;
 };

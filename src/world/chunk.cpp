@@ -6,6 +6,8 @@
 #include <cstdint>
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
+#include <iostream>
+#include <stdexcept>
 
 Chunk::Chunk(const glm::vec3& worldPos)
     : _worldPos(worldPos),
@@ -14,25 +16,73 @@ Chunk::Chunk(const glm::vec3& worldPos)
       _indices(kChunkWidth * kChunkWidth * 6)
 {
 	_model = glm::translate(_model, _worldPos);
-	_voxels.fill(kBlockStone);
+
+	_voxels.fill(kBlockNone);
+	for (int y = 0; y < kChunkHeight / 2; y++)
+		for (int x = 0; x < kChunkWidth; x++)
+			for (int z = 0; z < kChunkWidth; z++)
+				index(x, y, z) = kBlockStone;
 }
 
 void Chunk::build()
 {
-	glm::vec3 pos;
+	for (int z = 0; z < kChunkWidth; z++)
+		for (int y = 0; y < kChunkHeight; y++)
+			for (int x = 0; x < kChunkWidth; x++)
+				checkCube(x, y, z);
 
-	for (int i = 0; i < kChunkSize; i++)
-	{
-		pos.x = i % kChunkWidth;
-		pos.y = i / kChunkWidth % kChunkHeight;
-		pos.z = i / (kChunkWidth * kChunkHeight) % kChunkWidth;
-
-		checkCube(pos);
-	}
 	setupMesh();
 }
 
-// TODO : could put x / y / z out of loop to make less calcul
+constexpr unsigned int kQuadIndices[6] = {0, 1, 2, 0, 2, 3};
+
+void Chunk::checkCube(int x, int y, int z)
+{
+	if (index(x, y, z) != kBlockNone)
+		for (uint8_t face = kFaceRight; face < kFaceCount; face++)
+			checkFace(face, x, y, z);
+}
+
+void Chunk::checkFace(uint8_t face, int x, int y, int z)
+{
+	int cx = x;
+	int cy = y;
+	int cz = z;
+
+	switch (face)
+	{
+	case kFaceRight:
+		cx++;
+		break;
+	case kFaceLeft:
+		cx--;
+		break;
+	case kFaceUp:
+		cy++;
+		break;
+	case kFaceDown:
+		cy--;
+		break;
+	case kFaceFront:
+		cz++;
+		break;
+	case kFaceBack:
+		cz--;
+		break;
+	}
+
+	if (!isValid(cx, cy, cz) || !isBlock(cx, cy, cz))
+	{
+		const unsigned int base = static_cast<unsigned int>(_vertices.size());
+		glm::vec3          pos(x, y, z);
+
+		for (uint8_t corner = 0; corner < 4; corner++)
+			_vertices.push_back({pos, face, corner});
+		for (int j = 0; j < 6; j++)
+			_indices.push_back(base + kQuadIndices[j]);
+	}
+}
+
 void Chunk::draw(Shader& shader)
 {
 	shader.use();
@@ -41,35 +91,33 @@ void Chunk::draw(Shader& shader)
 	glDrawElements(GL_TRIANGLES, _indices.size(), GL_UNSIGNED_INT, 0);
 }
 
-enum Face : uint8_t
+BlockId& Chunk::index(int x, int y, int z)
 {
-	kFaceRight,
-	kFaceLeft,
-	kFaceUp,
-	kFaceDown,
-	kFaceForward,
-	kFaceBack,
-	kFaceCount
-};
-
-constexpr unsigned int kQuadIndices[6] = {0, 1, 2, 0, 2, 3};
-
-void Chunk::checkCube(const glm::vec3& pos)
-{
-	for (uint8_t face = 0; face < kFaceCount; face++)
-	{
-		checkFace(face, pos);
-	}
+	if (!isValid(x, y, z))
+		throw std::runtime_error("Chunk: position out of chunk");
+	return _voxels[x + y * kChunkWidth + z * kChunkWidth * kChunkHeight];
 }
 
-void Chunk::checkFace(uint8_t face, const glm::vec3& pos)
+BlockId Chunk::index(int x, int y, int z) const
 {
-	const unsigned int base = static_cast<unsigned int>(_vertices.size());
+	if (!isValid(x, y, z))
+		return kBlockNone;
+	return _voxels[x + y * kChunkWidth + z * kChunkWidth * kChunkHeight];
+}
 
-	for (uint8_t i = 0; i < 4; i++)
-		_vertices.push_back({pos, face, i});
-	for (int j = 0; j < 6; j++)
-		_indices.push_back(base + kQuadIndices[j]);
+bool Chunk::isValid(int x, int y, int z) const
+{
+	if (x < 0 || y < 0 || z < 0 || x >= kChunkWidth || y >= kChunkHeight ||
+	    z >= kChunkWidth)
+		return false;
+	return true;
+}
+
+bool Chunk::isBlock(int x, int y, int z) const
+{
+	if (index(x, y, z) != kBlockNone)
+		return true;
+	return false;
 }
 
 void Chunk::setupMesh()
