@@ -1,17 +1,12 @@
 #version 460 core
-in vec2 TexCoord;
-flat in int id;
 
 out vec4 FragColor;
 
-uniform sampler2D texture1;
-uniform sampler2D texture2;
+uniform sampler2DArray uBlocks;
+flat in int vLayer;
+in vec2 vUV;
 
 void main()
 {
-    FragColor = vec4(1.0f,1.0f,1.0f,1.0f);
-    if (id == 0)
-        FragColor = texture(texture1, TexCoord);
-    if (id == 1)
-        FragColor = texture(texture2, TexCoord);
+    FragColor = texture(uBlocks, vec3(vUV, float(vLayer)));
 }

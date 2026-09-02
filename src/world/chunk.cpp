@@ -9,10 +9,11 @@
 #include <GLFW/glfw3.h>
 #include <stdexcept>
 
-Chunk::Chunk(const glm::vec3& worldPos, const Shader* shader, const Texture* texture)
+Chunk::Chunk(const glm::vec3& worldPos, const Shader* shader,
+             const ATexture* texture)
     : _worldPos(worldPos),
       _model(glm::translate(glm::mat4(1.0f), _worldPos)),
-	  _material{shader, texture}
+      _material{shader, texture}
 {
 	_vertices.reserve(kChunkWidth * kChunkHeight);
 	_indices.reserve(kChunkWidth * kChunkWidth * 6);
@@ -21,8 +22,8 @@ Chunk::Chunk(const glm::vec3& worldPos, const Shader* shader, const Texture* tex
 	for (int z = 0; z < kChunkWidth; z++)
 		for (int y = 0; y < kChunkHeight; y++)
 			for (int x = 0; x < kChunkWidth; x++)
-				index({x, y, z}) =
-				    (x % 2 == y % 2) == z % 2 ? kBlockStone : kBlockNone;
+				_index({x, y, z}) =
+				    (x % 2 == y % 2) == z % 2 ? kBlockStone : kBlockOakPlanks;
 }
 
 void Chunk::build()
@@ -30,32 +31,32 @@ void Chunk::build()
 	for (int z = 0; z < kChunkWidth; z++)
 		for (int y = 0; y < kChunkHeight; y++)
 			for (int x = 0; x < kChunkWidth; x++)
-				checkCube(glm::ivec3(x, y, z));
+				_checkCube(glm::ivec3(x, y, z));
 
-	setupMesh();
+	_setupMesh();
 }
 
 constexpr unsigned int kQuadIndices[6] = {0, 1, 2, 0, 2, 3};
 
-void Chunk::checkCube(const glm::ivec3& pos)
+void Chunk::_checkCube(const glm::ivec3& pos)
 {
-	if (index(pos) != kBlockNone)
+	if (_index(pos) != kBlockNone)
 		for (uint8_t face = kFaceRight; face < kFaceCount; face++)
-			checkFace(face, pos);
+			_checkFace(face, pos);
 }
 
 constexpr glm::ivec3 kNeighbours[6] = {
     glm::ivec3(1, 0, 0),  glm::ivec3(-1, 0, 0), glm::ivec3(0, 1, 0),
     glm::ivec3(0, -1, 0), glm::ivec3(0, 0, 1),  glm::ivec3(0, 0, -1)};
 
-void Chunk::checkFace(uint8_t face, const glm::ivec3& pos)
+void Chunk::_checkFace(uint8_t face, const glm::ivec3& pos)
 {
 	glm::ivec3 neighbour = pos + kNeighbours[face];
 
-	if (!isValid(neighbour) || !isBlock(neighbour))
+	if (!_isValid(neighbour) || !_isBlock(neighbour))
 	{
 		const unsigned int base = static_cast<unsigned int>(_vertices.size());
-		const BlockId      id = index(pos);
+		const BlockId      id = _index(pos);
 
 		for (uint8_t corner = 0; corner < 4; corner++)
 			_vertices.push_back({pos, face, corner, id});
@@ -66,31 +67,32 @@ void Chunk::checkFace(uint8_t face, const glm::ivec3& pos)
 
 void Chunk::draw()
 {
-	_material.texture->bind(0);
 	_material.shader->use();
-	_material.shader->setUniform<int>("texture1", 0);
-	_material.shader->setUniform<const glm::mat4x4 &>("model", _model);
+	_material.shader->setUniform<const glm::mat4x4&>("model", _model);
+	_material.texture->bind(0);
+	_material.shader->setUniform<int>("uBlock", 0);
+
 	glBindVertexArray(_vao);
 	glDrawElements(GL_TRIANGLES, _indices.size(), GL_UNSIGNED_INT, 0);
 }
 
-BlockId& Chunk::index(const glm::ivec3& pos)
+BlockId& Chunk::_index(const glm::ivec3& pos)
 {
-	if (!isValid(pos))
+	if (!_isValid(pos))
 		throw std::runtime_error("Chunk: position out of chunk");
 	return _voxels[pos.x + pos.y * kChunkWidth +
 	               pos.z * kChunkWidth * kChunkHeight];
 }
 
-BlockId Chunk::index(const glm::ivec3& pos) const
+BlockId Chunk::_index(const glm::ivec3& pos) const
 {
-	if (!isValid(pos))
+	if (!_isValid(pos))
 		return kBlockNone;
 	return _voxels[pos.x + pos.y * kChunkWidth +
 	               pos.z * kChunkWidth * kChunkHeight];
 }
 
-bool Chunk::isValid(const glm::ivec3& pos) const
+bool Chunk::_isValid(const glm::ivec3& pos) const
 {
 	if (pos.x < 0 || pos.y < 0 || pos.z < 0 || pos.x >= kChunkWidth ||
 	    pos.y >= kChunkHeight || pos.z >= kChunkWidth)
@@ -98,14 +100,14 @@ bool Chunk::isValid(const glm::ivec3& pos) const
 	return true;
 }
 
-bool Chunk::isBlock(const glm::ivec3& pos) const
+bool Chunk::_isBlock(const glm::ivec3& pos) const
 {
-	if (index(pos) != kBlockNone)
+	if (_index(pos) != kBlockNone)
 		return true;
 	return false;
 }
 
-void Chunk::setupMesh()
+void Chunk::_setupMesh()
 {
 	glGenVertexArrays(1, &_vao);
 	glGenBuffers(1, &_vbo);

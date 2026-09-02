@@ -4,26 +4,28 @@
 
 #include <map>
 
-enum class ResourceId {
+enum class ResourceId
+{
 	SHADER_2D,
 	SHADER_CHUNK,
 	SHADER_CONTROL,
 	TEXTURE_FONT,
-	TEXTURE_BLOCK_COBBLESTONE,
-	TEXTURE_BLOCK_STONE,
-	TEXTURE_BLOCK_DIRT,
+	TEXTURE_BLOCKS,
 };
 
-constexpr const unsigned int kMaxPaths = 2;
+constexpr const unsigned int kMaxPaths = 8;
 
-struct ResourceInfo {
+struct ResourceInfo
+{
 	ResourceId   id;
 	ResourceType type;
-	const char* paths[kMaxPaths] = {};
+	const char*  paths[kMaxPaths] = {};
+	unsigned int width = 0;
+	unsigned int height = 0;
+	bool         alpha = false;
 };
 
 constexpr ResourceInfo data[] = {
-
 	{
 		ResourceId::SHADER_2D,
 		ResourceType::SHADER,
@@ -40,25 +42,18 @@ constexpr ResourceInfo data[] = {
 	},
 	{
 		ResourceId::TEXTURE_FONT,
-		ResourceType::TEXTURE,
+		ResourceType::TEXTURE_2D,
 		{"assets/font/texture_mipmap_font.png"}
 	},
 	{
-		ResourceId::TEXTURE_BLOCK_COBBLESTONE,
-		ResourceType::TEXTURE,
-		{"assets/block/cobblestone.png"}
-	},
-	{
-		ResourceId::TEXTURE_BLOCK_STONE,
-		ResourceType::TEXTURE,
-		{"assets/block/stone.png"}
-	},
-	{
-		ResourceId::TEXTURE_BLOCK_DIRT,
-		ResourceType::TEXTURE,
-		{"assets/block/dirt.png"}
-	},
-
+		ResourceId::TEXTURE_BLOCKS,
+		ResourceType::TEXTURE_ARRAY_2D,
+		{"assets/block/stone.png",
+		"assets/block/dirt.png",
+		"assets/block/cobblestone.png",
+		"assets/block/oak_planks.png"},
+		16, 16, true
+	}
 };
 
 class ResourceManager {
