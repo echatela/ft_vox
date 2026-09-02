@@ -100,7 +100,7 @@ constexpr const float kBitmapWidth = 500;
 
 void Label::_constructMesh()
 {
-	
+
 	std::vector<glm::vec2> 		coords;
 	std::vector<unsigned int> 	indexes;
 
@@ -198,9 +198,9 @@ Label::Label(std::string text, unsigned int size, glm::vec3 color)
 	_color(color)
 {
 	_constructMesh();
-	
+
 	ResourceManager& rm = ResourceManager::instance();
-	const Texture* texturePtr = rm.get<Texture>(ResourceId::TEXTURE_FONT);
+	const ATexture* texturePtr = rm.get<ATexture>(ResourceId::TEXTURE_FONT);
 	const Shader* shaderPtr= rm.get<Shader>(ResourceId::SHADER_CONTROL);
 	_material.texture = texturePtr;
 	_material.shader = shaderPtr;

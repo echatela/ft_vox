@@ -1,24 +1,29 @@
-#include "render/texture.hpp"
+#include "render/texture_2d.hpp"
+#include "render/a_texture.hpp"
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
-
 #include <fcntl.h>
-
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
-
 #include <stdexcept>
 
-void	Texture::load(const std::string& path)
+Texture2D::Texture2D()
+    : ATexture(GL_TEXTURE_2D)
 {
-	if (_isLoaded)
-		glDeleteTextures(1, &_id);
+}
 
+Texture2D::Texture2D(const std::string& path)
+    : ATexture(GL_TEXTURE_2D)
+{
+	load(path);
+}
+
+void Texture2D::load(const std::string& path)
+{
 	unsigned char* data;
-	int width, height, nrChannels;
+	int            width, height, nrChannels;
 
-	glGenTextures(1, &_id);
 	glBindTexture(GL_TEXTURE_2D, _id);
 
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
@@ -36,29 +41,4 @@ void	Texture::load(const std::string& path)
 	             GL_UNSIGNED_BYTE, data);
 	glGenerateMipmap(GL_TEXTURE_2D);
 	stbi_image_free(data);
-
-	_isLoaded = true;
-}
-
-Texture::Texture()
-{
-}
-
-Texture::Texture(const char* path)
-{
-	load(path);
-}
-
-void Texture::bind(unsigned int textureUnit) const
-{
-	if (!_isLoaded)
-		return ;
-	glActiveTexture(GL_TEXTURE0 + textureUnit);
-	glBindTexture(GL_TEXTURE_2D, _id);
-}
-
-Texture::~Texture()
-{
-	if (_isLoaded)
-		glDeleteTextures(1, &_id);
 }

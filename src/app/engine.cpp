@@ -13,10 +13,9 @@
 #include "loader/resource_manager.hpp"
 #include "app/frame.hpp"
 #include "render/shader.hpp"
-#include "render/texture.hpp"
+#include "render/a_texture.hpp"
 #include "time.hpp"
 #include "scene/label.hpp"
-
 
 Engine::Engine(Window& window)
     : _window(window)
@@ -47,11 +46,12 @@ void Engine::_initWorld()
 	_state.projection =
 	    glm::perspective(glm::radians(kFov), aspectRatio, kZNear, kZFar);
 
-	_camera.setPos(glm::vec3(0,0,-3));
+	_camera.setPos(glm::vec3(0, 0, -3));
 
 	ResourceManager& rm = ResourceManager::instance();
-	const Shader* shaderPtr = rm.get<Shader>(ResourceId::SHADER_CHUNK);
-	const Texture* texturePtr = rm.get<Texture>(ResourceId::TEXTURE_BLOCK_COBBLESTONE);
+	const Shader*    shaderPtr = rm.get<Shader>(ResourceId::SHADER_CHUNK);
+	const ATexture*   texturePtr =
+	    rm.get<ATexture>(ResourceId::TEXTURE_BLOCKS);
 
 	_chunk = Chunk({0, 0, 0}, shaderPtr, texturePtr);
 	_chunk.build();
@@ -59,15 +59,15 @@ void Engine::_initWorld()
 
 void Engine::_initGUI()
 {
-	Label *frameLabel = new Label("", 24, kColorWhite);
+	Label* frameLabel = new Label("", 24, kColorWhite);
 	frameLabel->setPos({10, 10});
 	frameLabel->setVisible(false);
 
-	Label *positionLabel = new Label("", 24, kColorWhite);
+	Label* positionLabel = new Label("", 24, kColorWhite);
 	positionLabel->setPos({10, 45});
 	positionLabel->setVisible(false);
 
-	Label *resolutionLabel = new Label("", 24, kColorWhite);
+	Label* resolutionLabel = new Label("", 24, kColorWhite);
 	resolutionLabel->setPos({10, 80});
 	resolutionLabel->setVisible(false);
 
@@ -156,31 +156,31 @@ void Engine::_update(const Frame& frame)
 		    glm::perspective(glm::radians(kFov), aspectRatio, kZNear, kZFar);
 	}
 
-	_updateGUI(frame);
-
 	_camera.processInput(frame.input, frame.dt);
 	_state.view = _camera.getViewMatrix();
+
+	_updateGUI(frame);
 }
 
-void Engine::_render3d()
-{
-	// render 3D
-	glEnable(GL_DEPTH_TEST);
+// void Engine::_render3d(const Frame& frame)
+// {
+// 	// render 3D
+// 	glEnable(GL_DEPTH_TEST);
 
-	// TODO : The shader used here and in _chunk.draw() are the same (as exactly the same, we use a ptr)
-	// Since chunk now has its texture, I moved the binding in _chunk.draw() function.
-	//
-	// Since we are in the _render3d(), maybe every 3D object should take the projection/view matrix
-	// as a parameter for the draw() function
+// 	// TODO : The shader used here and in _chunk.draw() are the same (as exactly the same, we use a ptr)
+// 	// Since chunk now has its texture, I moved the binding in _chunk.draw() function.
+// 	//
+// 	// Since we are in the _render3d(), maybe every 3D object should take the projection/view matrix
+// 	// as a parameter for the draw() function
 
-	ResourceManager& rm = ResourceManager::instance();
-	const Shader* shader = rm.get<Shader>(ResourceId::SHADER_CHUNK);
-	shader->use();
-	shader->setUniform<const glm::mat4&>("projection", _state.projection);
-	shader->setUniform<const glm::mat4&>("view", _state.view);
+// 	ResourceManager& rm = ResourceManager::instance();
+// 	const Shader* shader = rm.get<Shader>(ResourceId::SHADER_CHUNK);
+// 	shader->use();
+// 	shader->setUniform<const glm::mat4&>("projection", _state.projection);
+// 	shader->setUniform<const glm::mat4&>("view", _state.view);
 
-	_chunk.draw();
-}
+// 	_chunk.draw();
+// }
 
 void Engine::_renderControl()
 {
@@ -199,3 +199,21 @@ void Engine::_render()
 
 	_window.swapBuffers();
 }
+
+void Engine::_render3d()
+{
+	glEnable(GL_DEPTH_TEST);
+
+	_chunk.draw();
+}
+
+void Engine::_renderControl()
+{
+	glDisable(GL_DEPTH_TEST);
+
+	for (const std::pair<const CONTROL_ID, Control*>& control : _controlTree)
+	{
+		control.second->draw();
+	}
+}
+

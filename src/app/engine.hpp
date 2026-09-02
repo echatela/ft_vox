@@ -23,7 +23,7 @@ constexpr glm::vec3 kColorRed = glm::vec3(1.0, 0.0, 0.0);
 constexpr auto kVert = "shaders/control_vert.glsl";
 constexpr auto kFrag = "shaders/control_frag.glsl";
 
-struct State
+struct EngineState
 {
 	glm::mat4 model;
 	glm::mat4 view;
@@ -31,7 +31,7 @@ struct State
 
 	glm::ivec2 resolution = {kWidth, kHeight};
 
-	State()
+	EngineState()
 	    : model(1.0f),
 	      view(1.0f),
 	      projection(1.0f)
@@ -43,9 +43,9 @@ class Engine
 {
 	Window& _window;
 
-	State  _state;
-	Camera _camera;
-	Chunk  _chunk;
+	EngineState _state;
+	Camera      _camera;
+	Chunk       _chunk;
 
 	Node _root;
 
@@ -54,6 +54,8 @@ public:
 
 	void init();
 	void loop();
+
+	~Engine();
 
 private:
 	void _initRenderSettings() const;
@@ -68,8 +70,4 @@ private:
 	void _render();
 	void _render3d();
 	void _renderControl();
-
-public:
-	Engine();
-	~Engine();
 };
