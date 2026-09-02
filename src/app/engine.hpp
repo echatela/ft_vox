@@ -1,19 +1,20 @@
 #pragma once
 
+#include "render/texture_2d_array.hpp"
 #include "world/camera.hpp"
 #include "app/frame.hpp"
-#include "glm/ext/matrix_float4x4.hpp"
 #include "render/shader.hpp"
-#include "render/texture.hpp"
 #include "world/chunk.hpp"
+
+#include "glm/ext/matrix_float4x4.hpp"
 
 static constexpr float kZNear = 0.1f;
 static constexpr float kZFar = 1000.0f;
 static constexpr float kFov = 80.0f;
-static constexpr int kWidth = 800;
-static constexpr int kHeight = 600;
+static constexpr int   kWidth = 800;
+static constexpr int   kHeight = 600;
 
-struct State
+struct EngineState
 {
 	glm::mat4 model;
 	glm::mat4 view;
@@ -22,7 +23,7 @@ struct State
 	int width = kWidth;
 	int height = kHeight;
 
-	State()
+	EngineState()
 	    : model(1.0f),
 	      view(1.0f),
 	      projection(1.0f)
@@ -32,12 +33,12 @@ struct State
 
 class Engine
 {
-	Texture      _texture;
-	Shader       _shader;
-	State        _state;
-	unsigned int _vao;
-	Camera       _camera;
-	Chunk _chunk;
+	EngineState _state;
+
+	Texture2DArray _texBlock;
+	Shader         _shaderBlock;
+	Chunk          _chunk;
+	Camera         _camera;
 
 public:
 	Engine();

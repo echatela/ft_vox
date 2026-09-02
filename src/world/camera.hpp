@@ -4,9 +4,9 @@
 #include "glm/ext/matrix_float4x4.hpp"
 #include "glm/ext/vector_float3.hpp"
 
-static constexpr float kYaw = -90.0f;
+static constexpr float kYaw = 90.0f;
 static constexpr float kPitch = 0.0f;
-static constexpr float kSpeed = 5.0f;
+static constexpr float kSpeed = 4.0f;
 static constexpr float kSensitivity = 0.1f;
 static constexpr float kSprintMultiplier = 20.0f;
 

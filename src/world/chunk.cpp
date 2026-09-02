@@ -3,14 +3,17 @@
 #include "glm/ext/vector_float3.hpp"
 #include "glm/ext/vector_int3.hpp"
 #include "render/shader.hpp"
+#include "render/texture_2d_array.hpp"
 
 #include <cstdint>
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <stdexcept>
 
-Chunk::Chunk(const glm::vec3& worldPos)
-    : _worldPos(worldPos),
+Chunk::Chunk(Shader& shader, Texture2DArray& tex, const glm::vec3& worldPos)
+    : _shader(shader),
+      _tex(tex),
+      _worldPos(worldPos),
       _model(glm::translate(glm::mat4(1.0f), _worldPos))
 {
 	_vertices.reserve(kChunkWidth * kChunkHeight);
@@ -21,7 +24,7 @@ Chunk::Chunk(const glm::vec3& worldPos)
 		for (int y = 0; y < kChunkHeight; y++)
 			for (int x = 0; x < kChunkWidth; x++)
 				index({x, y, z}) =
-				    (x % 2 == y % 2) == z % 2 ? kBlockStone : kBlockNone;
+				    (x % 2 == y % 2) == z % 2 ? kBlockStone : kBlockOakPlanks;
 }
 
 void Chunk::build()
@@ -63,10 +66,11 @@ void Chunk::checkFace(uint8_t face, const glm::ivec3& pos)
 	}
 }
 
-void Chunk::draw(Shader& shader)
+void Chunk::draw()
 {
-	shader.use();
-	shader.setMat4("model", _model);
+	_shader.use();
+	_shader.setMat4("model", _model);
+	_tex.bind();
 	glBindVertexArray(_vao);
 	glDrawElements(GL_TRIANGLES, _indices.size(), GL_UNSIGNED_INT, 0);
 }

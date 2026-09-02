@@ -3,6 +3,7 @@
 #include "glm/ext/matrix_float4x4.hpp"
 #include "glm/fwd.hpp"
 #include "render/shader.hpp"
+#include "render/texture_2d_array.hpp"
 #include <array>
 #include <cstdint>
 #include <vector>
@@ -22,6 +23,8 @@ enum BlockId : uint8_t
 {
 	kBlockStone,
 	kBlockDirt,
+	kBlockCobblestone,
+	kBlockOakPlanks,
 	kBlockNone = 255
 };
 
@@ -40,6 +43,9 @@ class Chunk
 {
 	std::array<BlockId, kChunkSize> _voxels;
 
+	Shader&         _shader;
+	Texture2DArray& _tex;
+
 	glm::vec3 _worldPos;
 	glm::mat4 _model;
 
@@ -51,10 +57,11 @@ class Chunk
 	std::vector<unsigned int> _indices;
 
 public:
-	Chunk(const glm::vec3& worldPos = glm::vec3(0, 0, 0));
+	Chunk(Shader& shader, Texture2DArray& tex,
+	      const glm::vec3& worldPos = glm::vec3(0, 0, 0));
 
 	void build();
-	void draw(Shader& shader);
+	void draw();
 
 private:
 	void checkCube(const glm::ivec3& pos);
