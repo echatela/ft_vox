@@ -66,7 +66,7 @@ void Chunk::checkFace(uint8_t face, const glm::ivec3& pos)
 void Chunk::draw(Shader& shader)
 {
 	shader.use();
-	shader.setMat4("model", _model);
+	shader.setUniform<const glm::mat4x4 &>("model", _model);
 	glBindVertexArray(_vao);
 	glDrawElements(GL_TRIANGLES, _indices.size(), GL_UNSIGNED_INT, 0);
 }
