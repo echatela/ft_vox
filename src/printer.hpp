@@ -59,7 +59,8 @@ class Printer
 	const LabelMesh _createLabelMesh(const std::string &text,
 		float size, glm::vec2 pos, const glm::ivec2 &resolution) const;
 
-	// void	_push(const std::string textInfo);
+	unsigned int    _generateGPUBuffers(const LabelMesh &label) const;
+    void	        _drawLabel(const LabelMesh &label, const glm::vec3 &color) const;
 
 public:
 

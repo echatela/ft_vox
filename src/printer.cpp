@@ -126,7 +126,6 @@ const LabelMesh Printer::_createLabelMesh(const std::string &text,
 
 	startY = -(pos.y / resolution.y * 2 - 1);
 	endY = startY - height;
-
 	endX = (pos.x / resolution.x * 2 - 1); // initial xStart
 
 	for (const char letter : text)
@@ -175,13 +174,8 @@ const LabelMesh Printer::_createLabelMesh(const std::string &text,
 	return (label);
 }
 
-//TODO : res devrait pas etre donnee ici
-void	Printer::print(const std::string &text, glm::vec2 pos, float size,
-						const glm::ivec2 &resolution, const glm::vec3 &color) const
-{	
-
-	LabelMesh label = _createLabelMesh(text, size, pos, resolution);
-
+unsigned int Printer::_generateGPUBuffers(const LabelMesh &label) const
+{
 	unsigned int VAO;
 	unsigned int VBO;
 	unsigned int EBO;
@@ -208,12 +202,31 @@ void	Printer::print(const std::string &text, glm::vec2 pos, float size,
 	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(glm::vec2) * 2, (void *)sizeof(glm::vec2));
 	glEnableVertexAttribArray(1);
 
+	return (VAO);
+}
+
+void	Printer::_drawLabel(const LabelMesh &label, const glm::vec3 &color) const
+{
 	_shader.use();
 	_bitmap.bind(0);
 	_shader.setUniform<int>("myTexture", 0);
 	_shader.setUniform<const glm::vec3&>("myColor", color);
 
 	glDrawElements(GL_TRIANGLES, label.indexes.size(), GL_UNSIGNED_INT, (void *)0);
+}
+
+//TODO : label.cpp
+void	Printer::print(const std::string &text, glm::vec2 pos, float size,
+						const glm::ivec2 &resolution, const glm::vec3 &color) const
+{	
+
+	LabelMesh    label;
+	unsigned int VAO;
+
+	
+	label = _createLabelMesh(text, size, pos, resolution);
+	VAO = _generateGPUBuffers(label);
+	_drawLabel(label, color);
 }
 
 Printer::~Printer()
