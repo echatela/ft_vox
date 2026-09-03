@@ -17,7 +17,7 @@ CPPFLAGS   := -I$(SRC_DIR) -I$(GLAD_DIR)/include -I$(GLM_DIR) -I$(STB_DIR)
 LDFLAGS    :=
 LDLIBS     := -lglfw
 
-SRCS       := $(addprefix src/,main.cpp printer.cpp \
+SRCS       := $(addprefix src/,main.cpp printer.cpp time.cpp\
 		$(addprefix app/,engine.cpp) \
 		$(addprefix platform/,glfw_context.cpp window.cpp glad_context.cpp) \
 		$(addprefix render/,shader.cpp texture.cpp) \
