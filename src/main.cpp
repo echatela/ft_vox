@@ -7,9 +7,9 @@ int main()
 {
 	try
 	{
-		Engine minecraft;
+		Engine engine;
 
-		minecraft.loop();
+		engine.loop();
 	}
 	catch (const std::exception& e)
 	{

@@ -5,6 +5,7 @@
 #include "glm/trigonometric.hpp"
 #include "render/shader.hpp"
 #include "render/texture.hpp"
+#include "time.hpp"
 
 #define GLM_ENABLE_EXPERIMENTAL // Needed for string_cast.hpp
 #include "glm/gtx/string_cast.hpp"
@@ -51,36 +52,9 @@ void Engine::_processInputs()
 	_window.consumeCursorOffset(&_frame.input.xOffset, &_frame.input.yOffset);
 }
 
-// TODO : time.cpp
-static double deltaTime()
-{
-	static double last = -1.0;
-	double        now = glfwGetTime();
-	double        dt = last >= 0.0 ? now - last : 0.0;
-
-	last = now;
-	return dt;
-}
-
-static constexpr const unsigned int kFramerateRange = 32;
-
-static int getFramerate(double delta)
-{
-	static double       deltas[kFramerateRange] = {};
-	static unsigned int i = 0;
-	static float		average = 0;
-	
-	average += delta - deltas[i];
-	i = (i + 1) % kFramerateRange;
-	deltas[i] = delta;
-
-	return (kFramerateRange / average);
-
-}
-
 void Engine::_update()
 {
-	_frame.dt = deltaTime();
+	_frame.dt = timeinfo::deltaTime();
 	_frame.resolution = _window.getRes();
 
 	if (_frame.resolution != _state.resolution)
@@ -104,21 +78,22 @@ void Engine::_render()
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glEnable(GL_DEPTH_TEST);
 
+	//render 3D
+	glEnable(GL_DEPTH_TEST);
+
 	_shader.use();
 	_texture.bind(0);
 	_shader.setUniform<int>("texture1", 0);
 
 	_shader.setUniform<const glm::mat4&>("projection", _state.projection);
 	_shader.setUniform<const glm::mat4&>("view", _state.view);
-
-	//render 3D
-	glEnable(GL_DEPTH_TEST);
+	
 	_chunk.draw(_shader);
 
 	//render UI
 	glDisable(GL_DEPTH_TEST);
 
-	std::string framerate =  "Framerate : " + std::to_string(getFramerate(_frame.dt));
+	std::string framerate =  "Framerate : " + std::to_string(timeinfo::getFramerate(_frame.dt));
 	std::string position =   "Position : " + glm::to_string(_camera.getPos());
 	std::string resolution = "Resolution : " + glm::to_string(_window.getRes());
 
