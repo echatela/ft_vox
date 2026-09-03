@@ -1,7 +1,7 @@
 NAME       := ft_vox
 
-CXX        := c++
-CC         := cc
+CXX        := clang++
+CC         := clang
 CXXSTD     ?= c++26
 
 SRC_DIR    := src
@@ -12,13 +12,13 @@ GLAD_DIR   := $(EXT_DIR)/glad
 GLM_DIR    := $(EXT_DIR)/glm
 STB_DIR    := $(EXT_DIR)/stb_image
 
-CXXFLAGS   := -Wall -Wextra -Werror -std=$(CXXSTD) -MMD -MP
+CXXFLAGS   := -Wall -Wextra  -std=$(CXXSTD) -MMD -MP # -Werror
 CPPFLAGS   := -I$(SRC_DIR) -I$(GLAD_DIR)/include -I$(GLM_DIR) -I$(STB_DIR)
 LDFLAGS    :=
 LDLIBS     := -lglfw
 
-SRCS       := $(addprefix src/,main.cpp \
-		$(addprefix app/,application.cpp engine.cpp) \
+SRCS       := $(addprefix src/,main.cpp printer.cpp time.cpp\
+		$(addprefix app/,engine.cpp) \
 		$(addprefix platform/,glfw_context.cpp window.cpp glad_context.cpp) \
 		$(addprefix render/,shader.cpp texture.cpp) \
 		$(addprefix world/,camera.cpp chunk.cpp))
@@ -50,8 +50,7 @@ fclean: clean
 	$(RM) $(NAME)
 	$(RM) compile_commands.json
 
-re: fclean
-	$(MAKE) all
+re: fclean all
 
 cdb:
 	@command -v bear >/dev/null 2>&1 || \

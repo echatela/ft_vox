@@ -7,7 +7,7 @@
 
 Window::Window()
 {
-	GLFWmonitor* monitor;
+	GLFWmonitor*       monitor;
 	const GLFWvidmode* mode;
 	
 	monitor = glfwGetPrimaryMonitor();
@@ -16,11 +16,12 @@ Window::Window()
 
 	mode = glfwGetVideoMode(monitor);
 	if (mode == nullptr)
-		throw std::runtime_error("Failed to get GLFW monitor");
+		throw std::runtime_error("Failed to get GLFW mode");
 
 	_window = glfwCreateWindow(mode->width, mode->height, "Scop", glfwGetPrimaryMonitor(), NULL);
 	if (_window == nullptr)
 		throw std::runtime_error("Failed to create GLFW window");
+	_resolution = {mode->width, mode->height};
 
 	glfwMakeContextCurrent(_window);
 
@@ -50,12 +51,17 @@ void Window::setShouldClose()
 
 int Window::getWidth() const
 {
-	return _width;
+	return _resolution.x;
 }
 
 int Window::getHeight() const
 {
-	return _height;
+	return _resolution.y;
+}
+
+const glm::ivec2 &Window::getRes() const
+{
+	return _resolution;
 }
 
 void Window::swapBuffers()
@@ -90,8 +96,8 @@ void Window::framebufferSizeCallback(GLFWwindow* window, int width, int height)
 	glfwGetFramebufferSize(window, &width, &height);
 	if (self != nullptr)
 	{
-		self->_width = width;
-		self->_height = height;
+		self->_resolution.x = width;
+		self->_resolution.y = height;
 	}
 	glViewport(0, 0, width, height);
 }

@@ -9,3 +9,6 @@
 # --- Tools ---
 /compile_commands.json
 /.cache/
+
+# --- Utils ---
+todo.txt
