@@ -19,8 +19,7 @@ struct Frame
 {
 	double dt = 0.0;
 
-	int width = 0;
-	int height = 0;
+	glm::ivec2 resolution = {0, 0};
 
 	InputIntent input;
 };
