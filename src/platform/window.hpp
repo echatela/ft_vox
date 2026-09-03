@@ -1,13 +1,16 @@
 #pragma once
 
+#include <glm/vec2.hpp>
+#include "platform/glad_context.hpp"
+#include "platform/glfw_context.hpp"
+
 struct GLFWwindow;
 
 class Window
 {
 	GLFWwindow* _window;
 
-	int _width = 800;
-	int _height = 600;
+	glm::ivec2 _resolution = {800, 600};
 
 	bool  _cursorInitialized = false;
 	float _cursorLastX = 0.0f;
@@ -24,6 +27,7 @@ public:
 
 	int getWidth() const;
 	int getHeight() const;
+	const glm::ivec2 &getRes() const;
 
 	void swapBuffers();
 	void pollEvents();

@@ -34,6 +34,8 @@ public:
 
 	void processInput(const InputIntent& input, float dt);
 
+	const glm::vec3 &getPos() const;
+
 private:
 	void updateVectors();
 };

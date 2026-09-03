@@ -1,14 +1,15 @@
 #include <exception>
 #include <iostream>
 
-#include "app/application.hpp"
+#include "app/engine.hpp"
 
 int main()
 {
 	try
 	{
-		Application app;
-		app.run();
+		Engine minecraft;
+
+		minecraft.loop();
 	}
 	catch (const std::exception& e)
 	{
