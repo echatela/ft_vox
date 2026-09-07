@@ -11,11 +11,11 @@
 #include "world/chunk.hpp"
 #include "printer.hpp"
 
-static constexpr float kZNear = 0.1f;
-static constexpr float kZFar = 1000.0f;
-static constexpr float kFov = 80.0f;
-static constexpr int kWidth = 800;
-static constexpr int kHeight = 600;
+constexpr float kZNear = 0.1f;
+constexpr float kZFar = 1000.0f;
+constexpr float kFov = 80.0f;
+constexpr int kWidth = 800;
+constexpr int kHeight = 600;
 
 struct State
 {
@@ -34,7 +34,7 @@ struct State
 };
 
 
-/*TODO: 
+/*TODO:
 * 3 possibilites :
 *	- comme ca
 *	- glfw & glad directement dans window
@@ -55,16 +55,14 @@ class Engine
 
 	Frame	      _frame;
 
-	unsigned int  _vao;
+public:
+	Engine();
+
+	void loop();
 
 private:
-
 	void _processInputs();
 	void _update();
 	void _render();
 
-public:	
-
-	void loop();
-	Engine();
 };

@@ -6,6 +6,7 @@
 #include "render/shader.hpp"
 #include "render/texture.hpp"
 #include "time.hpp"
+#include <array>
 
 #define GLM_ENABLE_EXPERIMENTAL // Needed for string_cast.hpp
 #include "glm/gtx/string_cast.hpp"
@@ -16,7 +17,7 @@
 Engine::Engine()
     : _texture("assets/block/cobblestone.png"),
       _shader("shaders/chunk_vert.glsl", "shaders/chunk_frag.glsl"),
-      _camera(glm::vec3(0.0f, 0.0f, -3.0f), glm::vec3(0.0f, 1.0f, 0.0f), 180.0f)
+      _camera(glm::vec3(0.0f, 0.0f, -3.0f), glm::vec3(0.0f, 1.0f, 0.0f), 0.0f)
 {
 	const float aspectRatio = static_cast<float>(_state.resolution.x) /
 	                          static_cast<float>(_state.resolution.y);
@@ -30,6 +31,7 @@ void Engine::loop()
 {
 	while (_window.shouldClose() == false)
 	{
+		_window.pollEvents();
 		_processInputs();
 		_update();
 		_render();
@@ -38,24 +40,25 @@ void Engine::loop()
 
 void Engine::_processInputs()
 {
-	_window.pollEvents();
+	const std::array<bool, 1024>& keys = _window.getKeys();
+	InputIntent&                  input = _frame.input;
 
-	if (_window.isKeyPressed(GLFW_KEY_ESCAPE) == true)
+	if (keys[GLFW_KEY_ESCAPE])
 		_window.setShouldClose();
 
-	_frame.input.forward = _window.isKeyPressed(GLFW_KEY_W);
-	_frame.input.backward = _window.isKeyPressed(GLFW_KEY_S);
-	_frame.input.right = _window.isKeyPressed(GLFW_KEY_D);
-	_frame.input.left = _window.isKeyPressed(GLFW_KEY_A);
-	_frame.input.sprint = _window.isKeyPressed(GLFW_KEY_LEFT_SHIFT);
+	input.forward = keys[GLFW_KEY_W];
+	input.backward = keys[GLFW_KEY_S];
+	input.right = keys[GLFW_KEY_D];
+	input.left = keys[GLFW_KEY_A];
+	input.sprint = keys[GLFW_KEY_LEFT_SHIFT];
 
-	_window.consumeCursorOffset(&_frame.input.xOffset, &_frame.input.yOffset);
+	_window.consumeCursorOffset(&input.xOffset, &input.yOffset);
 }
 
 void Engine::_update()
 {
 	_frame.dt = timeinfo::deltaTime();
-	_frame.resolution = _window.getResolution();
+	_frame.resolution = _window.getRes();
 
 	if (_frame.resolution != _state.resolution)
 	{
@@ -96,14 +99,13 @@ void Engine::_render()
 	std::string framerate =
 	    "Framerate : " + std::to_string(timeinfo::getFramerate(_frame.dt));
 	std::string position = "Position : " + glm::to_string(_camera.getPos());
-	std::string resolution =
-	    "Resolution : " + glm::to_string(_window.getResolution());
+	std::string resolution = "Resolution : " + glm::to_string(_window.getRes());
 
-	_printer.print(framerate, glm::vec2(10, 10), 12, _window.getResolution(),
+	_printer.print(framerate, glm::vec2(10, 10), 12, _window.getRes(),
 	               glm::vec3(0.9, 0.9, 0.9));
-	_printer.print(position, glm::vec2(10, 26), 12, _window.getResolution(),
+	_printer.print(position, glm::vec2(10, 26), 12, _window.getRes(),
 	               glm::vec3(0.9, 0.9, 0.9));
-	_printer.print(resolution, glm::vec2(10, 42), 12, _window.getResolution(),
+	_printer.print(resolution, glm::vec2(10, 42), 12, _window.getRes(),
 	               glm::vec3(0.9, 0.9, 0.9));
 
 	_window.swapBuffers();

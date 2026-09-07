@@ -1,5 +1,6 @@
 #pragma once
 
+#include <array>
 #include <glm/vec2.hpp>
 
 struct GLFWwindow;
@@ -10,11 +11,12 @@ class Window
 
 	glm::ivec2 _resolution = {800, 600};
 
-	bool  _cursorInitialized = false;
-	float _cursorLastX = 0.0f;
-	float _cursorLastY = 0.0f;
+	std::array<bool, 1024> _keys{false};
+
 	float _cursorOffsetX = 0.0f;
 	float _cursorOffsetY = 0.0f;
+	float _cursorLastX = 0.0f;
+	float _cursorLastY = 0.0f;
 
 public:
 	Window();
@@ -25,7 +27,9 @@ public:
 
 	int               getWidth() const;
 	int               getHeight() const;
-	const glm::ivec2& getResolution() const;
+	const glm::ivec2& getRes() const;
+
+	const std::array<bool, 1024>& getKeys() const;
 
 	void swapBuffers();
 	void pollEvents();
@@ -34,7 +38,10 @@ public:
 	void consumeCursorOffset(float* offsetX, float* offsetY);
 
 private:
-	static void cursorPosCallback(GLFWwindow* window, double xpos, double ypos);
-	static void framebufferSizeCallback(GLFWwindow* window, int width,
-	                                    int height);
+	static void cursor_pos_callback(GLFWwindow* window, double xpos,
+	                                double ypos);
+	static void framebuffer_size_callback(GLFWwindow* window, int width,
+	                                      int height);
+	static void key_callback(GLFWwindow* window, int key, int scancode,
+	                         int action, int mods);
 };
