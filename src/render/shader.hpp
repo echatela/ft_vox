@@ -13,8 +13,7 @@ public:
 	void use() const;
 
 	template <typename T>
-	void setUniform(const std::string &name, T value) const;
-
+	void setUniform(const std::string& name, T value) const;
 };
 
 #include "shader.tpp"

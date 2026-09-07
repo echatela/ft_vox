@@ -15,11 +15,11 @@
 
 Engine::Engine()
     : _texture("assets/block/cobblestone.png"),
-      _shader("shaders/vert.glsl", "shaders/frag.glsl"),
+      _shader("shaders/chunk_vert.glsl", "shaders/chunk_frag.glsl"),
       _camera(glm::vec3(0.0f, 0.0f, -3.0f), glm::vec3(0.0f, 1.0f, 0.0f), 180.0f)
 {
-	const float aspectRatio =
-	    static_cast<float>(_state.resolution.x) / static_cast<float>(_state.resolution.y);
+	const float aspectRatio = static_cast<float>(_state.resolution.x) /
+	                          static_cast<float>(_state.resolution.y);
 	_state.projection =
 	    glm::perspective(glm::radians(kFov), aspectRatio, kZNear, kZFar);
 
@@ -55,7 +55,7 @@ void Engine::_processInputs()
 void Engine::_update()
 {
 	_frame.dt = timeinfo::deltaTime();
-	_frame.resolution = _window.getRes();
+	_frame.resolution = _window.getResolution();
 
 	if (_frame.resolution != _state.resolution)
 	{
@@ -78,7 +78,7 @@ void Engine::_render()
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glEnable(GL_DEPTH_TEST);
 
-	//render 3D
+	// render 3D
 	glEnable(GL_DEPTH_TEST);
 
 	_shader.use();
@@ -87,19 +87,24 @@ void Engine::_render()
 
 	_shader.setUniform<const glm::mat4&>("projection", _state.projection);
 	_shader.setUniform<const glm::mat4&>("view", _state.view);
-	
+
 	_chunk.draw(_shader);
 
-	//render UI
+	// render UI
 	glDisable(GL_DEPTH_TEST);
 
-	std::string framerate =  "Framerate : " + std::to_string(timeinfo::getFramerate(_frame.dt));
-	std::string position =   "Position : " + glm::to_string(_camera.getPos());
-	std::string resolution = "Resolution : " + glm::to_string(_window.getRes());
+	std::string framerate =
+	    "Framerate : " + std::to_string(timeinfo::getFramerate(_frame.dt));
+	std::string position = "Position : " + glm::to_string(_camera.getPos());
+	std::string resolution =
+	    "Resolution : " + glm::to_string(_window.getResolution());
 
-	_printer.print(framerate, glm::vec2(10, 10), 12, _window.getRes(), glm::vec3(0.9, 0.9, 0.9));
-	_printer.print(position, glm::vec2(10, 26), 12, _window.getRes(), glm::vec3(0.9, 0.9, 0.9));
-	_printer.print(resolution, glm::vec2(10, 42), 12, _window.getRes(), glm::vec3(0.9, 0.9, 0.9));
+	_printer.print(framerate, glm::vec2(10, 10), 12, _window.getResolution(),
+	               glm::vec3(0.9, 0.9, 0.9));
+	_printer.print(position, glm::vec2(10, 26), 12, _window.getResolution(),
+	               glm::vec3(0.9, 0.9, 0.9));
+	_printer.print(resolution, glm::vec2(10, 42), 12, _window.getResolution(),
+	               glm::vec3(0.9, 0.9, 0.9));
 
 	_window.swapBuffers();
 }

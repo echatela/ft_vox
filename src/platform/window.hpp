@@ -1,8 +1,6 @@
 #pragma once
 
 #include <glm/vec2.hpp>
-#include "platform/glad_context.hpp"
-#include "platform/glfw_context.hpp"
 
 struct GLFWwindow;
 
@@ -25,9 +23,9 @@ public:
 	bool shouldClose() const;
 	void setShouldClose();
 
-	int getWidth() const;
-	int getHeight() const;
-	const glm::ivec2 &getRes() const;
+	int               getWidth() const;
+	int               getHeight() const;
+	const glm::ivec2& getResolution() const;
 
 	void swapBuffers();
 	void pollEvents();
