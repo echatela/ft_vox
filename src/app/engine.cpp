@@ -27,6 +27,38 @@ Engine::Engine()
 	_chunk.build();
 }
 
+// controlTree deviendra une classe, mettre cela dans le destructeur de control ?
+Engine::~Engine()
+{
+	for (const std::pair<CONTROL_ID, Control*> &control : controlTree)
+	{
+		delete control.second;
+	}
+}
+
+void Engine::initGUI()
+{
+	std::string framerate =  "Framerate : " + std::to_string(timeinfo::getFramerate(_frame.dt));
+	std::string position =   "Position : " + glm::to_string(_camera.getPos());
+	std::string resolution = "Resolution : " + glm::to_string(_window.getRes());
+
+	Label *frameLabel = new Label(framerate, 24, kColorWhite);
+	frameLabel->setPos({10, 10});
+	frameLabel->setVisible(false);
+
+	Label *positionLabel = new Label(position, 24, kColorWhite);
+	positionLabel->setPos({10, 45});
+	positionLabel->setVisible(false);
+
+	Label *resolutionLabel = new Label(resolution, 24, kColorWhite);
+	resolutionLabel->setPos({10, 80});
+	resolutionLabel->setVisible(false);
+
+	controlTree[CONTROL_FRAMERATE] = frameLabel;
+	controlTree[CONTROL_POSITION] = positionLabel;
+	controlTree[CONTROL_RESOLUTION] = resolutionLabel;
+}
+
 void Engine::loop()
 {
 	while (_window.shouldClose() == false)
@@ -49,8 +81,34 @@ void Engine::_processInputs()
 	_frame.input.right = _window.isKeyPressed(GLFW_KEY_D);
 	_frame.input.left = _window.isKeyPressed(GLFW_KEY_A);
 	_frame.input.sprint = _window.isKeyPressed(GLFW_KEY_LEFT_SHIFT);
+	_frame.input.toggleInfo = _window.isKeyPressed(GLFW_KEY_F5);
 
 	_window.consumeCursorOffset(&_frame.input.xOffset, &_frame.input.yOffset);
+}
+
+void Engine::_updateGUI()
+{
+	if (_frame.input.toggleInfo)
+	{
+		controlTree[CONTROL_FRAMERATE]->toggleVisible();
+		controlTree[CONTROL_POSITION]->toggleVisible();
+		controlTree[CONTROL_RESOLUTION]->toggleVisible();
+	}
+	if (controlTree[CONTROL_FRAMERATE]->getVisible())
+	{
+		std::string framerate = "Framerate : " + std::to_string(timeinfo::getFramerate(_frame.dt));
+		((Label *)controlTree[CONTROL_FRAMERATE])->setText(framerate);
+	}
+	if (controlTree[CONTROL_POSITION]->getVisible())
+	{
+		std::string position = "Position : " + glm::to_string(_camera.getPos());
+		((Label *)controlTree[CONTROL_POSITION])->setText(position);
+	}
+	if (controlTree[CONTROL_RESOLUTION]->getVisible())
+	{
+		std::string resolution = "Resolution : " + glm::to_string(_window.getRes());
+		((Label *)controlTree[CONTROL_RESOLUTION])->setText(resolution);
+	}
 }
 
 void Engine::_update()
@@ -69,23 +127,14 @@ void Engine::_update()
 		    glm::perspective(glm::radians(kFov), aspectRatio, kZNear, kZFar);
 	}
 
+	_updateGUI();
+
 	_camera.processInput(_frame.input, _frame.dt);
 	_state.view = _camera.getViewMatrix();
 }
 
-static constexpr const glm::vec3 kColorWhite = glm::vec3(0.9, 0.9, 0.9);
-static constexpr const glm::vec3 kColorRed = glm::vec3(1.0, 0.0, 0.0);
-
-static constexpr auto kVert = "shaders/control_vert.glsl";
-static constexpr auto kFrag = "shaders/control_frag.glsl";
-
-void Engine::_render()
+void Engine::_render3d()
 {
-	glClearColor(0.3f, 0.3f, 0.3f, 1.0f);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	glEnable(GL_DEPTH_TEST);
-
-	//render 3D
 	glEnable(GL_DEPTH_TEST);
 
 	_shader.use();
@@ -96,27 +145,27 @@ void Engine::_render()
 	_shader.setUniform<const glm::mat4&>("view", _state.view);
 	
 	_chunk.draw(_shader);
+}
 
-	//render UI
+void Engine::_renderControl()
+{
 	glDisable(GL_DEPTH_TEST);
 
-	std::string framerate =  "Framerate : " + std::to_string(timeinfo::getFramerate(_frame.dt));
-	std::string position =   "Position : " + glm::to_string(_camera.getPos());
-	std::string resolution = "Resolution : " + glm::to_string(_window.getRes());
+	Shader controlShader(kVert, kFrag);
 
-	// _printer.print(framerate, glm::vec2(10, 10), 12, _window.getRes(), kColorWhite);
-	// _printer.print(position, glm::vec2(10, 26), 12, _window.getRes(), kColorWhite);
-	// _printer.print(resolution, glm::vec2(10, 42), 12, _window.getRes(), kColorWhite);
+	for (const std::pair<CONTROL_ID, Control*> &control : controlTree)
+	{
+		control.second->draw(controlShader);
+	}
+}
 
-	Label framerateLabel(framerate, 24, kColorWhite);
-	framerateLabel.setPos({10, 10});
-	Label positionLabel(position, 24, kColorWhite);
-	positionLabel.setPos({10, 45});
-	Label resolutionLabel(resolution, 24, kColorWhite);
-	resolutionLabel.setPos({10, 80});
+void Engine::_render()
+{
+	glClearColor(0.3f, 0.3f, 0.3f, 1.0f);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	framerateLabel.draw(Shader(kVert, kFrag));
-	positionLabel.draw(Shader(kVert, kFrag));
-	resolutionLabel.draw(Shader(kVert, kFrag));
+	_render3d();
+	_renderControl();
+
 	_window.swapBuffers();
 }

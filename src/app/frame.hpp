@@ -10,6 +10,7 @@ struct InputIntent
 	bool left = false;
 
 	bool sprint = false;
+	bool toggleInfo = false;
 
 	float xOffset = 0.0f;
 	float yOffset = 0.0f;

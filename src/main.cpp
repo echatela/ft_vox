@@ -9,6 +9,7 @@ int main()
 	{
 		Engine engine;
 
+		engine.initGUI();
 		engine.loop();
 	}
 	catch (const std::exception& e)

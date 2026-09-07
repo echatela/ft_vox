@@ -22,15 +22,15 @@ class Label : public Control
 {
 	private :
 
-		std::string _text;
+		std::string  _text;
 		unsigned int _size;
-		glm::vec3   _color;
+		glm::vec3    _color;
 		
 		void	_constructMesh();
 
 	public :
 
-		virtual void	draw(const Shader& shader) const;
+		virtual void	draw(const Shader& shader) const override;
 
 		const std::string&	getText() const;
 		void                setText(const std::string& text);

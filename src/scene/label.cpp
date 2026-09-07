@@ -158,6 +158,8 @@ const std::string& Label::getText() const
 void Label::setText(const std::string& text)
 {
 	_text = text;
+	_constructMesh();
+	generateGPUBuffers();
 }
 
 unsigned int  Label::getSize() const
@@ -168,6 +170,8 @@ unsigned int  Label::getSize() const
 void Label::setSize(const unsigned int size)
 {
 	_size = size;
+	_constructMesh();
+	generateGPUBuffers();
 }
 
 const glm::vec3& Label::getColor() const
@@ -196,7 +200,6 @@ Label::Label(std::string text, unsigned int size, glm::vec3 color)
 	_color(color)
 {
 	_constructMesh();
-
 	generateGPUBuffers();
 	getTexture().load(kBitmap);
 }

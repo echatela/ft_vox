@@ -32,7 +32,9 @@ void Control::generateGPUBuffers()
 
 void Control::draw(const Shader& shader) const
 {
-	shader.use();
+	if (!_visible)
+		return ;
+	shader.use(); 
 	_texture.bind(0);
 	shader.setUniform<int>("myTexture", 0);
 	shader.setUniform<const glm::vec2 &>("resolution", {2560, 1440});
@@ -86,6 +88,20 @@ const glm::vec2& Control::getPos() const
 	return (_transform.position);
 }
 
+void	Control::toggleVisible()
+{
+	_visible = !_visible;
+}
+
+void	Control::setVisible(bool visible)
+{
+	_visible = visible;
+}
+
+bool	Control::getVisible() const
+{
+	return (_visible);
+}
 
 Control::Control() : _texture()
 {
