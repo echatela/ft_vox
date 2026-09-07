@@ -33,13 +33,6 @@ struct State
 	}
 };
 
-
-/*TODO: 
-* 3 possibilites :
-*	- comme ca
-*	- glfw & glad directement dans window
-*	- application creer window en smart ptr et move a engine
-*/
 class Engine
 {
 	GlfwContext   _glfw;

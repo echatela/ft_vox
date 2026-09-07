@@ -6,6 +6,7 @@
 #include "render/shader.hpp"
 #include "render/texture.hpp"
 #include "time.hpp"
+#include "scene/label.hpp"
 
 #define GLM_ENABLE_EXPERIMENTAL // Needed for string_cast.hpp
 #include "glm/gtx/string_cast.hpp"
@@ -72,6 +73,12 @@ void Engine::_update()
 	_state.view = _camera.getViewMatrix();
 }
 
+static constexpr const glm::vec3 kColorWhite = glm::vec3(0.9, 0.9, 0.9);
+static constexpr const glm::vec3 kColorRed = glm::vec3(1.0, 0.0, 0.0);
+
+static constexpr auto kVert = "shaders/control_vert.glsl";
+static constexpr auto kFrag = "shaders/control_frag.glsl";
+
 void Engine::_render()
 {
 	glClearColor(0.3f, 0.3f, 0.3f, 1.0f);
@@ -97,9 +104,18 @@ void Engine::_render()
 	std::string position =   "Position : " + glm::to_string(_camera.getPos());
 	std::string resolution = "Resolution : " + glm::to_string(_window.getRes());
 
-	_printer.print(framerate, glm::vec2(10, 10), 12, _window.getRes(), glm::vec3(0.9, 0.9, 0.9));
-	_printer.print(position, glm::vec2(10, 26), 12, _window.getRes(), glm::vec3(0.9, 0.9, 0.9));
-	_printer.print(resolution, glm::vec2(10, 42), 12, _window.getRes(), glm::vec3(0.9, 0.9, 0.9));
+	// _printer.print(framerate, glm::vec2(10, 10), 12, _window.getRes(), kColorWhite);
+	// _printer.print(position, glm::vec2(10, 26), 12, _window.getRes(), kColorWhite);
+	// _printer.print(resolution, glm::vec2(10, 42), 12, _window.getRes(), kColorWhite);
 
+	Label framerateLabel(framerate, 24, kColorWhite);
+	Label positionLabel(position, 24, kColorWhite);
+	positionLabel.setPos({0, 24});
+	Label resolutionLabel(resolution, 24, kColorWhite);
+	resolutionLabel.setPos({0, 48});
+
+	framerateLabel.draw(Shader(kVert, kFrag));
+	positionLabel.draw(Shader(kVert, kFrag));
+	resolutionLabel.draw(Shader(kVert, kFrag));
 	_window.swapBuffers();
 }

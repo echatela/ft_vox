@@ -152,15 +152,12 @@ const LabelMesh Printer::_createLabelMesh(const std::string &text,
 		// v0
 		label.coords.push_back(glm::vec2(startX, startY));
 		label.coords.push_back(glm::vec2(info.offset / kFontWidth, 1));
-
 		// v1
 		label.coords.push_back(glm::vec2(endX, startY));
 		label.coords.push_back(glm::vec2((info.offset + info.width) / kFontWidth, 1));
-
 		// v2
 		label.coords.push_back(glm::vec2(endX, endY));
 		label.coords.push_back(glm::vec2((info.offset + info.width) / kFontWidth, 0));
-		
 		// v3
 		label.coords.push_back(glm::vec2(startX, endY));
 		label.coords.push_back(glm::vec2(info.offset / kFontWidth, 0));
@@ -197,7 +194,6 @@ unsigned int Printer::_generateGPUBuffers(const LabelMesh &label) const
 	// layout 0 -> pos
 	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(glm::vec2) * 2, (void *)0);
 	glEnableVertexAttribArray(0) ;
-
 	// layout 1 -> UV
 	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(glm::vec2) * 2, (void *)sizeof(glm::vec2));
 	glEnableVertexAttribArray(1);
@@ -223,10 +219,10 @@ void	Printer::print(const std::string &text, glm::vec2 pos, float size,
 	LabelMesh    label;
 	unsigned int VAO;
 
-	
 	label = _createLabelMesh(text, size, pos, resolution);
 	VAO = _generateGPUBuffers(label);
 	_drawLabel(label, color);
+	glDeleteVertexArrays(1, &VAO);
 }
 
 Printer::~Printer()
