@@ -109,10 +109,11 @@ void Engine::_render()
 	// _printer.print(resolution, glm::vec2(10, 42), 12, _window.getRes(), kColorWhite);
 
 	Label framerateLabel(framerate, 24, kColorWhite);
+	framerateLabel.setPos({10, 10});
 	Label positionLabel(position, 24, kColorWhite);
-	positionLabel.setPos({0, 24});
+	positionLabel.setPos({10, 45});
 	Label resolutionLabel(resolution, 24, kColorWhite);
-	resolutionLabel.setPos({0, 48});
+	resolutionLabel.setPos({10, 80});
 
 	framerateLabel.draw(Shader(kVert, kFrag));
 	positionLabel.draw(Shader(kVert, kFrag));
