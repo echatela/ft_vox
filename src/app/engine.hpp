@@ -12,11 +12,11 @@
 #include "printer.hpp"
 #include "scene/control.hpp"
 
-static constexpr float kZNear = 0.1f;
-static constexpr float kZFar = 1000.0f;
-static constexpr float kFov = 80.0f;
-static constexpr int kWidth = 800;
-static constexpr int kHeight = 600;
+constexpr float kZNear = 0.1f;
+constexpr float kZFar = 1000.0f;
+constexpr float kFov = 80.0f;
+constexpr int kWidth = 800;
+constexpr int kHeight = 600;
 
 
 static constexpr const glm::vec3 kColorWhite = glm::vec3(0.9, 0.9, 0.9);
@@ -58,9 +58,12 @@ class Engine
 
 	Frame	      _frame;
 
-	unsigned int  _vao;
-	
-	std::map<CONTROL_ID, Control *>	controlTree;
+public:
+
+	void initGUI();
+	void loop();
+
+private:
 
 	void _processInputs();
 
@@ -73,8 +76,6 @@ class Engine
 
 public:	
 
-	void initGUI();
-	void loop();
 	Engine();
 	~Engine();
 };
