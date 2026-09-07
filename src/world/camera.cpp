@@ -24,6 +24,11 @@ glm::mat4 Camera::getViewMatrix() const
 	return glm::lookAt(_position, _position + _front, _up);
 }
 
+const glm::vec3 &Camera::getPos() const
+{
+	return _position;
+}
+
 void Camera::processInput(const InputIntent& input, float dt)
 {
 	float     velocity = _movementSpeed * dt;

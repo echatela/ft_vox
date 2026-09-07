@@ -1,13 +1,14 @@
 #pragma once
 
+#include <glm/vec2.hpp>
+
 struct GLFWwindow;
 
 class Window
 {
 	GLFWwindow* _window;
 
-	int _width = 800;
-	int _height = 600;
+	glm::ivec2 _resolution = {800, 600};
 
 	bool  _cursorInitialized = false;
 	float _cursorLastX = 0.0f;
@@ -22,8 +23,9 @@ public:
 	bool shouldClose() const;
 	void setShouldClose();
 
-	int getWidth() const;
-	int getHeight() const;
+	int               getWidth() const;
+	int               getHeight() const;
+	const glm::ivec2& getResolution() const;
 
 	void swapBuffers();
 	void pollEvents();
