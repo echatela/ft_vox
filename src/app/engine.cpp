@@ -17,8 +17,9 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
-Engine::Engine()
-    : _texture("assets/block/cobblestone.png"),
+Engine::Engine(Window& window)
+    : _window(window),
+      _texture("assets/block/cobblestone.png"),
       _shader("shaders/chunk_vert.glsl", "shaders/chunk_frag.glsl"),
       _camera(glm::vec3(0.0f, 0.0f, -3.0f), glm::vec3(0.0f, 1.0f, 0.0f), 0.0f)
 {
@@ -41,19 +42,16 @@ Engine::~Engine()
 
 void Engine::initGUI()
 {
-	std::string framerate =  "Framerate : " + std::to_string(timeinfo::getFramerate(_frame.dt));
-	std::string position =   "Position : " + glm::to_string(_camera.getPos());
-	std::string resolution = "Resolution : " + glm::to_string(_window.getResolution());
 
-	Label *frameLabel = new Label(framerate, 24, kColorWhite);
+	Label *frameLabel = new Label("", 24, kColorWhite);
 	frameLabel->setPos({10, 10});
 	frameLabel->setVisible(false);
 
-	Label *positionLabel = new Label(position, 24, kColorWhite);
+	Label *positionLabel = new Label("", 24, kColorWhite);
 	positionLabel->setPos({10, 45});
 	positionLabel->setVisible(false);
 
-	Label *resolutionLabel = new Label(resolution, 24, kColorWhite);
+	Label *resolutionLabel = new Label("", 24, kColorWhite);
 	resolutionLabel->setPos({10, 80});
 	resolutionLabel->setVisible(false);
 
@@ -64,19 +62,25 @@ void Engine::initGUI()
 
 void Engine::loop()
 {
-	while (_window.shouldClose() == false)
+	Frame frame;
+
+	while (!_window.shouldClose())
 	{
-		_window.pollEvents();
-		_processInputs();
-		_update();
+		_processEvents(frame);
+		_update(frame);
 		_render();
 	}
 }
 
-void Engine::_processInputs()
+void Engine::_processEvents(Frame& frame)
 {
+	_window.pollEvents();
+
 	const std::array<bool, 1024>& keys = _window.getKeys();
-	InputIntent&                  input = _frame.input;
+	InputIntent&                  input = frame.input;
+
+	frame.dt = timeinfo::deltaTime();
+	frame.resolution = _window.getRes();
 
 	if (keys[GLFW_KEY_ESCAPE])
 		_window.setShouldClose();
@@ -91,30 +95,56 @@ void Engine::_processInputs()
 	_window.consumeCursorOffset(&input.xOffset, &input.yOffset);
 }
 
-void Engine::_update()
+void Engine::_updateGUI(const Frame& frame)
 {
-	_frame.dt = timeinfo::deltaTime();
-	_frame.resolution = _window.getRes();
+	if (frame.input.toggleInfo)
+	{
+		controlTree[CONTROL_FRAMERATE]->toggleVisible();
+		controlTree[CONTROL_POSITION]->toggleVisible();
+		controlTree[CONTROL_RESOLUTION]->toggleVisible();
+	}
+	if (controlTree[CONTROL_FRAMERATE]->getVisible())
+	{
+		std::string framerate = "Framerate : " + std::to_string(timeinfo::getFramerate(frame.dt));
+		((Label *)controlTree[CONTROL_FRAMERATE])->setText(framerate);
+	}
+	if (controlTree[CONTROL_POSITION]->getVisible())
+	{
+		std::string position = "Position : " + glm::to_string(_camera.getPos());
+		((Label *)controlTree[CONTROL_POSITION])->setText(position);
+	}
+	if (controlTree[CONTROL_RESOLUTION]->getVisible())
+	{
+		std::string resolution = "Resolution : " + glm::to_string(_window.getRes());
+		((Label *)controlTree[CONTROL_RESOLUTION])->setText(resolution);
+	}
+}
 
-	if (_frame.resolution != _state.resolution)
+void Engine::_update(const Frame& frame)
+{
+	if (frame.resolution != _state.resolution)
 	{
 		float aspectRatio;
 
-		_state.resolution = _frame.resolution;
+		_state.resolution = frame.resolution;
 		aspectRatio = static_cast<float>(_state.resolution.x) /
 		              static_cast<float>(_state.resolution.y);
 		_state.projection =
 		    glm::perspective(glm::radians(kFov), aspectRatio, kZNear, kZFar);
 	}
 
-	_updateGUI();
+	_updateGUI(frame);
 
-	_camera.processInput(_frame.input, _frame.dt);
+	_camera.processInput(frame.input, frame.dt);
 	_state.view = _camera.getViewMatrix();
 }
 
 void Engine::_render3d()
 {
+	glClearColor(0.3f, 0.3f, 0.3f, 1.0f);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	// render 3D
 	glEnable(GL_DEPTH_TEST);
 
 	_shader.use();

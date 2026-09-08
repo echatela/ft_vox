@@ -134,5 +134,7 @@ void Window::key_callback(GLFWwindow* window, int key, int scancode, int action,
 	{
 		if (action == GLFW_PRESS)
 			self->_keys[key] = true;
+		if (action == GLFW_RELEASE)
+			self->_keys[key] = false;
 	}
 }
