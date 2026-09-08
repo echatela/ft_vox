@@ -1,7 +1,5 @@
 #pragma once
 
-#include "platform/glad_context.hpp"
-#include "platform/glfw_context.hpp"
 #include "platform/window.hpp"
 #include "world/camera.hpp"
 #include "app/frame.hpp"
@@ -11,11 +9,11 @@
 #include "world/chunk.hpp"
 #include "printer.hpp"
 
-static constexpr float kZNear = 0.1f;
-static constexpr float kZFar = 1000.0f;
-static constexpr float kFov = 80.0f;
-static constexpr int kWidth = 800;
-static constexpr int kHeight = 600;
+constexpr float kZNear = 0.1f;
+constexpr float kZFar = 1000.0f;
+constexpr float kFov = 80.0f;
+constexpr int   kWidth = 800;
+constexpr int   kHeight = 600;
 
 struct State
 {
@@ -33,38 +31,24 @@ struct State
 	}
 };
 
-
-/*TODO: 
-* 3 possibilites :
-*	- comme ca
-*	- glfw & glad directement dans window
-*	- application creer window en smart ptr et move a engine
-*/
 class Engine
 {
-	GlfwContext   _glfw;
-	Window        _window;
-	GladContext   _glad;
+	Window&     _window;
 
-	Texture       _texture;
-	Shader        _shader;
-	State         _state;
-	Camera        _camera;
-	Printer       _printer;
-	Chunk         _chunk;
+	Texture _texture;
+	Shader  _shader;
+	State   _state;
+	Camera  _camera;
+	Printer _printer;
+	Chunk   _chunk;
 
-	Frame	      _frame;
-
-	unsigned int  _vao;
-
-private:
-
-	void _processInputs();
-	void _update();
-	void _render();
-
-public:	
+public:
+	Engine(Window& window);
 
 	void loop();
-	Engine();
+
+private:
+	void _processEvents(Frame& frame);
+	void _update(const Frame& frame);
+	void _render(const Frame& frame);
 };
