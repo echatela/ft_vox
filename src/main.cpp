@@ -2,12 +2,21 @@
 #include <iostream>
 
 #include "app/engine.hpp"
+#include "platform/glad_context.hpp"
+#include "platform/glfw_context.hpp"
+#include "platform/window.hpp"
 
 int main()
 {
 	try
 	{
-		Engine engine;
+		GlfwContext glfw;
+		Window      window;
+		GladContext glad;
+
+		Engine engine(window);
+
+		// TODO: engine.init()
 
 		engine.loop();
 	}

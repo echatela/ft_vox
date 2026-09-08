@@ -48,8 +48,8 @@ void Camera::processInput(const InputIntent& input, float dt)
 	if (glm::length(dir) > 0.0001f)
 		_position += glm::normalize(dir) * velocity;
 
-	_yaw += input.xOffset * kSensitivity;
-	_pitch += input.yOffset * kSensitivity;
+	_yaw += input.xOffset * _mouseSensitivity;
+	_pitch += input.yOffset * _mouseSensitivity;
 
 	if (_pitch > 89.9f)
 		_pitch = 89.9f;
@@ -62,7 +62,7 @@ void Camera::processInput(const InputIntent& input, float dt)
 void Camera::updateVectors()
 {
 	glm::vec3 front;
-	
+
 	front.x = cos(glm::radians(_yaw)) * cos(glm::radians(_pitch));
 	front.y = sin(glm::radians(_pitch));
 	front.z = sin(glm::radians(_yaw)) * cos(glm::radians(_pitch));
