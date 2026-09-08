@@ -1,6 +1,7 @@
 #include <exception>
 #include <iostream>
 
+#include "loader/resource_manager.hpp"
 #include "app/engine.hpp"
 #include "platform/glad_context.hpp"
 #include "platform/glfw_context.hpp"
@@ -15,9 +16,8 @@ int main()
 		GladContext glad;
 
 		Engine engine(window);
-
-		// TODO: engine.init()
-
+		ResourceManagerGuard resourceManagerGuard;
+		
 		engine.initGUI();
 		engine.loop();
 	}

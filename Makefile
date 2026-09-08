@@ -19,6 +19,7 @@ LDLIBS     := -lglfw
 
 SRCS       := $(addprefix src/, main.cpp time.cpp\
 		$(addprefix app/, engine.cpp) \
+		$(addprefix loader/, resource_manager.cpp) \
 		$(addprefix platform/, glfw_context.cpp window.cpp glad_context.cpp) \
 		$(addprefix render/, shader.cpp texture.cpp) \
 		$(addprefix scene/, control.cpp label.cpp mesh.cpp) \

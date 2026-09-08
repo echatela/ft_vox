@@ -1,5 +1,7 @@
 #include "app/engine.hpp"
 
+#include <glad/glad.h>
+#include <GLFW/glfw3.h>
 #include <array>
 
 #include "app/frame.hpp"
@@ -14,8 +16,7 @@
 #define GLM_ENABLE_EXPERIMENTAL // Needed for string_cast.hpp
 #include "glm/gtx/string_cast.hpp"
 
-#include <glad/glad.h>
-#include <GLFW/glfw3.h>
+
 
 Engine::Engine(Window& window)
     : _window(window),
