@@ -9,7 +9,7 @@ Window::Window()
 {
 	GLFWmonitor*       monitor;
 	const GLFWvidmode* mode;
-	
+
 	monitor = glfwGetPrimaryMonitor();
 	if (monitor == nullptr)
 		throw std::runtime_error("Failed to get GLFW monitor");
@@ -18,7 +18,8 @@ Window::Window()
 	if (mode == nullptr)
 		throw std::runtime_error("Failed to get GLFW mode");
 
-	_window = glfwCreateWindow(mode->width, mode->height, "Scop", glfwGetPrimaryMonitor(), NULL);
+	_window = glfwCreateWindow(mode->width, mode->height, "Scop",
+	                           glfwGetPrimaryMonitor(), NULL);
 	if (_window == nullptr)
 		throw std::runtime_error("Failed to create GLFW window");
 	_resolution = {mode->width, mode->height};
@@ -59,7 +60,7 @@ int Window::getHeight() const
 	return _resolution.y;
 }
 
-const glm::ivec2 &Window::getRes() const
+const glm::ivec2& Window::getResolution() const
 {
 	return _resolution;
 }
@@ -93,7 +94,6 @@ void Window::framebufferSizeCallback(GLFWwindow* window, int width, int height)
 {
 	Window* self = static_cast<Window*>(glfwGetWindowUserPointer(window));
 
-	glfwGetFramebufferSize(window, &width, &height);
 	if (self != nullptr)
 	{
 		self->_resolution.x = width;

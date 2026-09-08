@@ -16,11 +16,11 @@
 
 Engine::Engine()
     : _texture("assets/block/cobblestone.png"),
-      _shader("shaders/vert.glsl", "shaders/frag.glsl"),
+      _shader("shaders/chunk_vert.glsl", "shaders/chunk_frag.glsl"),
       _camera(glm::vec3(0.0f, 0.0f, -3.0f), glm::vec3(0.0f, 1.0f, 0.0f), 180.0f)
 {
-	const float aspectRatio =
-	    static_cast<float>(_state.resolution.x) / static_cast<float>(_state.resolution.y);
+	const float aspectRatio = static_cast<float>(_state.resolution.x) /
+	                          static_cast<float>(_state.resolution.y);
 	_state.projection =
 	    glm::perspective(glm::radians(kFov), aspectRatio, kZNear, kZFar);
 
@@ -30,7 +30,7 @@ Engine::Engine()
 // controlTree deviendra une classe, mettre cela dans le destructeur de control ?
 Engine::~Engine()
 {
-	for (const std::pair<CONTROL_ID, Control*> &control : controlTree)
+	for (const std::pair<const CONTROL_ID, Control*> &control : controlTree)
 	{
 		delete control.second;
 	}
@@ -40,7 +40,7 @@ void Engine::initGUI()
 {
 	std::string framerate =  "Framerate : " + std::to_string(timeinfo::getFramerate(_frame.dt));
 	std::string position =   "Position : " + glm::to_string(_camera.getPos());
-	std::string resolution = "Resolution : " + glm::to_string(_window.getRes());
+	std::string resolution = "Resolution : " + glm::to_string(_window.getResolution());
 
 	Label *frameLabel = new Label(framerate, 24, kColorWhite);
 	frameLabel->setPos({10, 10});
@@ -106,7 +106,7 @@ void Engine::_updateGUI()
 	}
 	if (controlTree[CONTROL_RESOLUTION]->getVisible())
 	{
-		std::string resolution = "Resolution : " + glm::to_string(_window.getRes());
+		std::string resolution = "Resolution : " + glm::to_string(_window.getResolution());
 		((Label *)controlTree[CONTROL_RESOLUTION])->setText(resolution);
 	}
 }
@@ -114,7 +114,7 @@ void Engine::_updateGUI()
 void Engine::_update()
 {
 	_frame.dt = timeinfo::deltaTime();
-	_frame.resolution = _window.getRes();
+	_frame.resolution = _window.getResolution();
 
 	if (_frame.resolution != _state.resolution)
 	{
@@ -143,7 +143,7 @@ void Engine::_render3d()
 
 	_shader.setUniform<const glm::mat4&>("projection", _state.projection);
 	_shader.setUniform<const glm::mat4&>("view", _state.view);
-	
+
 	_chunk.draw(_shader);
 }
 
@@ -153,7 +153,7 @@ void Engine::_renderControl()
 
 	Shader controlShader(kVert, kFrag);
 
-	for (const std::pair<CONTROL_ID, Control*> &control : controlTree)
+	for (const std::pair<const CONTROL_ID, Control*> &control : controlTree)
 	{
 		control.second->draw(controlShader);
 	}
