@@ -155,6 +155,23 @@ void Engine::_render3d()
 	_shader.setUniform<const glm::mat4&>("view", _state.view);
 
 	_chunk.draw(_shader);
+
+	// render UI
+	glDisable(GL_DEPTH_TEST);
+
+	std::string framerate =
+	    "Framerate : " + std::to_string(timeinfo::getFramerate(frame.dt));
+	std::string position = "Position : " + glm::to_string(_camera.getPos());
+	std::string resolution = "Resolution : " + glm::to_string(_window.getRes());
+
+	_printer.print(framerate, glm::vec2(10, 10), 12, _window.getRes(),
+	               glm::vec3(0.9, 0.9, 0.9));
+	_printer.print(position, glm::vec2(10, 26), 12, _window.getRes(),
+	               glm::vec3(0.9, 0.9, 0.9));
+	_printer.print(resolution, glm::vec2(10, 42), 12, _window.getRes(),
+	               glm::vec3(0.9, 0.9, 0.9));
+
+	_window.swapBuffers();
 }
 
 void Engine::_renderControl()
