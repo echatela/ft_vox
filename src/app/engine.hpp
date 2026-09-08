@@ -9,7 +9,6 @@
 #include "render/shader.hpp"
 #include "render/texture.hpp"
 #include "world/chunk.hpp"
-#include "printer.hpp"
 #include "scene/control.hpp"
 
 constexpr float kZNear = 0.1f;
@@ -50,7 +49,6 @@ class Engine
 	Shader  _shader;
 	State   _state;
 	Camera  _camera;
-	Printer _printer;
 	Chunk   _chunk;
 
 	std::map<CONTROL_ID, Control*> controlTree;
