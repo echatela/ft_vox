@@ -24,6 +24,27 @@ public:
 	Texture2DArray(const std::vector<std::string>& texFiles, unsigned int width,
 	               unsigned int height, bool alpha);
 
+<<<<<<< HEAD
 	void load(const std::vector<std::string>& texFiles, unsigned int width,
 	          unsigned int height, bool alpha);
+=======
+	void bind(unsigned int textureUnit = 0) const;
+
+	void loadFromFiles(const std::vector<std::string>& texFiles,
+	                   unsigned int width, unsigned int height, bool alpha);
+
+	void         setInternalFormat(unsigned int format);
+	unsigned int getInternalFormat() const;
+	void         setImageFormat(unsigned int format);
+	unsigned int getImageFormat() const;
+
+	void         setWrapS(unsigned int wrap);
+	unsigned int getWrapS() const;
+	void         setWrapT(unsigned int wrap);
+	unsigned int getWrapT() const;
+	void         setFilterMin(unsigned int filter);
+	unsigned int getFilterMin() const;
+	void         setFilterMax(unsigned int filter);
+	unsigned int getFilterMax() const;
+>>>>>>> df903ab (feat: mipmaps, setters and getters)
 };
