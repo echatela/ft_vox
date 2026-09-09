@@ -92,3 +92,63 @@ void Texture2DArray::load(const std::vector<std::string>& texFiles,
 
 	glBindTexture(GL_TEXTURE_2D_ARRAY, 0);
 }
+
+void Texture2DArray::setInternalFormat(unsigned int format)
+{
+	_internalFormat = format;
+}
+
+unsigned int Texture2DArray::getInternalFormat() const
+{
+	return _internalFormat;
+}
+
+void Texture2DArray::setImageFormat(unsigned int format)
+{
+	_imageFormat = format;
+}
+
+unsigned int Texture2DArray::getImageFormat() const
+{
+	return _imageFormat;
+}
+
+void Texture2DArray::setWrapS(unsigned int wrap)
+{
+	_wrapS = wrap;
+}
+
+unsigned int Texture2DArray::getWrapS() const
+{
+	return _wrapS;
+}
+
+void Texture2DArray::setWrapT(unsigned int wrap)
+{
+	_wrapT = wrap;
+}
+
+unsigned int Texture2DArray::getWrapT() const
+{
+	return _wrapT;
+}
+
+void Texture2DArray::setFilterMin(unsigned int filter)
+{
+	_filterMin = filter;
+}
+
+unsigned int Texture2DArray::getFilterMin() const
+{
+	return _filterMin;
+}
+
+void Texture2DArray::setFilterMax(unsigned int filter)
+{
+	_filterMax = filter;
+}
+
+unsigned int Texture2DArray::getFilterMax() const
+{
+	return _filterMax;
+}
