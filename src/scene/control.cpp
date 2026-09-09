@@ -1,34 +1,5 @@
 # include "control.hpp"
-# include "glad/glad.h"
 
-void Control::generateGPUBuffers()
-{
-	if (_activeBuffers)
-	{
-		glDeleteBuffers(1, &_VBO);
-		glDeleteBuffers(1, &_EBO);
-	}
-	_activeBuffers = true;
-
-	glEnable(GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-	glBindVertexArray(_VAO);
-
-	glGenBuffers(1, &_VBO);
-	glBindBuffer(GL_ARRAY_BUFFER, _VBO);
-	glBufferData(GL_ARRAY_BUFFER, _mesh.getCoords().size() * sizeof(glm::vec2), _mesh.getCoords().data(), GL_STATIC_DRAW);
-	glGenBuffers(1, &_EBO);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _EBO);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, _mesh.getIndexes().size() * sizeof(unsigned int), _mesh.getIndexes().data(), GL_STATIC_DRAW);
-
-	// layout 0 -> pos
-	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(glm::vec2) * 2, (void *)0);
-	glEnableVertexAttribArray(0) ;
-	// layout 1 -> UV
-	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(glm::vec2) * 2, (void *)sizeof(glm::vec2));
-	glEnableVertexAttribArray(1);
-}
 
 void Control::draw() const
 {
@@ -41,7 +12,6 @@ void Control::draw() const
 	_material.shader->setUniform<const glm::vec2 &>("modelPos", getPos());
 	glDrawElements(GL_TRIANGLES, _mesh.getIndexes().size(), GL_UNSIGNED_INT, (void *)0);
 }
-
 
 const ControlTransform&	Control::getTransform() const
 {
@@ -61,31 +31,6 @@ const Mesh2d& Control::getMesh() const
 void Control::setMesh(const Mesh2d& mesh)
 {
 	_mesh = mesh;
-}
-
-// const Texture* Control::getTexture() const
-// {
-// 	return _texture;
-// }
-
-// void Control::setTexture(const Texture* texturePtr)
-// {
-// 	_texture = texturePtr;
-// }
-
-// const Shader* Control::getShader() const
-// {
-// 	return _shader;
-// }
-
-// void Control::setShader(const Shader* shaderPtr)
-// {
-// 	_shader = shaderPtr;
-// }
-
-unsigned int Control::getVAO() const
-{
-	return (_VAO);
 }
 
 void	Control::setPos(glm::vec2 pos)
@@ -114,16 +59,9 @@ bool	Control::getVisible() const
 }
 
 Control::Control()
-{
-	glGenVertexArrays(1, &_VAO);
+{	
 }
 
 Control::~Control()
 {
-	glDeleteVertexArrays(1, &_VAO);
-	if (_activeBuffers)
-	{
-		glDeleteBuffers(1, &_VBO);
-		glDeleteBuffers(1, &_EBO);
-	}
 }

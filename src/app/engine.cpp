@@ -29,8 +29,10 @@ Engine::Engine(Window& window)
 	    glm::perspective(glm::radians(kFov), aspectRatio, kZNear, kZFar);
 
 	ResourceManager& rm = ResourceManager::instanciate();
+
 	const Shader* shaderPtr = rm.get<Shader>(RESOURCE_ID::RES_SHADER_CHUNK);
 	const Texture* texturePtr = rm.get<Texture>(RESOURCE_ID::RES_TEXTURE_BLOCK_COBBLESTONE);
+	
 	_chunk = Chunk({0, 0, 0}, shaderPtr, texturePtr);
 	_chunk.build();
 }
@@ -110,17 +112,17 @@ void Engine::_updateGUI(const Frame& frame)
 	if (controlTree[CONTROL_FRAMERATE]->getVisible())
 	{
 		std::string framerate = "Framerate : " + std::to_string(timeinfo::getFramerate(frame.dt));
-		((Label *)controlTree[CONTROL_FRAMERATE])->setText(framerate);
+		(static_cast<Label *>(controlTree[CONTROL_FRAMERATE]))->setText(framerate);
 	}
 	if (controlTree[CONTROL_POSITION]->getVisible())
 	{
 		std::string position = "Position : " + glm::to_string(_camera.getPos());
-		((Label *)controlTree[CONTROL_POSITION])->setText(position);
+		(static_cast<Label *>(controlTree[CONTROL_POSITION]))->setText(position);
 	}
 	if (controlTree[CONTROL_RESOLUTION]->getVisible())
 	{
 		std::string resolution = "Resolution : " + glm::to_string(_window.getRes());
-		((Label *)controlTree[CONTROL_RESOLUTION])->setText(resolution);
+		(static_cast<Label *>(controlTree[CONTROL_RESOLUTION]))->setText(resolution);
 	}
 }
 
@@ -152,12 +154,10 @@ void Engine::_render3d()
 	// Since chunk now has its texture, I moved the binding in _chunk.draw() function.
 	//
 	// Since we are in the _render3d(), maybe every 3D object should take the projection/view matrix
-	// as a parameter for the draw()
-	// and
+	// as a parameter for the draw() function
 
 	ResourceManager& rm = ResourceManager::instanciate();
 	const Shader* shader = rm.get<Shader>(RESOURCE_ID::RES_SHADER_CHUNK);
-	const Texture* texture = rm.get<Texture>(RESOURCE_ID::RES_TEXTURE_BLOCK_COBBLESTONE);
 	shader->use();
 	shader->setUniform<const glm::mat4&>("projection", _state.projection);
 	shader->setUniform<const glm::mat4&>("view", _state.view);

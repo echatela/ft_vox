@@ -38,7 +38,6 @@ static unsigned int compileShader(const char* shaderCode, int type)
 
 Shader::Shader(const char* vertexPath, const char* fragmentPath)
 {
-	std::cout << "Constructor of class Shader" << std::endl;
 
 	std::string vertexCode = getShaderCode(vertexPath);
 	std::string fragmentCode = getShaderCode(fragmentPath);
@@ -69,7 +68,6 @@ Shader::Shader(const char* vertexPath, const char* fragmentPath)
 Shader::~Shader()
 {
 	glDeleteProgram(_id);
-	std::cout << "Destructor of class Shader" << std::endl;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -100,6 +100,7 @@ constexpr const float kBitmapWidth = 500;
 
 void Label::_constructMesh()
 {
+	
 	std::vector<glm::vec2> 		coords;
 	std::vector<unsigned int> 	indexes;
 
@@ -160,7 +161,6 @@ void Label::setText(const std::string& text)
 {
 	_text = text;
 	_constructMesh();
-	generateGPUBuffers();
 }
 
 unsigned int  Label::getSize() const
@@ -172,7 +172,6 @@ void Label::setSize(const unsigned int size)
 {
 	_size = size;
 	_constructMesh();
-	generateGPUBuffers();
 }
 
 const glm::vec3& Label::getColor() const
@@ -187,7 +186,7 @@ void Label::setColor(const glm::vec3& color)
 
 void Label::draw() const
 {
-	glBindVertexArray(getVAO()); // not sure if needed
+	glBindVertexArray(_mesh.getVAO()); // not sure if needed
 	_material.shader->use(); // not sure if needed
 	_material.shader->setUniform<const glm::vec3&>("myColor", _color);
 	Control::draw();
@@ -199,7 +198,6 @@ Label::Label(std::string text, unsigned int size, glm::vec3 color)
 	_color(color)
 {
 	_constructMesh();
-	generateGPUBuffers();
 	
 	ResourceManager& rm = ResourceManager::instanciate();
 	const Texture* texturePtr = rm.get<Texture>(RESOURCE_ID::RES_TEXTURE_FONT);

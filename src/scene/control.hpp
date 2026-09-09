@@ -10,12 +10,6 @@ class Control {
 
 		bool _visible = true;
 
-		// UNE CLASSE ?
-		unsigned int _VAO;
-		unsigned int _VBO;
-		unsigned int _EBO;
-		bool	     _activeBuffers = false;
-
 		ControlTransform	_transform;
 		Mesh2d				_mesh;
 		Material			_material;
@@ -26,12 +20,10 @@ class Control {
 		void                    setTransform(const ControlTransform& transform);
 		const Mesh2d&			getMesh() const;
 		void					setMesh(const Mesh2d& mesh);
-		unsigned int			getVAO() const;
 		void					toggleVisible();
 		void					setVisible(bool visible);
 		bool					getVisible() const;
 
-		void generateGPUBuffers();
 		virtual void draw() const;
 
 		void			 setPos(glm::vec2 pos);
