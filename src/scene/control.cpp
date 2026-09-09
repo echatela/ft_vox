@@ -30,15 +30,15 @@ void Control::generateGPUBuffers()
 	glEnableVertexAttribArray(1);
 }
 
-void Control::draw(const Shader& shader) const
+void Control::draw() const
 {
 	if (!_visible)
 		return ;
-	shader.use(); 
-	_texture.bind(0);
-	shader.setUniform<int>("myTexture", 0);
-	shader.setUniform<const glm::vec2 &>("resolution", {2560, 1440});
-	shader.setUniform<const glm::vec2 &>("modelPos", getPos());
+	_material.shader->use(); 
+	_material.texture->bind(0);
+	_material.shader->setUniform<int>("myTexture", 0);
+	_material.shader->setUniform<const glm::vec2 &>("resolution", {2560, 1440});
+	_material.shader->setUniform<const glm::vec2 &>("modelPos", getPos());
 	glDrawElements(GL_TRIANGLES, _mesh.getIndexes().size(), GL_UNSIGNED_INT, (void *)0);
 }
 
@@ -63,15 +63,25 @@ void Control::setMesh(const Mesh2d& mesh)
 	_mesh = mesh;
 }
 
-Texture& Control::getTexture()
-{
-	return _texture;
-}
+// const Texture* Control::getTexture() const
+// {
+// 	return _texture;
+// }
 
-void Control::setTexture(const Texture& texture)
-{
-	_texture = texture;
-}
+// void Control::setTexture(const Texture* texturePtr)
+// {
+// 	_texture = texturePtr;
+// }
+
+// const Shader* Control::getShader() const
+// {
+// 	return _shader;
+// }
+
+// void Control::setShader(const Shader* shaderPtr)
+// {
+// 	_shader = shaderPtr;
+// }
 
 unsigned int Control::getVAO() const
 {
@@ -103,7 +113,7 @@ bool	Control::getVisible() const
 	return (_visible);
 }
 
-Control::Control() : _texture()
+Control::Control()
 {
 	glGenVertexArrays(1, &_VAO);
 }

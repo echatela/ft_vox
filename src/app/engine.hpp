@@ -45,8 +45,6 @@ class Engine
 {
 	Window&     _window;
 
-	Texture _texture;
-	Shader  _shader;
 	State   _state;
 	Camera  _camera;
 	Chunk   _chunk;

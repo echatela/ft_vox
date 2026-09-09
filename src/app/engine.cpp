@@ -4,6 +4,7 @@
 #include <GLFW/glfw3.h>
 #include <array>
 
+#include "loader/resource_manager.hpp"
 #include "app/frame.hpp"
 #include "glm/ext/matrix_clip_space.hpp"
 #include "glm/ext/matrix_float4x4.hpp"
@@ -20,8 +21,6 @@
 
 Engine::Engine(Window& window)
     : _window(window),
-      _texture("assets/block/cobblestone.png"),
-      _shader("shaders/chunk_vert.glsl", "shaders/chunk_frag.glsl"),
       _camera(glm::vec3(0.0f, 0.0f, -3.0f), glm::vec3(0.0f, 1.0f, 0.0f), 0.0f)
 {
 	const float aspectRatio = static_cast<float>(_state.resolution.x) /
@@ -29,6 +28,10 @@ Engine::Engine(Window& window)
 	_state.projection =
 	    glm::perspective(glm::radians(kFov), aspectRatio, kZNear, kZFar);
 
+	ResourceManager& rm = ResourceManager::instanciate();
+	const Shader* shaderPtr = rm.get<Shader>(RESOURCE_ID::RES_SHADER_CHUNK);
+	const Texture* texturePtr = rm.get<Texture>(RESOURCE_ID::RES_TEXTURE_BLOCK_COBBLESTONE);
+	_chunk = Chunk({0, 0, 0}, shaderPtr, texturePtr);
 	_chunk.build();
 }
 
@@ -142,31 +145,33 @@ void Engine::_update(const Frame& frame)
 
 void Engine::_render3d()
 {
-	glClearColor(0.3f, 0.3f, 0.3f, 1.0f);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
 	// render 3D
 	glEnable(GL_DEPTH_TEST);
 
-	_shader.use();
-	_texture.bind(0);
-	_shader.setUniform<int>("texture1", 0);
+	// TODO : The shader used here and in _chunk.draw() are the same (as exactly the same, we use a ptr)
+	// Since chunk now has its texture, I moved the binding in _chunk.draw() function.
+	//
+	// Since we are in the _render3d(), maybe every 3D object should take the projection/view matrix
+	// as a parameter for the draw()
+	// and
 
-	_shader.setUniform<const glm::mat4&>("projection", _state.projection);
-	_shader.setUniform<const glm::mat4&>("view", _state.view);
+	ResourceManager& rm = ResourceManager::instanciate();
+	const Shader* shader = rm.get<Shader>(RESOURCE_ID::RES_SHADER_CHUNK);
+	const Texture* texture = rm.get<Texture>(RESOURCE_ID::RES_TEXTURE_BLOCK_COBBLESTONE);
+	shader->use();
+	shader->setUniform<const glm::mat4&>("projection", _state.projection);
+	shader->setUniform<const glm::mat4&>("view", _state.view);
 
-	_chunk.draw(_shader);
+	_chunk.draw();
 }
 
 void Engine::_renderControl()
 {
 	glDisable(GL_DEPTH_TEST);
 
-	Shader controlShader(kVert, kFrag);
-
 	for (const std::pair<const CONTROL_ID, Control*> &control : controlTree)
 	{
-		control.second->draw(controlShader);
+		control.second->draw();
 	}
 }
 

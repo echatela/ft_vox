@@ -10,7 +10,10 @@ enum class RESOURCE_ID {
 	RES_SHADER_2D,
 	RES_SHADER_CHUNK,
 	RES_SHADER_CONTROL,
-	RES_TEXTURE_FONT
+	RES_TEXTURE_FONT,
+	RES_TEXTURE_BLOCK_COBBLESTONE,
+	RES_TEXTURE_BLOCK_STONE,
+	RES_TEXTURE_BLOCK_DIRT,
 };
 
 constexpr const unsigned int kMaxPaths = 2;
@@ -41,7 +44,22 @@ constexpr ResourceInfo data[] = {
 		RESOURCE_ID::RES_TEXTURE_FONT,
 		RESOURCE_TYPE::RES_TEXTURE,
 		{"assets/font/texture_mipmap_font.png"}
-	}
+	},
+	{
+		RESOURCE_ID::RES_TEXTURE_BLOCK_COBBLESTONE,
+		RESOURCE_TYPE::RES_TEXTURE,
+		{"assets/block/cobblestone.png"}
+	},
+	{
+		RESOURCE_ID::RES_TEXTURE_BLOCK_STONE,
+		RESOURCE_TYPE::RES_TEXTURE,
+		{"assets/block/stone.png"}
+	},
+	{
+		RESOURCE_ID::RES_TEXTURE_BLOCK_DIRT,
+		RESOURCE_TYPE::RES_TEXTURE,
+		{"assets/block/dirt.png"}
+	},
 
 };
 
@@ -64,12 +82,15 @@ class ResourceManager {
 		static ResourceManager& instanciate();
 		static void				destroy();
 		
-		// Resource *load(const std::string &resource_id);
+		template <typename T>
+		const T* get(RESOURCE_ID id) const;
 
 		ResourceManager(const ResourceManager&) = delete;
 		ResourceManager& operator=(const ResourceManager&) = delete;
 
 };
+
+#include "resource_manager.tpp"
 
 class ResourceManagerGuard {
 

@@ -44,8 +44,11 @@ ResourceManager::ResourceManager()
 
 ResourceManager::~ResourceManager()
 {
+	for (std::pair<RESOURCE_ID, Resource*> resource : resources)
+	{
+		delete resource.second;
+	}
 	std::cout << "Destructor of ResourceManager" << std::endl;
-	// _clear();
 }
 
 ResourceManager& ResourceManager::instanciate()

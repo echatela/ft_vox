@@ -2,12 +2,11 @@
 
 #include "transform.hpp"
 #include "mesh.hpp"
-#include "render/shader.hpp"
-#include "render/texture.hpp"
+#include "material.hpp"
 
 class Control {
 
-	private:
+	protected:
 
 		bool _visible = true;
 
@@ -19,8 +18,7 @@ class Control {
 
 		ControlTransform	_transform;
 		Mesh2d				_mesh;
-
-		Texture				_texture;
+		Material			_material;
 	
 	public:
 
@@ -28,15 +26,13 @@ class Control {
 		void                    setTransform(const ControlTransform& transform);
 		const Mesh2d&			getMesh() const;
 		void					setMesh(const Mesh2d& mesh);
-		Texture&				getTexture(); //Should be const but I need access to modify in class Control...
-		void					setTexture(const Texture& texture);
 		unsigned int			getVAO() const;
 		void					toggleVisible();
 		void					setVisible(bool visible);
 		bool					getVisible() const;
 
 		void generateGPUBuffers();
-		virtual void draw(const Shader& shader) const;
+		virtual void draw() const;
 
 		void			 setPos(glm::vec2 pos);
 		const glm::vec2& getPos() const;
