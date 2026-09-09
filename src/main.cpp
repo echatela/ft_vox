@@ -18,6 +18,7 @@ int main()
 
 		// TODO: engine.init()
 
+		engine.initGUI();
 		engine.loop();
 	}
 	catch (const std::exception& e)

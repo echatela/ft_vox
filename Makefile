@@ -17,11 +17,12 @@ CPPFLAGS   := -I$(SRC_DIR) -I$(GLAD_DIR)/include -I$(GLM_DIR) -I$(STB_DIR)
 LDFLAGS    :=
 LDLIBS     := -lglfw
 
-SRCS       := $(addprefix src/,main.cpp printer.cpp time.cpp\
-		$(addprefix app/,engine.cpp) \
-		$(addprefix platform/,glfw_context.cpp window.cpp glad_context.cpp) \
-		$(addprefix render/,shader.cpp texture.cpp) \
-		$(addprefix world/,camera.cpp chunk.cpp))
+SRCS       := $(addprefix src/, main.cpp time.cpp\
+		$(addprefix app/, engine.cpp) \
+		$(addprefix platform/, glfw_context.cpp window.cpp glad_context.cpp) \
+		$(addprefix render/, shader.cpp texture.cpp) \
+		$(addprefix scene/, control.cpp label.cpp mesh.cpp) \
+		$(addprefix world/, camera.cpp chunk.cpp))
 OBJS       := $(SRCS:$(SRC_DIR)/%.cpp=$(OBJ_DIR)/%.o)
 GLAD_OBJ   := $(OBJ_DIR)/glad.o
 DEPS       := $(OBJS:.o=.d)
