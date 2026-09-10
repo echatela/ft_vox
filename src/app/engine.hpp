@@ -1,12 +1,15 @@
 #pragma once
 
+# include <map>
+# include "glm/vec3.hpp"
+# include "glm/mat4x4.hpp"
+
 #include "platform/window.hpp"
-#include "scene/control.hpp"
+#include "scene/node.hpp"
 #include "world/camera.hpp"
 #include "app/frame.hpp"
 #include "glm/ext/matrix_float4x4.hpp"
 #include "world/chunk.hpp"
-#include <map>
 
 constexpr float kZNear = 0.1f;
 constexpr float kZFar = 1000.0f;
@@ -19,13 +22,6 @@ constexpr glm::vec3 kColorRed = glm::vec3(1.0, 0.0, 0.0);
 
 constexpr auto kVert = "shaders/control_vert.glsl";
 constexpr auto kFrag = "shaders/control_frag.glsl";
-
-enum CONTROL_ID
-{
-	CONTROL_FRAMERATE,
-	CONTROL_POSITION,
-	CONTROL_RESOLUTION
-};
 
 struct State
 {
@@ -51,7 +47,7 @@ class Engine
 	Camera _camera;
 	Chunk  _chunk;
 
-	std::map<CONTROL_ID, Control*> _controlTree;
+	Node _root;
 
 public:
 	Engine(Window& window);

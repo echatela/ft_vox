@@ -1,10 +1,11 @@
 #pragma once
 
+#include "node.hpp"
 #include "transform.hpp"
 #include "mesh_2d.hpp"
 #include "material.hpp"
 
-class Control {
+class Control : public Node {
 
 	protected:
 
@@ -13,8 +14,6 @@ class Control {
 		ControlTransform	_transform;
 		Mesh2d				_mesh;
 		Material			_material;
-
-		// std::map<ID, Node*> _tree// dans node
 
 	public:
 

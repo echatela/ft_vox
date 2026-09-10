@@ -25,10 +25,6 @@ Engine::Engine(Window& window)
 
 Engine::~Engine()
 {
-	for (const std::pair<const CONTROL_ID, Control*> &control : _controlTree)
-	{
-		delete control.second;
-	}
 }
 
 void Engine::init()
@@ -75,9 +71,11 @@ void Engine::_initGUI()
 	resolutionLabel->setPos({10, 80});
 	resolutionLabel->setVisible(false);
 
-	_controlTree[CONTROL_FRAMERATE] = frameLabel;
-	_controlTree[CONTROL_POSITION] = positionLabel;
-	_controlTree[CONTROL_RESOLUTION] = resolutionLabel;
+	// NOTE : dynamic cast for cleaness, not needed
+	_root.append(LABEL_FRAMERATE, dynamic_cast<Node *>(frameLabel));
+	_root.append(LABEL_POSITION, dynamic_cast<Node *>(positionLabel));
+	_root.append(LABEL_RESOLUTION, dynamic_cast<Node *>(resolutionLabel));
+
 }
 
 void Engine::loop()
@@ -117,26 +115,31 @@ void Engine::_processEvents(Frame& frame)
 
 void Engine::_updateGUI(const Frame& frame)
 {
+
+	Label* frameLabel = 		dynamic_cast<Label *>((_root)[LABEL_FRAMERATE]);
+	Label* positionLabel = 		dynamic_cast<Label *>((_root)[LABEL_POSITION]);
+	Label* resolutionLabel = 	dynamic_cast<Label *>((_root)[LABEL_RESOLUTION]);
+
 	if (frame.input.toggleInfo)
 	{
-		_controlTree[CONTROL_FRAMERATE]->toggleVisible();
-		_controlTree[CONTROL_POSITION]->toggleVisible();
-		_controlTree[CONTROL_RESOLUTION]->toggleVisible();
+		frameLabel->toggleVisible();
+		positionLabel->toggleVisible();
+		resolutionLabel->toggleVisible();
 	}
-	if (_controlTree[CONTROL_FRAMERATE]->getVisible())
+	if (frameLabel->getVisible())
 	{
 		std::string framerate = "Framerate : " + std::to_string(timeinfo::getFramerate(frame.dt));
-		(static_cast<Label *>(_controlTree[CONTROL_FRAMERATE]))->setText(framerate);
+		frameLabel->setText(framerate);
 	}
-	if (_controlTree[CONTROL_POSITION]->getVisible())
+	if (positionLabel->getVisible())
 	{
 		std::string position = "Position : " + glm::to_string(_camera.getPos());
-		(static_cast<Label *>(_controlTree[CONTROL_POSITION]))->setText(position);
+		positionLabel->setText(position);
 	}
-	if (_controlTree[CONTROL_RESOLUTION]->getVisible())
+	if (resolutionLabel->getVisible())
 	{
 		std::string resolution = "Resolution : " + glm::to_string(_window.getRes());
-		(static_cast<Label *>(_controlTree[CONTROL_RESOLUTION]))->setText(resolution);
+		resolutionLabel->setText(resolution);
 	}
 }
 
@@ -183,10 +186,7 @@ void Engine::_renderControl()
 {
 	glDisable(GL_DEPTH_TEST);
 
-	for (const std::pair<const CONTROL_ID, Control*> &control : _controlTree)
-	{
-		control.second->draw();
-	}
+	_root.recursiveDraw();
 }
 
 void Engine::_render()

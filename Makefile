@@ -22,7 +22,7 @@ SRCS       := $(addprefix src/, main.cpp time.cpp\
 		$(addprefix loader/, resource_manager.cpp) \
 		$(addprefix platform/, glfw_context.cpp window.cpp glad_context.cpp) \
 		$(addprefix render/, shader.cpp texture.cpp) \
-		$(addprefix scene/, control.cpp label.cpp mesh_2d.cpp) \
+		$(addprefix scene/, control.cpp label.cpp mesh_2d.cpp node.cpp) \
 		$(addprefix world/, camera.cpp chunk.cpp))
 OBJS       := $(SRCS:$(SRC_DIR)/%.cpp=$(OBJ_DIR)/%.o)
 GLAD_OBJ   := $(OBJ_DIR)/glad.o
