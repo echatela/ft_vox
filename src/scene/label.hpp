@@ -30,7 +30,7 @@ class Label : public Control
 
 	public :
 
-		virtual void	draw(const Shader& shader) const override;
+		virtual void	draw() const override;
 
 		const std::string&	getText() const;
 		void                setText(const std::string& text);
@@ -40,6 +40,6 @@ class Label : public Control
 		void                setColor(const glm::vec3& color);
 
 			Label(std::string text, unsigned int size, glm::vec3 color);
-			Label();
+			Label() = delete;
 	virtual ~Label();
 };

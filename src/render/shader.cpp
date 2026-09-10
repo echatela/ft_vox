@@ -38,6 +38,7 @@ static unsigned int compileShader(const char* shaderCode, int type)
 
 Shader::Shader(const char* vertexPath, const char* fragmentPath)
 {
+
 	std::string vertexCode = getShaderCode(vertexPath);
 	std::string fragmentCode = getShaderCode(fragmentPath);
 

@@ -44,7 +44,7 @@ Texture::Texture()
 {
 }
 
-Texture::Texture(const std::string& path)
+Texture::Texture(const char* path)
 {
 	load(path);
 }

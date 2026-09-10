@@ -1,48 +1,68 @@
 #include "app/engine.hpp"
+#include "glm/ext/vector_float3.hpp"
 
+#include <glad/glad.h>
+#include <GLFW/glfw3.h>
+#include <glm/ext/matrix_clip_space.hpp>
+#include <glm/ext/matrix_float4x4.hpp>
+#include <glm/trigonometric.hpp>
 #include <array>
+#define GLM_ENABLE_EXPERIMENTAL // Needed for string_cast.hpp
+#include <glm/gtx/string_cast.hpp>
 
+#include "loader/resource_manager.hpp"
 #include "app/frame.hpp"
-#include "glm/ext/matrix_clip_space.hpp"
-#include "glm/ext/matrix_float4x4.hpp"
-#include "glm/trigonometric.hpp"
 #include "render/shader.hpp"
 #include "render/texture.hpp"
 #include "time.hpp"
 #include "scene/label.hpp"
 
-#define GLM_ENABLE_EXPERIMENTAL // Needed for string_cast.hpp
-#include "glm/gtx/string_cast.hpp"
-
-#include <glad/glad.h>
-#include <GLFW/glfw3.h>
 
 Engine::Engine(Window& window)
-    : _window(window),
-      _texture("assets/block/cobblestone.png"),
-      _shader("shaders/chunk_vert.glsl", "shaders/chunk_frag.glsl"),
-      _camera(glm::vec3(0.0f, 0.0f, -3.0f), glm::vec3(0.0f, 1.0f, 0.0f), 0.0f)
+    : _window(window)
+{
+}
+
+Engine::~Engine()
+{
+	for (const std::pair<const CONTROL_ID, Control*> &control : _controlTree)
+	{
+		delete control.second;
+	}
+}
+
+void Engine::init()
+{
+	_initRenderSettings();
+	_initWorld();
+	_initGUI();
+}
+
+void Engine::_initRenderSettings() const
+{
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+}
+
+void Engine::_initWorld()
 {
 	const float aspectRatio = static_cast<float>(_state.resolution.x) /
 	                          static_cast<float>(_state.resolution.y);
 	_state.projection =
 	    glm::perspective(glm::radians(kFov), aspectRatio, kZNear, kZFar);
 
+	_camera.setPos(glm::vec3(0,0,-3));
+
+	ResourceManager& rm = ResourceManager::instance();
+	const Shader* shaderPtr = rm.get<Shader>(ResourceId::SHADER_CHUNK);
+	const Texture* texturePtr = rm.get<Texture>(ResourceId::TEXTURE_BLOCK_COBBLESTONE);
+
+	_chunk = Chunk({0, 0, 0}, shaderPtr, texturePtr);
 	_chunk.build();
 }
 
-// controlTree deviendra une classe, mettre cela dans le destructeur de control ?
-Engine::~Engine()
+void Engine::_initGUI()
 {
-	for (const std::pair<const CONTROL_ID, Control*> &control : controlTree)
-	{
-		delete control.second;
-	}
-}
-
-void Engine::initGUI()
-{
-
 	Label *frameLabel = new Label("", 24, kColorWhite);
 	frameLabel->setPos({10, 10});
 	frameLabel->setVisible(false);
@@ -55,9 +75,9 @@ void Engine::initGUI()
 	resolutionLabel->setPos({10, 80});
 	resolutionLabel->setVisible(false);
 
-	controlTree[CONTROL_FRAMERATE] = frameLabel;
-	controlTree[CONTROL_POSITION] = positionLabel;
-	controlTree[CONTROL_RESOLUTION] = resolutionLabel;
+	_controlTree[CONTROL_FRAMERATE] = frameLabel;
+	_controlTree[CONTROL_POSITION] = positionLabel;
+	_controlTree[CONTROL_RESOLUTION] = resolutionLabel;
 }
 
 void Engine::loop()
@@ -99,24 +119,24 @@ void Engine::_updateGUI(const Frame& frame)
 {
 	if (frame.input.toggleInfo)
 	{
-		controlTree[CONTROL_FRAMERATE]->toggleVisible();
-		controlTree[CONTROL_POSITION]->toggleVisible();
-		controlTree[CONTROL_RESOLUTION]->toggleVisible();
+		_controlTree[CONTROL_FRAMERATE]->toggleVisible();
+		_controlTree[CONTROL_POSITION]->toggleVisible();
+		_controlTree[CONTROL_RESOLUTION]->toggleVisible();
 	}
-	if (controlTree[CONTROL_FRAMERATE]->getVisible())
+	if (_controlTree[CONTROL_FRAMERATE]->getVisible())
 	{
 		std::string framerate = "Framerate : " + std::to_string(timeinfo::getFramerate(frame.dt));
-		((Label *)controlTree[CONTROL_FRAMERATE])->setText(framerate);
+		(static_cast<Label *>(_controlTree[CONTROL_FRAMERATE]))->setText(framerate);
 	}
-	if (controlTree[CONTROL_POSITION]->getVisible())
+	if (_controlTree[CONTROL_POSITION]->getVisible())
 	{
 		std::string position = "Position : " + glm::to_string(_camera.getPos());
-		((Label *)controlTree[CONTROL_POSITION])->setText(position);
+		(static_cast<Label *>(_controlTree[CONTROL_POSITION]))->setText(position);
 	}
-	if (controlTree[CONTROL_RESOLUTION]->getVisible())
+	if (_controlTree[CONTROL_RESOLUTION]->getVisible())
 	{
 		std::string resolution = "Resolution : " + glm::to_string(_window.getRes());
-		((Label *)controlTree[CONTROL_RESOLUTION])->setText(resolution);
+		(static_cast<Label *>(_controlTree[CONTROL_RESOLUTION]))->setText(resolution);
 	}
 }
 
@@ -144,25 +164,28 @@ void Engine::_render3d()
 	// render 3D
 	glEnable(GL_DEPTH_TEST);
 
-	_shader.use();
-	_texture.bind(0);
-	_shader.setUniform<int>("texture1", 0);
+	// TODO : The shader used here and in _chunk.draw() are the same (as exactly the same, we use a ptr)
+	// Since chunk now has its texture, I moved the binding in _chunk.draw() function.
+	//
+	// Since we are in the _render3d(), maybe every 3D object should take the projection/view matrix
+	// as a parameter for the draw() function
 
-	_shader.setUniform<const glm::mat4&>("projection", _state.projection);
-	_shader.setUniform<const glm::mat4&>("view", _state.view);
+	ResourceManager& rm = ResourceManager::instance();
+	const Shader* shader = rm.get<Shader>(ResourceId::SHADER_CHUNK);
+	shader->use();
+	shader->setUniform<const glm::mat4&>("projection", _state.projection);
+	shader->setUniform<const glm::mat4&>("view", _state.view);
 
-	_chunk.draw(_shader);
+	_chunk.draw();
 }
 
 void Engine::_renderControl()
 {
 	glDisable(GL_DEPTH_TEST);
 
-	Shader controlShader(kVert, kFrag);
-
-	for (const std::pair<const CONTROL_ID, Control*> &control : controlTree)
+	for (const std::pair<const CONTROL_ID, Control*> &control : _controlTree)
 	{
-		control.second->draw(controlShader);
+		control.second->draw();
 	}
 }
 

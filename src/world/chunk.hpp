@@ -3,6 +3,7 @@
 #include "glm/ext/matrix_float4x4.hpp"
 #include "glm/fwd.hpp"
 #include "render/shader.hpp"
+#include "scene/material.hpp"
 #include <array>
 #include <cstdint>
 #include <vector>
@@ -43,6 +44,8 @@ class Chunk
 	glm::vec3 _worldPos;
 	glm::mat4 _model;
 
+	Material	_material;
+
 	unsigned int _vao;
 	unsigned int _vbo;
 	unsigned int _ebo;
@@ -51,10 +54,10 @@ class Chunk
 	std::vector<unsigned int> _indices;
 
 public:
-	Chunk(const glm::vec3& worldPos = glm::vec3(0, 0, 0));
+	Chunk(const glm::vec3& worldPos = glm::vec3(0, 0, 0), const Shader* shader = nullptr, const Texture* texture = nullptr);
 
 	void build();
-	void draw(Shader& shader);
+	void draw();
 
 private:
 	void checkCube(const glm::ivec3& pos);

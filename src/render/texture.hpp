@@ -1,8 +1,9 @@
 #pragma once
 
 #include <string>
+#include "loader/resource.hpp"
 
-class Texture
+class Texture : public Resource
 {
 	unsigned int _id;
 	bool		 _isLoaded = false;
@@ -13,7 +14,7 @@ public:
 	void	bind(unsigned int textureUnit) const;
 
 	Texture();
-	Texture(const std::string& path);
+	Texture(const char* path);
 	~Texture();
 
 };

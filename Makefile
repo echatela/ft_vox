@@ -12,16 +12,17 @@ GLAD_DIR   := $(EXT_DIR)/glad
 GLM_DIR    := $(EXT_DIR)/glm
 STB_DIR    := $(EXT_DIR)/stb_image
 
-CXXFLAGS   := -Wall -Wextra  -std=$(CXXSTD) -MMD -MP # -Werror
+CXXFLAGS   := -Wall -Wextra -Werror -std=$(CXXSTD) -MMD -MP
 CPPFLAGS   := -I$(SRC_DIR) -I$(GLAD_DIR)/include -I$(GLM_DIR) -I$(STB_DIR)
 LDFLAGS    :=
 LDLIBS     := -lglfw
 
 SRCS       := $(addprefix src/, main.cpp time.cpp\
 		$(addprefix app/, engine.cpp) \
+		$(addprefix loader/, resource_manager.cpp) \
 		$(addprefix platform/, glfw_context.cpp window.cpp glad_context.cpp) \
 		$(addprefix render/, shader.cpp texture.cpp) \
-		$(addprefix scene/, control.cpp label.cpp mesh.cpp) \
+		$(addprefix scene/, control.cpp label.cpp mesh_2d.cpp) \
 		$(addprefix world/, camera.cpp chunk.cpp))
 OBJS       := $(SRCS:$(SRC_DIR)/%.cpp=$(OBJ_DIR)/%.o)
 GLAD_OBJ   := $(OBJ_DIR)/glad.o

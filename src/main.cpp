@@ -1,6 +1,7 @@
 #include <exception>
 #include <iostream>
 
+#include "loader/resource_manager.hpp"
 #include "app/engine.hpp"
 #include "platform/glad_context.hpp"
 #include "platform/glfw_context.hpp"
@@ -13,12 +14,11 @@ int main()
 		GlfwContext glfw;
 		Window      window;
 		GladContext glad;
+		ResourceManagerGuard rmGuard;
 
 		Engine engine(window);
-
-		// TODO: engine.init()
-
-		engine.initGUI();
+		
+		engine.init();
 		engine.loop();
 	}
 	catch (const std::exception& e)

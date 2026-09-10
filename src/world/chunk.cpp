@@ -9,9 +9,10 @@
 #include <GLFW/glfw3.h>
 #include <stdexcept>
 
-Chunk::Chunk(const glm::vec3& worldPos)
+Chunk::Chunk(const glm::vec3& worldPos, const Shader* shader, const Texture* texture)
     : _worldPos(worldPos),
-      _model(glm::translate(glm::mat4(1.0f), _worldPos))
+      _model(glm::translate(glm::mat4(1.0f), _worldPos)),
+	  _material{shader, texture}
 {
 	_vertices.reserve(kChunkWidth * kChunkHeight);
 	_indices.reserve(kChunkWidth * kChunkWidth * 6);
@@ -63,10 +64,12 @@ void Chunk::checkFace(uint8_t face, const glm::ivec3& pos)
 	}
 }
 
-void Chunk::draw(Shader& shader)
+void Chunk::draw()
 {
-	shader.use();
-	shader.setUniform<const glm::mat4x4 &>("model", _model);
+	_material.texture->bind(0);
+	_material.shader->use();
+	_material.shader->setUniform<int>("texture1", 0);
+	_material.shader->setUniform<const glm::mat4x4 &>("model", _model);
 	glBindVertexArray(_vao);
 	glDrawElements(GL_TRIANGLES, _indices.size(), GL_UNSIGNED_INT, 0);
 }

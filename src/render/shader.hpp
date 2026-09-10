@@ -2,7 +2,9 @@
 
 #include <string>
 
-class Shader
+#include "loader/resource.hpp"
+
+class Shader : public Resource
 {
 	unsigned int _id;
 

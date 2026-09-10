@@ -1,6 +1,7 @@
 
 # include <map>
 # include "label.hpp"
+# include "loader/resource_manager.hpp"
 
 
 static const std::map<const char, Letter> letterMap = {
@@ -99,6 +100,7 @@ constexpr const float kBitmapWidth = 500;
 
 void Label::_constructMesh()
 {
+	
 	std::vector<glm::vec2> 		coords;
 	std::vector<unsigned int> 	indexes;
 
@@ -159,7 +161,6 @@ void Label::setText(const std::string& text)
 {
 	_text = text;
 	_constructMesh();
-	generateGPUBuffers();
 }
 
 unsigned int  Label::getSize() const
@@ -171,7 +172,6 @@ void Label::setSize(const unsigned int size)
 {
 	_size = size;
 	_constructMesh();
-	generateGPUBuffers();
 }
 
 const glm::vec3& Label::getColor() const
@@ -184,15 +184,13 @@ void Label::setColor(const glm::vec3& color)
 	_color = color;
 }
 
-void Label::draw(const Shader& shader) const
+void Label::draw() const
 {
-	glBindVertexArray(getVAO()); // not sure if needed
-	shader.use(); // not sure if needed
-	shader.setUniform<const glm::vec3&>("myColor", _color);
-	Control::draw(shader);
+	_mesh.bind();
+	_material.shader->use();
+	_material.shader->setUniform<const glm::vec3&>("myColor", _color);
+	Control::draw();
 }
-
-static constexpr auto kBitmap = "assets/font/texture_mipmap_font.png";
 
 Label::Label(std::string text, unsigned int size, glm::vec3 color)
 :	_text(text),
@@ -200,13 +198,12 @@ Label::Label(std::string text, unsigned int size, glm::vec3 color)
 	_color(color)
 {
 	_constructMesh();
-	generateGPUBuffers();
-	getTexture().load(kBitmap);
-}
-
-
-Label::Label()
-{
+	
+	ResourceManager& rm = ResourceManager::instance();
+	const Texture* texturePtr = rm.get<Texture>(ResourceId::TEXTURE_FONT);
+	const Shader* shaderPtr= rm.get<Shader>(ResourceId::SHADER_CONTROL);
+	_material.texture = texturePtr;
+	_material.shader = shaderPtr;
 }
 
 Label::~Label()
