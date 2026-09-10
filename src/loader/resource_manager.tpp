@@ -3,12 +3,12 @@
 #include <stdexcept>
 
 template <typename T>
-const T*	ResourceManager::get(RESOURCE_ID id) const
+const T*	ResourceManager::get(ResourceId id) const
 {
-	auto result = resources.find(id);
+	auto result = _resources.find(id);
 
-	if (result == resources.end())
+	if (result == _resources.end())
 		throw std::runtime_error("ResourceManager: Tried to get an inexistant resource");
-	
+
 	return (static_cast<T *>(result->second));
 }

@@ -13,6 +13,8 @@ class Control {
 		ControlTransform	_transform;
 		Mesh2d				_mesh;
 		Material			_material;
+
+		// std::map<ID, Node*> _tree// dans node
 	
 	public:
 

@@ -10,19 +10,19 @@ void ResourceManager::_preload()
 {
 	for (ResourceInfo res : data)
 	{
-		if (resources.find(res.id) != resources.end())
+		if (_resources.find(res.id) != _resources.end())
 			throw std::runtime_error("ResourceManager: resource already loaded");
 
 		Resource *resourcePtr = nullptr;
 
 		switch (res.type)
 		{
-			case RESOURCE_TYPE::RES_SHADER:
+			case ResourceType::SHADER:
 			{
 				resourcePtr = new Shader(res.paths[0], res.paths[1]);
 				break ;
 			}
-			case RESOURCE_TYPE::RES_TEXTURE:
+			case ResourceType::TEXTURE:
 			{
 				resourcePtr = new Texture(res.paths[0]);
 				break ;
@@ -32,40 +32,38 @@ void ResourceManager::_preload()
 				throw std::runtime_error("ResourceManager: invalid type");
 			}
 		}
-		resources[res.id] = resourcePtr;
+		_resources[res.id] = resourcePtr;
 	}
 }
 
 ResourceManager::ResourceManager()
 {
-	std::cout << "Constructor of ResourceManager" << std::endl;
 	_preload();
 }
 
 ResourceManager::~ResourceManager()
 {
-	for (std::pair<RESOURCE_ID, Resource*> resource : resources)
+	for (std::pair<ResourceId, Resource*> resource : _resources)
 	{
 		delete resource.second;
 	}
-	std::cout << "Destructor of ResourceManager" << std::endl;
 }
 
-ResourceManager& ResourceManager::instanciate()
+ResourceManager& ResourceManager::instance()
 {
-	if (!instance)
+	if (!inst)
 	{
-		instance = new ResourceManager();
+		inst = new ResourceManager();
 	}
-	return *instance;
+	return *inst;
 }
 
 void	ResourceManager::destroy()
 {
-	if (instance)
+	if (inst)
 	{
-		delete instance;
-		instance = nullptr;
+		delete inst;
+		inst = nullptr;
 	}
 }
 

@@ -14,11 +14,11 @@ int main()
 		GlfwContext glfw;
 		Window      window;
 		GladContext glad;
+		ResourceManagerGuard rmGuard;
 
 		Engine engine(window);
-		ResourceManagerGuard resourceManagerGuard;
 		
-		engine.initGUI();
+		engine.init();
 		engine.loop();
 	}
 	catch (const std::exception& e)

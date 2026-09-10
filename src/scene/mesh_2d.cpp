@@ -12,9 +12,6 @@ void Mesh2d::generateGPUBuffers()
 	}
 	_activeBuffers = true;
 
-	glEnable(GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
 	glBindVertexArray(_VAO);
 
 	glGenBuffers(1, &_VBO);
@@ -42,15 +39,15 @@ const std::vector<unsigned int>& Mesh2d::getIndexes() const
 	return _indexes;
 }
 
-unsigned int Mesh2d::getVAO() const
+void Mesh2d::bind() const
 {
-	return (_VAO);
+	glBindVertexArray(_VAO);
 }
 
 // TODO : not sure about this function
 // I need it to be able to update the mesh
 // but I'm afraid there might be problems with VAO deletion etc
-void	Mesh2d::operator=(const Mesh2d &other)
+void Mesh2d::operator=(const Mesh2d &other)
 {
 	if (this == &other)
 		return ;

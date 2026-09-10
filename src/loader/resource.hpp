@@ -1,8 +1,8 @@
 #pragma once
 
-enum class RESOURCE_TYPE {
-	RES_SHADER,
-	RES_TEXTURE
+enum class ResourceType {
+	SHADER,
+	TEXTURE
 };
 
 class Resource {

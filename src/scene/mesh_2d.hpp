@@ -21,11 +21,10 @@ class Mesh2d
 		const std::vector<glm::vec2>& 	 getCoords() const;
 		const std::vector<unsigned int>& getIndexes() const;
 
-		unsigned int getVAO() const;
-
 		void generateGPUBuffers();
+		void bind() const;
 		
-		void	operator=(const Mesh2d &other);
+		void operator=(const Mesh2d &other);
 
 		Mesh2d(std::vector<glm::vec2> coords, std::vector<unsigned int> indexes);
 		Mesh2d();

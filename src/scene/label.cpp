@@ -186,8 +186,8 @@ void Label::setColor(const glm::vec3& color)
 
 void Label::draw() const
 {
-	glBindVertexArray(_mesh.getVAO()); // not sure if needed
-	_material.shader->use(); // not sure if needed
+	_mesh.bind();
+	_material.shader->use();
 	_material.shader->setUniform<const glm::vec3&>("myColor", _color);
 	Control::draw();
 }
@@ -199,9 +199,9 @@ Label::Label(std::string text, unsigned int size, glm::vec3 color)
 {
 	_constructMesh();
 	
-	ResourceManager& rm = ResourceManager::instanciate();
-	const Texture* texturePtr = rm.get<Texture>(RESOURCE_ID::RES_TEXTURE_FONT);
-	const Shader* shaderPtr= rm.get<Shader>(RESOURCE_ID::RES_SHADER_CONTROL);
+	ResourceManager& rm = ResourceManager::instance();
+	const Texture* texturePtr = rm.get<Texture>(ResourceId::TEXTURE_FONT);
+	const Shader* shaderPtr= rm.get<Shader>(ResourceId::SHADER_CONTROL);
 	_material.texture = texturePtr;
 	_material.shader = shaderPtr;
 }
