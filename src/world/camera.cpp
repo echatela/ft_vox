@@ -24,9 +24,14 @@ glm::mat4 Camera::getViewMatrix() const
 	return glm::lookAt(_position, _position + _front, _up);
 }
 
-const glm::vec3 &Camera::getPos() const
+const glm::vec3& Camera::getPos() const
 {
 	return _position;
+}
+
+void Camera::setPos(const glm::vec3& pos)
+{
+	_position = pos;
 }
 
 void Camera::processInput(const InputIntent& input, float dt)

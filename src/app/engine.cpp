@@ -1,4 +1,5 @@
 #include "app/engine.hpp"
+#include "glm/ext/vector_float3.hpp"
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
@@ -18,24 +19,10 @@
 
 
 Engine::Engine(Window& window)
-    : _window(window),
-      _camera(glm::vec3(0.0f, 0.0f, -3.0f), glm::vec3(0.0f, 1.0f, 0.0f), 0.0f)
+    : _window(window)
 {
-	const float aspectRatio = static_cast<float>(_state.resolution.x) /
-	                          static_cast<float>(_state.resolution.y);
-	_state.projection =
-	    glm::perspective(glm::radians(kFov), aspectRatio, kZNear, kZFar);
-
-	ResourceManager& rm = ResourceManager::instance();
-
-	const Shader* shaderPtr = rm.get<Shader>(ResourceId::SHADER_CHUNK);
-	const Texture* texturePtr = rm.get<Texture>(ResourceId::TEXTURE_BLOCK_COBBLESTONE);
-
-	_chunk = Chunk({0, 0, 0}, shaderPtr, texturePtr);
-	_chunk.build();
 }
 
-// controlTree deviendra une classe, mettre cela dans le destructeur de control ?
 Engine::~Engine()
 {
 	for (const std::pair<const CONTROL_ID, Control*> &control : _controlTree)
@@ -47,6 +34,7 @@ Engine::~Engine()
 void Engine::init()
 {
 	_initRenderSettings();
+	_initWorld();
 	_initGUI();
 }
 
@@ -54,6 +42,23 @@ void Engine::_initRenderSettings() const
 {
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+}
+
+void Engine::_initWorld()
+{
+	const float aspectRatio = static_cast<float>(_state.resolution.x) /
+	                          static_cast<float>(_state.resolution.y);
+	_state.projection =
+	    glm::perspective(glm::radians(kFov), aspectRatio, kZNear, kZFar);
+
+	_camera.setPos(glm::vec3(0,0,-3));
+
+	ResourceManager& rm = ResourceManager::instance();
+	const Shader* shaderPtr = rm.get<Shader>(ResourceId::SHADER_CHUNK);
+	const Texture* texturePtr = rm.get<Texture>(ResourceId::TEXTURE_BLOCK_COBBLESTONE);
+
+	_chunk = Chunk({0, 0, 0}, shaderPtr, texturePtr);
+	_chunk.build();
 }
 
 void Engine::_initGUI()

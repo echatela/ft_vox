@@ -1,7 +1,7 @@
 #pragma once
 
 #include "transform.hpp"
-#include "mesh.hpp"
+#include "mesh_2d.hpp"
 #include "material.hpp"
 
 class Control {
@@ -15,7 +15,7 @@ class Control {
 		Material			_material;
 
 		// std::map<ID, Node*> _tree// dans node
-	
+
 	public:
 
 		const ControlTransform&	getTransform() const;

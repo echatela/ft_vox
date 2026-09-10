@@ -1,7 +1,6 @@
-#include "mesh.hpp"
+#include "mesh_2d.hpp"
 
 #include "glad/glad.h"
-#include <iostream>
 
 void Mesh2d::generateGPUBuffers()
 {
@@ -58,7 +57,7 @@ void Mesh2d::operator=(const Mesh2d &other)
 		glDeleteBuffers(1, &_VBO);
 		glDeleteBuffers(1, &_EBO);
 	}
-	
+
 	_coords = other._coords;
 	_indexes = other._indexes;
 	glGenVertexArrays(1, &_VAO);

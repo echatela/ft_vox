@@ -1,11 +1,10 @@
-# include "control.hpp"
-
+#include "control.hpp"
 
 void Control::draw() const
 {
 	if (!_visible)
 		return ;
-	_material.shader->use(); 
+	_material.shader->use();
 	_material.texture->bind(0);
 	_material.shader->setUniform<int>("myTexture", 0);
 	_material.shader->setUniform<const glm::vec2 &>("resolution", {2560, 1440});
@@ -59,7 +58,7 @@ bool	Control::getVisible() const
 }
 
 Control::Control()
-{	
+{
 }
 
 Control::~Control()
