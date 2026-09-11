@@ -204,7 +204,7 @@ void Engine::_render3d()
 {
 	glEnable(GL_DEPTH_TEST);
 
-	_chunk.draw();
+	_chunk.draw(_state.projection * _state.view);
 }
 
 void Engine::_renderControl()

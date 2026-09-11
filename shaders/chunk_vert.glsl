@@ -4,9 +4,7 @@ layout (location = 1) in int aFace;
 layout (location = 2) in int aCorner;
 layout (location = 3) in int aId;
 
-uniform mat4 model;
-uniform mat4 view;
-uniform mat4 projection;
+uniform mat4 matrix;
 
 flat out int vLayer;
 out vec2 vUV;
@@ -23,8 +21,7 @@ const vec2 kUVs[4] = {vec2(0,0),vec2(1,0),vec2(1,1),vec2(0,1)};
 
 void main()
 {
-	gl_Position = projection * view * model *
-        vec4(aPos + kCorners[aFace][aCorner], 1.0f);
+	gl_Position = matrix * vec4(aPos + kCorners[aFace][aCorner], 1.0f);
     vUV = kUVs[aCorner];
     vLayer = aId;
 }

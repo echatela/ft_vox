@@ -62,7 +62,7 @@ public:
 	      const Shader* shader = nullptr, const ATexture* texture = nullptr);
 
 	void build();
-	void draw();
+	void draw(glm::mat4 matrix) const;
 
 private:
 	void _checkCube(const glm::ivec3& pos);
