@@ -9,7 +9,7 @@ enum NodeId
 	LABEL_RESOLUTION
 };
 
-class Node
+class Node 
 {
 
 	std::map<NodeId, Node*>	_tree;

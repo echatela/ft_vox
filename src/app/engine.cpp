@@ -207,13 +207,4 @@ void Engine::_render3d()
 	_chunk.draw(_state.projection * _state.view);
 }
 
-void Engine::_renderControl()
-{
-	glDisable(GL_DEPTH_TEST);
-
-	for (const std::pair<const CONTROL_ID, Control*>& control : _controlTree)
-	{
-		control.second->draw();
-	}
-}
 

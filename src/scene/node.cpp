@@ -16,6 +16,7 @@ void Node::append(NodeId id, Node *ptr)
 	_tree[id] = ptr;
 }
 
+
 void Node::draw() const
 {
 }
@@ -29,6 +30,7 @@ Node* Node::operator[](NodeId id)
 	
 	return (_tree.find(id)->second);
 }
+
 
 Node::~Node()
 {
