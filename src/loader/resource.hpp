@@ -3,7 +3,7 @@
 enum class ResourceType {
 	SHADER,
 	TEXTURE_2D,
-	TEXTURE_ARRAY_2D,
+	TEXTURE_2D_ARRAY,
 };
 
 class Resource {

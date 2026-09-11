@@ -72,7 +72,7 @@ void Chunk::draw(glm::mat4 matrix) const
 	_material.shader->use();
 	_material.shader->setUniform<const glm::mat4x4&>("matrix", matrix);
 	_material.texture->bind(0);
-	_material.shader->setUniform<int>("uBlock", 0);
+	_material.shader->setUniform<int>("uBlocksTexture", 0);
 
 	glBindVertexArray(_vao);
 	glDrawElements(GL_TRIANGLES, _indices.size(), GL_UNSIGNED_INT, 0);

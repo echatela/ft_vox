@@ -28,7 +28,7 @@ void ResourceManager::_preload()
 			resourcePtr = new Texture2D(res.paths[0]);
 			break;
 		}
-		case ResourceType::TEXTURE_ARRAY_2D:
+		case ResourceType::TEXTURE_2D_ARRAY:
 		{
 			std::vector<std::string> files;
 
