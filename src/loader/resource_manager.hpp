@@ -47,7 +47,7 @@ constexpr ResourceInfo data[] = {
 	},
 	{
 		ResourceId::TEXTURE_BLOCKS,
-		ResourceType::TEXTURE_ARRAY_2D,
+		ResourceType::TEXTURE_2D_ARRAY,
 		{"assets/block/stone.png",
 		"assets/block/dirt.png",
 		"assets/block/cobblestone.png",
