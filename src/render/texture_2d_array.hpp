@@ -24,11 +24,8 @@ public:
 	Texture2DArray(const std::vector<std::string>& texFiles, unsigned int width,
 	               unsigned int height, bool alpha);
 
-<<<<<<< HEAD
 	void load(const std::vector<std::string>& texFiles, unsigned int width,
 	          unsigned int height, bool alpha);
-=======
-	void bind(unsigned int textureUnit = 0) const;
 
 	void loadFromFiles(const std::vector<std::string>& texFiles,
 	                   unsigned int width, unsigned int height, bool alpha);
@@ -46,5 +43,4 @@ public:
 	unsigned int getFilterMin() const;
 	void         setFilterMax(unsigned int filter);
 	unsigned int getFilterMax() const;
->>>>>>> df903ab (feat: mipmaps, setters and getters)
 };
