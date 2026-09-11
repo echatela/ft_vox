@@ -1,4 +1,5 @@
 #include "chunk.hpp"
+#include "glm/ext/matrix_float4x4.hpp"
 #include "glm/ext/matrix_transform.hpp"
 #include "glm/ext/vector_float3.hpp"
 #include "glm/ext/vector_int3.hpp"
@@ -65,10 +66,11 @@ void Chunk::_checkFace(uint8_t face, const glm::ivec3& pos)
 	}
 }
 
-void Chunk::draw()
+void Chunk::draw(glm::mat4 matrix) const
 {
+	matrix *= _model;
 	_material.shader->use();
-	_material.shader->setUniform<const glm::mat4x4&>("model", _model);
+	_material.shader->setUniform<const glm::mat4x4&>("matrix", matrix);
 	_material.texture->bind(0);
 	_material.shader->setUniform<int>("uBlock", 0);
 
