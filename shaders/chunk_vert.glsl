@@ -4,12 +4,10 @@ layout (location = 1) in int aFace;
 layout (location = 2) in int aCorner;
 layout (location = 3) in int aId;
 
-uniform mat4 model;
-uniform mat4 view;
-uniform mat4 projection;
+uniform mat4 matrix;
 
-out vec2 TexCoord;
-flat out int id;
+flat out int vLayer;
+out vec2 vUV;
 
 const vec3 kCorners[6][4] = {
     {vec3(1, 0, 1), vec3(1, 0, 0), vec3(1, 1, 0), vec3(1, 1, 1)}, // +X
@@ -19,12 +17,11 @@ const vec3 kCorners[6][4] = {
     {vec3(0, 0, 1), vec3(1, 0, 1), vec3(1, 1, 1), vec3(0, 1, 1)}, // +Z
     {vec3(1, 0, 0), vec3(0, 0, 0), vec3(0, 1, 0), vec3(1, 1, 0)}, // -Z
 };
-const vec2 kTexCoord[4] = {vec2(0,0),vec2(1,0),vec2(1,1),vec2(0,1)};
+const vec2 kUVs[4] = {vec2(0,0),vec2(1,0),vec2(1,1),vec2(0,1)};
 
 void main()
 {
-	gl_Position = projection * view * model *
-        vec4(aPos + kCorners[aFace][aCorner], 1.0f);
-    TexCoord = kTexCoord[aCorner];
-    id = aId;
+	gl_Position = matrix * vec4(aPos + kCorners[aFace][aCorner], 1.0f);
+    vUV = kUVs[aCorner];
+    vLayer = aId;
 }

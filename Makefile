@@ -21,7 +21,7 @@ SRCS       := $(addprefix src/, main.cpp time.cpp\
 		$(addprefix app/, engine.cpp) \
 		$(addprefix loader/, resource_manager.cpp) \
 		$(addprefix platform/, glfw_context.cpp window.cpp glad_context.cpp) \
-		$(addprefix render/, shader.cpp texture.cpp) \
+		$(addprefix render/, shader.cpp a_texture.cpp texture_2d.cpp texture_2d_array.cpp) \
 		$(addprefix scene/, control.cpp label.cpp mesh_2d.cpp) \
 		$(addprefix world/, camera.cpp chunk.cpp))
 OBJS       := $(SRCS:$(SRC_DIR)/%.cpp=$(OBJ_DIR)/%.o)
