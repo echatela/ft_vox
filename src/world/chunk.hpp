@@ -11,7 +11,7 @@
 
 constexpr int kChunkWidth = 16;
 constexpr int kChunkHeight = 256;
-constexpr int kChunkSize = kChunkWidth * kChunkHeight * kChunkWidth;
+constexpr int kChunkSize = kChunkWidth * kChunkWidth * kChunkHeight;
 
 struct Vertex
 {
@@ -45,11 +45,12 @@ class Chunk
 {
 	std::array<BlockId, kChunkSize> _voxels;
 
-	glm::vec3 _worldPos;
-	glm::mat4 _model;
+	glm::i32vec3 _worldPos;
+	glm::mat4    _model;
 
 	Material _material;
 
+	// TODO: Mesh3D
 	unsigned int _vao;
 	unsigned int _vbo;
 	unsigned int _ebo;
@@ -64,13 +65,15 @@ public:
 	void build();
 	void draw(glm::mat4 matrix) const;
 
+	BlockId& at(const glm::ivec3& pos);
+	BlockId  at(const glm::ivec3& pos) const;
+
+	int index(const glm::ivec3& pos) const;
+
 private:
 	void _checkCube(const glm::ivec3& pos);
 	void _checkFace(uint8_t face, const glm::ivec3& pos);
 	void _setupMesh();
-
-	BlockId& _index(const glm::ivec3& pos);
-	BlockId  _index(const glm::ivec3& pos) const;
 
 	bool _isValid(const glm::ivec3& pos) const;
 	bool _isBlock(const glm::ivec3& pos) const;
