@@ -12,7 +12,7 @@ GLAD_DIR   := $(EXT_DIR)/glad
 GLM_DIR    := $(EXT_DIR)/glm
 STB_DIR    := $(EXT_DIR)/stb_image
 
-CXXFLAGS   := -Wall -Wextra -Werror -std=$(CXXSTD) -MMD -MP
+CXXFLAGS   := -Wall -Wextra -Werror -std=$(CXXSTD) -MMD -MP -g3
 CPPFLAGS   := -I$(SRC_DIR) -I$(GLAD_DIR)/include -I$(GLM_DIR) -I$(STB_DIR)
 LDFLAGS    :=
 LDLIBS     := -lglfw
