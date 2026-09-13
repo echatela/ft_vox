@@ -10,10 +10,8 @@
 #define GLM_ENABLE_EXPERIMENTAL // Needed for string_cast.hpp
 #include <glm/gtx/string_cast.hpp>
 
-#include "loader/resource_manager.hpp"
 #include "app/frame.hpp"
 #include "render/shader.hpp"
-#include "render/a_texture.hpp"
 #include "time.hpp"
 #include "scene/label.hpp"
 
@@ -47,7 +45,7 @@ void Engine::_initWorld()
 	_state.projection =
 	    glm::perspective(glm::radians(kFov), aspectRatio, kZNear, kZFar);
 
-	_camera.setPos(glm::vec3(0, 0, -3));
+	_camera.setPos(glm::vec3(0, 64, 0));
 
 	ResourceManager& rm = ResourceManager::instance();
 	const Shader*    shaderPtr = rm.get<Shader>(ResourceId::SHADER_CHUNK);
@@ -171,7 +169,7 @@ void Engine::_updateGUI(const Frame& frame)
 	}
 }
 
-void Engine::_render()
+void Engine::_render() const
 {
 	glClearColor(0.3f, 0.3f, 0.3f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);

@@ -9,7 +9,7 @@
 #include "world/camera.hpp"
 #include "app/frame.hpp"
 #include "glm/ext/matrix_float4x4.hpp"
-#include "world/chunk.hpp"
+#include "world/chunk_manager.hpp"
 
 constexpr float kZNear = 0.1f;
 constexpr float kZFar = 1000.0f;
@@ -25,15 +25,13 @@ constexpr auto kFrag = "shaders/control_frag.glsl";
 
 struct EngineState
 {
-	glm::mat4 model;
 	glm::mat4 view;
 	glm::mat4 projection;
 
 	glm::ivec2 resolution = {kWidth, kHeight};
 
 	EngineState()
-	    : model(1.0f),
-	      view(1.0f),
+	    : view(1.0f),
 	      projection(1.0f)
 	{
 	}
@@ -43,9 +41,9 @@ class Engine
 {
 	Window& _window;
 
-	EngineState _state;
-	Camera      _camera;
-	Chunk       _chunk;
+	EngineState  _state;
+	Camera       _camera;
+	ChunkManager _chunkManager;
 
 	Node _root;
 
@@ -67,7 +65,7 @@ private:
 	void _update(const Frame& frame);
 	void _updateGUI(const Frame& frame);
 
-	void _render();
-	void _render3d();
-	void _renderControl();
+	void _render() const;
+	void _render3d() const;
+	void _renderControl() const;
 };
