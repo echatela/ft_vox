@@ -10,10 +10,8 @@
 #define GLM_ENABLE_EXPERIMENTAL // Needed for string_cast.hpp
 #include <glm/gtx/string_cast.hpp>
 
-#include "loader/resource_manager.hpp"
 #include "app/frame.hpp"
 #include "render/shader.hpp"
-#include "render/a_texture.hpp"
 #include "time.hpp"
 #include "scene/label.hpp"
 
@@ -50,15 +48,7 @@ void Engine::_initWorld()
 	_state.projection =
 	    glm::perspective(glm::radians(kFov), aspectRatio, kZNear, kZFar);
 
-	_camera.setPos(glm::vec3(0, 0, -3));
-
-	ResourceManager& rm = ResourceManager::instance();
-	const Shader*    shaderPtr = rm.get<Shader>(ResourceId::SHADER_CHUNK);
-	const ATexture*   texturePtr =
-	    rm.get<ATexture>(ResourceId::TEXTURE_BLOCKS);
-
-	_chunk = Chunk({0, 0, 0}, shaderPtr, texturePtr);
-	_chunk.build();
+	_camera.setPos(glm::vec3(0, 64, 0));
 }
 
 void Engine::_initGUI()
@@ -164,7 +154,7 @@ void Engine::_updateGUI(const Frame& frame)
 	}
 }
 
-void Engine::_render()
+void Engine::_render() const
 {
 	glClearColor(0.3f, 0.3f, 0.3f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -175,14 +165,14 @@ void Engine::_render()
 	_window.swapBuffers();
 }
 
-void Engine::_render3d()
+void Engine::_render3d() const
 {
 	glEnable(GL_DEPTH_TEST);
 
-	_chunk.draw(_state.projection * _state.view);
+	_chunkManager.draw(_state.projection * _state.view);
 }
 
-void Engine::_renderControl()
+void Engine::_renderControl() const
 {
 	glDisable(GL_DEPTH_TEST);
 
