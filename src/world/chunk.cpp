@@ -122,7 +122,7 @@ void Chunk::_draw(RenderContext& context) const
 {
 	glBindVertexArray(_vao);
 
-	context.mat3D *= _model;
+	context.mat3D *= glm::translate(glm::mat4(1.0f), {_pos.x, 0, _pos.y});
 	_material.shader->use();
 	_material.shader->setUniform<const glm::mat4x4&>("matrix", context.mat3D);
 	_material.texture->bind(0);

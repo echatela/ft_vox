@@ -9,9 +9,10 @@ struct RenderContext
 	unsigned int       rect[4] = {};
 };
 
-enum NodeId
+enum NodeId : int
 {
 	//3D
+	CHUNK_MANAGER,
 	CHUNK,
 
 	// CONTROLS
@@ -26,8 +27,8 @@ class Node
 {
 	private:
 
-		std::map<NodeId, Node*>	_tree;
-		bool                    _process = true;
+		std::multimap<NodeId, Node*>	_tree;
+		bool                    		_process = true;
 
 		virtual void	_draw(RenderContext& context) const;
 	

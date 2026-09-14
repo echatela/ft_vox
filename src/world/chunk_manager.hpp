@@ -9,17 +9,18 @@
 
 #include "world/chunk.hpp"
 
-class ChunkManager
+class ChunkManager : public Node
 {
 	// TODO: maybe replace by <uint32_t, Chunk> for faster access
-	std::unordered_map<glm::i32vec2, Chunk> _chunks;
+	std::unordered_map<glm::i32vec2, Chunk*> _chunks;
 	Material                                _material;
+
+	void _draw(RenderContext& context) const;
 
 public:
 	ChunkManager();
 
 	void loadAround(const glm::vec3& pos);
-	void draw(glm::mat4 matrix) const;
 
 	void            setMaterial(const Material& mat);
 	const Material& getMaterial() const;

@@ -64,6 +64,7 @@ private:
 
 	void _update(const Frame& frame);
 	void _updateGUI(const Frame& frame);
+	void _updateWorld();
 
 	void _render() const;
 	void _render3d() const;

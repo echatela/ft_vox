@@ -47,15 +47,15 @@ void Engine::_initWorld()
 
 	_camera.setPos(glm::vec3(0, 90, 0));
 
-	ResourceManager& rm = ResourceManager::instance();
-	const Shader*    shaderPtr = rm.get<Shader>(ResourceId::SHADER_CHUNK);
-	const ATexture*   texturePtr =
-	    rm.get<ATexture>(ResourceId::TEXTURE_BLOCKS);
+	// ResourceManager& rm = ResourceManager::instance();
+	// const Shader*    shaderPtr = rm.get<Shader>(ResourceId::SHADER_CHUNK);
+	// const ATexture*   texturePtr =
+	//     rm.get<ATexture>(ResourceId::TEXTURE_BLOCKS);
 
-	Chunk* chunk = new Chunk({0, 0, 0}, shaderPtr, texturePtr);
-	chunk->build();
+	ChunkManager* chunk = new ChunkManager();
+	// chunk->build();
 
-	_root.append(NodeId::CHUNK, chunk);
+	_root.append(NodeId::CHUNK_MANAGER, chunk);
 
 }
 
@@ -135,8 +135,13 @@ void Engine::_update(const Frame& frame)
 	_camera.processInput(frame.input, frame.dt);
 	_state.view = _camera.getViewMatrix();
 
-	_chunkManager.loadAround(_camera.getPos());
+	_updateWorld();
 	_updateGUI(frame);
+}
+
+void Engine::_updateWorld()
+{
+	((ChunkManager*)_root[CHUNK_MANAGER])->loadAround(_camera.getPos());
 }
 
 void Engine::_updateGUI(const Frame& frame)

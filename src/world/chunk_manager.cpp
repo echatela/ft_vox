@@ -31,13 +31,14 @@ void ChunkManager::loadAround(const glm::vec3& pos)
 	}
 }
 
-void ChunkManager::draw(glm::mat4 matrix) const
+void ChunkManager::_draw(RenderContext& context) const
 {
+	(void)context;
 	// the const & is really important for performance !!!
-	for (const auto& chunkIt : _chunks)
-	{
-		chunkIt.second.draw(matrix);
-	}
+	// for (const auto& chunkIt : _chunks)
+	// {
+	// 	chunkIt.second._draw(matrix);
+	// }
 }
 
 void ChunkManager::setMaterial(const Material& mat)
@@ -53,7 +54,12 @@ const Material& ChunkManager::getMaterial() const
 void ChunkManager::_loadChunk(const glm::i32vec2& pos)
 {
 	if (!_isLoaded(pos))
-		_chunks.insert({pos, Chunk(pos * 16, _material)});
+	{
+		Chunk* chunk = new Chunk(pos * 16, _material);
+		_chunks.insert({pos, chunk});
+
+		append(CHUNK, chunk);
+	}
 }
 
 bool ChunkManager::_isLoaded(const glm::i32vec2& pos)
