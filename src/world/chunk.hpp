@@ -8,6 +8,7 @@
 #include "glm/fwd.hpp"
 #include "render/shader.hpp"
 #include "scene/material.hpp"
+#include "scene/node.hpp"
 
 constexpr int kChunkWidth = 16;
 constexpr int kChunkHeight = 256;
@@ -41,7 +42,7 @@ enum Face : uint8_t
 	kFaceCount
 };
 
-class Chunk
+class Chunk /*: public Node*/
 {
 	std::array<BlockId, kChunkSize> _voxels;
 

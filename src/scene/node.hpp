@@ -1,9 +1,22 @@
 #pragma once
 
 #include <map>
+#include "world/camera.hpp"
+
+struct RenderContext
+{
+	// glm::mat4   3dMat = glm::mat4(1.0f); //Repere 3D
+	unsigned int       _rect[4];
+};
 
 enum NodeId
 {
+	//3D
+	CHUNK,
+
+	// CONTROLS
+	MENU,
+
 	LABEL_FRAMERATE,
 	LABEL_POSITION,
 	LABEL_RESOLUTION
@@ -11,15 +24,21 @@ enum NodeId
 
 class Node 
 {
+	private:
 
-	std::map<NodeId, Node*>	_tree;
-
-	virtual void	draw() const;
+		std::map<NodeId, Node*>	_tree;
+		bool                    _process = true;
+	
+		virtual void	_draw(RenderContext& context) const;
 	
 	public:
 	
-		void recursiveDraw() const;
+		void recursiveDraw(RenderContext context) const;
 		void append(NodeId id, Node *ptr);
+
+		void	setProcess(bool process);
+		bool	getProcess() const;
+		void	toggleProcess();
 
 		Node * operator[](NodeId id);
 

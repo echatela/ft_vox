@@ -41,6 +41,7 @@ void Engine::_initRenderSettings() const
 
 void Engine::_initWorld()
 {
+
 	const float aspectRatio = static_cast<float>(_state.resolution.x) /
 	                          static_cast<float>(_state.resolution.y);
 	_state.projection =
@@ -53,28 +54,35 @@ void Engine::_initWorld()
 	const ATexture*   texturePtr =
 	    rm.get<ATexture>(ResourceId::TEXTURE_BLOCKS);
 
-	_chunk = Chunk({0, 0, 0}, shaderPtr, texturePtr);
-	_chunk.build();
+	Chunk* chunk = new Chunk({0, 0, 0}, shaderPtr, texturePtr);
+	chunk->build();
+
+	// _root.append(CHUNK, chunk);
+
 }
 
 void Engine::_initGUI()
+
 {
+	Node* menu = new Control();
+
 	Label* frameLabel = new Label("", 24, kColorWhite);
 	frameLabel->setPos({10, 10});
-	frameLabel->setVisible(false);
+	frameLabel->setProcess(false);
 
 	Label* positionLabel = new Label("", 24, kColorWhite);
 	positionLabel->setPos({10, 45});
-	positionLabel->setVisible(false);
+	positionLabel->setProcess(false);
 
 	Label* resolutionLabel = new Label("", 24, kColorWhite);
 	resolutionLabel->setPos({10, 80});
-	resolutionLabel->setVisible(false);
+	resolutionLabel->setProcess(false);
 
-	// NOTE : dynamic cast for cleaness, not needed
-	_root.append(LABEL_FRAMERATE, dynamic_cast<Node *>(frameLabel));
-	_root.append(LABEL_POSITION, dynamic_cast<Node *>(positionLabel));
-	_root.append(LABEL_RESOLUTION, dynamic_cast<Node *>(resolutionLabel));
+	menu->append(NodeId::LABEL_FRAMERATE, frameLabel);
+	menu->append(NodeId::LABEL_POSITION, positionLabel);
+	menu->append(NodeId::LABEL_RESOLUTION, resolutionLabel);
+	
+	_root.append(NodeId::MENU, menu);
 
 }
 
@@ -115,28 +123,29 @@ void Engine::_processEvents(Frame& frame)
 
 void Engine::_updateGUI(const Frame& frame)
 {
+	Control* menu = dynamic_cast<Control *>(_root[MENU]);
 
-	Label* frameLabel = 		dynamic_cast<Label *>((_root)[LABEL_FRAMERATE]);
-	Label* positionLabel = 		dynamic_cast<Label *>((_root)[LABEL_POSITION]);
-	Label* resolutionLabel = 	dynamic_cast<Label *>((_root)[LABEL_RESOLUTION]);
+	Label* frameLabel = 		dynamic_cast<Label *>((*menu)[LABEL_FRAMERATE]);
+	Label* positionLabel = 		dynamic_cast<Label *>((*menu)[LABEL_POSITION]);
+	Label* resolutionLabel = 	dynamic_cast<Label *>((*menu)[LABEL_RESOLUTION]);
 
 	if (frame.input.toggleInfo)
 	{
-		frameLabel->toggleVisible();
-		positionLabel->toggleVisible();
-		resolutionLabel->toggleVisible();
+		frameLabel->toggleProcess();
+		positionLabel->toggleProcess();
+		resolutionLabel->toggleProcess();
 	}
-	if (frameLabel->getVisible())
+	if (frameLabel->getProcess())
 	{
 		std::string framerate = "Framerate : " + std::to_string(timeinfo::getFramerate(frame.dt));
 		frameLabel->setText(framerate);
 	}
-	if (positionLabel->getVisible())
+	if (positionLabel->getProcess())
 	{
 		std::string position = "Position : " + glm::to_string(_camera.getPos());
 		positionLabel->setText(position);
 	}
-	if (resolutionLabel->getVisible())
+	if (resolutionLabel->getProcess())
 	{
 		std::string resolution = "Resolution : " + glm::to_string(_window.getRes());
 		resolutionLabel->setText(resolution);
@@ -186,7 +195,12 @@ void Engine::_renderControl()
 {
 	glDisable(GL_DEPTH_TEST);
 
-	_root.recursiveDraw();
+	RenderContext context;
+
+	context._rect[2] = _window.getRes()[0];
+	context._rect[3] = _window.getRes()[1];
+
+	_root.recursiveDraw(context);
 }
 
 void Engine::_render()
@@ -194,17 +208,17 @@ void Engine::_render()
 	glClearColor(0.3f, 0.3f, 0.3f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	_render3d();
+	// _render3d();
 	_renderControl();
 
 	_window.swapBuffers();
 }
 
-void Engine::_render3d()
-{
-	glEnable(GL_DEPTH_TEST);
+// void Engine::_render3d()
+// {
+// 	glEnable(GL_DEPTH_TEST);
 
-	_chunk.draw(_state.projection * _state.view);
-}
+// 	_chunk.draw(_state.projection * _state.view);
+// }
 
 

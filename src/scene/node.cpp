@@ -2,12 +2,15 @@
 
 #include <stdexcept>
 
-void	Node::recursiveDraw() const
+void	Node::recursiveDraw(RenderContext context) const
 {
-	draw();
+	if (!_process)
+		return;
+	
+	_draw(context);
 	for (auto &node : _tree)
 	{
-		node.second->recursiveDraw();
+		node.second->recursiveDraw(context);
 	}
 }
 
@@ -16,10 +19,28 @@ void Node::append(NodeId id, Node *ptr)
 	_tree[id] = ptr;
 }
 
+// draw rajoute un argument pour la relativite du mvmt
 
-void Node::draw() const
+void Node::_draw(RenderContext& context) const
 {
+	(void)context;
 }
+
+void Node::setProcess(bool process)
+{
+	_process = process;
+}
+
+bool Node::getProcess() const
+{
+	return (_process);
+}
+
+void Node::toggleProcess()
+{
+	_process = !_process;
+}
+
 
 Node* Node::operator[](NodeId id)
 {
