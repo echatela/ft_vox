@@ -12,7 +12,7 @@
 #include "world/chunk_manager.hpp"
 
 constexpr float kZNear = 0.1f;
-constexpr float kZFar = 1000.0f;
+constexpr float kZFar = 10000.0f;
 constexpr float kFov = 80.0f;
 constexpr int   kWidth = 800;
 constexpr int   kHeight = 600;

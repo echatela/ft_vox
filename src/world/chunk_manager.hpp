@@ -16,11 +16,16 @@ class ChunkManager : public Node
 	Material                                _material;
 
 	void _draw(RenderContext& context) const;
+	
+	void _loadAround(const glm::ivec2& pos);
+	void _unloadFurther(const glm::ivec2& pos);
+
 
 public:
 	ChunkManager();
 
-	void loadAround(const glm::vec3& pos);
+	void updateChunks(const glm::vec3& pos, bool preload = false);
+
 
 	void            setMaterial(const Material& mat);
 	const Material& getMaterial() const;

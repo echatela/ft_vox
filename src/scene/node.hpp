@@ -1,5 +1,6 @@
 #pragma once
 
+#include <string>
 #include <map>
 #include "world/camera.hpp"
 
@@ -9,25 +10,11 @@ struct RenderContext
 	unsigned int       rect[4] = {};
 };
 
-enum NodeId : int
-{
-	//3D
-	CHUNK_MANAGER,
-	CHUNK,
-
-	// CONTROLS
-	MENU,
-
-	LABEL_FRAMERATE,
-	LABEL_POSITION,
-	LABEL_RESOLUTION
-};
-
 class Node 
 {
-	private:
+	protected:
 
-		std::multimap<NodeId, Node*>	_tree;
+		std::map<std::string, Node*>	_tree;
 		bool                    		_process = true;
 
 		virtual void	_draw(RenderContext& context) const;
@@ -35,13 +22,13 @@ class Node
 	public:
 	
 		void recursiveDraw(RenderContext context) const;
-		void append(NodeId id, Node *ptr);
+		void append(const std::string &id, Node *ptr);
 
 		void	setProcess(bool process);
 		bool	getProcess() const;
 		void	toggleProcess();
 
-		Node * operator[](NodeId id);
+		Node * operator[](const std::string &id);
 
 		Node() = default;
 		virtual ~Node();

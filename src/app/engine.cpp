@@ -55,7 +55,7 @@ void Engine::_initWorld()
 	ChunkManager* chunk = new ChunkManager();
 	// chunk->build();
 
-	_root.append(NodeId::CHUNK_MANAGER, chunk);
+	_root.append("chunk_manager", chunk);
 
 }
 
@@ -76,11 +76,11 @@ void Engine::_initGUI()
 	resolutionLabel->setPos({10, 80});
 	resolutionLabel->setProcess(false);
 
-	menu->append(NodeId::LABEL_FRAMERATE, frameLabel);
-	menu->append(NodeId::LABEL_POSITION, positionLabel);
-	menu->append(NodeId::LABEL_RESOLUTION, resolutionLabel);
+	menu->append("label_framerate", frameLabel);
+	menu->append("label_position", positionLabel);
+	menu->append("label_resolution", resolutionLabel);
 	
-	_root.append(NodeId::MENU, menu);
+	_root.append("menu", menu);
 
 }
 
@@ -141,16 +141,16 @@ void Engine::_update(const Frame& frame)
 
 void Engine::_updateWorld()
 {
-	((ChunkManager*)_root[CHUNK_MANAGER])->loadAround(_camera.getPos());
+	((ChunkManager*)_root["chunk_manager"])->updateChunks(_camera.getPos());
 }
 
 void Engine::_updateGUI(const Frame& frame)
 {
-	Control* menu = dynamic_cast<Control *>(_root[MENU]);
+	Control* menu = dynamic_cast<Control *>(_root["menu"]);
 
-	Label* frameLabel = 		dynamic_cast<Label *>((*menu)[LABEL_FRAMERATE]);
-	Label* positionLabel = 		dynamic_cast<Label *>((*menu)[LABEL_POSITION]);
-	Label* resolutionLabel = 	dynamic_cast<Label *>((*menu)[LABEL_RESOLUTION]);
+	Label* frameLabel = 		dynamic_cast<Label *>((*menu)["label_framerate"]);
+	Label* positionLabel = 		dynamic_cast<Label *>((*menu)["label_position"]);
+	Label* resolutionLabel = 	dynamic_cast<Label *>((*menu)["label_resolution"]);
 
 	if (frame.input.toggleInfo)
 	{

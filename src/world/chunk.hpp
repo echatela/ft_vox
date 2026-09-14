@@ -45,6 +45,7 @@ enum Face : uint8_t
 
 class Chunk : public Node
 {
+	unsigned int					_ID;
 	glm::ivec2                      _pos;
 	std::array<BlockId, kChunkSize> _blocks;
 	Material                        _material;
@@ -70,6 +71,9 @@ public:
 
 	BlockId& at(const glm::ivec3& pos);
 	BlockId  at(const glm::ivec3& pos) const;
+
+	unsigned int getID() const;
+	void		 setID(unsigned int ID);
 
 private:
 	void _load();

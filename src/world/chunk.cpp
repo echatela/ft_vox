@@ -19,10 +19,12 @@ Chunk::Chunk(const glm::ivec2& pos, const Material& mat)
 	buildMesh();
 }
 
+//NOTE : should the id be kept in this case and the operator= ?
 Chunk::Chunk(const Chunk& src)
     : _pos(src._pos),
       _material(src._material)
 {
+	_ID = src.getID();
 	_load();
 	buildMesh();
 }
@@ -33,6 +35,7 @@ Chunk& Chunk::operator=(const Chunk& rhs)
 {
 	if (this != &rhs)
 	{
+		_ID = rhs.getID();
 		_pos = rhs._pos;
 		_material = rhs._material;
 	}
@@ -164,6 +167,16 @@ bool Chunk::_isBlock(const glm::ivec3& pos) const
 	if (at(pos) != kBlockNone)
 		return true;
 	return false;
+}
+
+unsigned int Chunk::getID() const
+{
+	return (_ID);
+}
+
+void Chunk::setID(unsigned int ID)
+{
+	_ID = ID;
 }
 
 void Chunk::_setupMesh()
