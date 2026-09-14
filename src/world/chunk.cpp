@@ -27,6 +27,8 @@ Chunk::Chunk(const Chunk& src)
 	buildMesh();
 }
 
+// TODO: Probably a bad thing to do, maybe the mesh is created and rebuild at
+// copy
 Chunk& Chunk::operator=(const Chunk& rhs)
 {
 	if (this != &rhs)
@@ -132,7 +134,7 @@ void Chunk::_draw(RenderContext& context) const
 
 int Chunk::_index(const glm::ivec3& pos) const
 {
-	return (pos.y + kChunkHeight + pos.z) * kChunkWidth + pos.x;
+	return (pos.y * kChunkWidth + pos.z) * kChunkWidth + pos.x;
 }
 
 BlockId& Chunk::at(const glm::ivec3& pos)

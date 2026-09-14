@@ -6,7 +6,7 @@
 #include "scene/material.hpp"
 #include <exception>
 
-constexpr int kViewDistance = 12;
+constexpr int kViewDistance = 5;
 
 ChunkManager::ChunkManager()
 {
@@ -19,11 +19,11 @@ ChunkManager::ChunkManager()
 
 void ChunkManager::loadAround(const glm::ivec3& pos)
 {
-	int x = pos.x - kViewDistance;
 	int y = pos.z - kViewDistance;
-	for (; x < pos.x + kViewDistance; x++)
+	for (; y <= pos.z + kViewDistance; y++)
 	{
-		for (; y < pos.z + kViewDistance; y++)
+		int x = pos.x - kViewDistance;
+		for (; x <= pos.x + kViewDistance; x++)
 		{
 			_loadChunk({x, y});
 		}
@@ -32,7 +32,8 @@ void ChunkManager::loadAround(const glm::ivec3& pos)
 
 void ChunkManager::draw(glm::mat4 matrix) const
 {
-	for (auto chunkIt : _chunks)
+	// the const & is really important for performance !!!
+	for (const auto& chunkIt : _chunks)
 	{
 		chunkIt.second.draw(matrix);
 	}
