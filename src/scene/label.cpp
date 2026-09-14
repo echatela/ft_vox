@@ -184,12 +184,12 @@ void Label::setColor(const glm::vec3& color)
 	_color = color;
 }
 
-void Label::draw() const
+void Label::_draw(RenderContext& context) const
 {
 	_mesh.bind();
 	_material.shader->use();
 	_material.shader->setUniform<const glm::vec3&>("myColor", _color);
-	Control::draw();
+	Control::_draw(context);
 }
 
 Label::Label(std::string text, unsigned int size, glm::vec3 color)

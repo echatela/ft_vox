@@ -1,20 +1,19 @@
 #pragma once
 
+#include "node.hpp"
 #include "transform.hpp"
 #include "mesh_2d.hpp"
 #include "material.hpp"
 
-class Control {
+class Control : public Node {
 
 	protected:
-
-		bool _visible = true;
 
 		ControlTransform	_transform;
 		Mesh2d				_mesh;
 		Material			_material;
 
-		// std::map<ID, Node*> _tree// dans node
+		virtual void _draw(RenderContext& context) const;
 
 	public:
 
@@ -22,11 +21,7 @@ class Control {
 		void                    setTransform(const ControlTransform& transform);
 		const Mesh2d&			getMesh() const;
 		void					setMesh(const Mesh2d& mesh);
-		void					toggleVisible();
-		void					setVisible(bool visible);
-		bool					getVisible() const;
 
-		virtual void draw() const;
 
 		void			 setPos(glm::vec2 pos);
 		const glm::vec2& getPos() const;

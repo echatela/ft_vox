@@ -24,10 +24,6 @@ Engine::Engine(Window& window)
 
 Engine::~Engine()
 {
-	for (const std::pair<const CONTROL_ID, Control*>& control : _controlTree)
-	{
-		delete control.second;
-	}
 }
 
 void Engine::init()
@@ -45,6 +41,7 @@ void Engine::_initRenderSettings() const
 
 void Engine::_initWorld()
 {
+
 	const float aspectRatio = static_cast<float>(_state.resolution.x) /
 	                          static_cast<float>(_state.resolution.y);
 	_state.projection =
@@ -57,27 +54,36 @@ void Engine::_initWorld()
 	const ATexture*   texturePtr =
 	    rm.get<ATexture>(ResourceId::TEXTURE_BLOCKS);
 
-	_chunk = Chunk({0, 0, 0}, shaderPtr, texturePtr);
-	_chunk.build();
+	Chunk* chunk = new Chunk({0, 0, 0}, shaderPtr, texturePtr);
+	chunk->build();
+
+	_root.append(NodeId::CHUNK, chunk);
+
 }
 
 void Engine::_initGUI()
+
 {
+	Node* menu = new Control();
+
 	Label* frameLabel = new Label("", 24, kColorWhite);
 	frameLabel->setPos({10, 10});
-	frameLabel->setVisible(false);
+	frameLabel->setProcess(false);
 
 	Label* positionLabel = new Label("", 24, kColorWhite);
 	positionLabel->setPos({10, 45});
-	positionLabel->setVisible(false);
+	positionLabel->setProcess(false);
 
 	Label* resolutionLabel = new Label("", 24, kColorWhite);
 	resolutionLabel->setPos({10, 80});
-	resolutionLabel->setVisible(false);
+	resolutionLabel->setProcess(false);
 
-	_controlTree[CONTROL_FRAMERATE] = frameLabel;
-	_controlTree[CONTROL_POSITION] = positionLabel;
-	_controlTree[CONTROL_RESOLUTION] = resolutionLabel;
+	menu->append(NodeId::LABEL_FRAMERATE, frameLabel);
+	menu->append(NodeId::LABEL_POSITION, positionLabel);
+	menu->append(NodeId::LABEL_RESOLUTION, resolutionLabel);
+	
+	_root.append(NodeId::MENU, menu);
+
 }
 
 void Engine::loop()
@@ -136,31 +142,32 @@ void Engine::_update(const Frame& frame)
 
 void Engine::_updateGUI(const Frame& frame)
 {
+	Control* menu = dynamic_cast<Control *>(_root[MENU]);
+
+	Label* frameLabel = 		dynamic_cast<Label *>((*menu)[LABEL_FRAMERATE]);
+	Label* positionLabel = 		dynamic_cast<Label *>((*menu)[LABEL_POSITION]);
+	Label* resolutionLabel = 	dynamic_cast<Label *>((*menu)[LABEL_RESOLUTION]);
+
 	if (frame.input.toggleInfo)
 	{
-		_controlTree[CONTROL_FRAMERATE]->toggleVisible();
-		_controlTree[CONTROL_POSITION]->toggleVisible();
-		_controlTree[CONTROL_RESOLUTION]->toggleVisible();
+		frameLabel->toggleProcess();
+		positionLabel->toggleProcess();
+		resolutionLabel->toggleProcess();
 	}
-	if (_controlTree[CONTROL_FRAMERATE]->getVisible())
+	if (frameLabel->getProcess())
 	{
-		std::string framerate =
-		    "Framerate : " + std::to_string(timeinfo::getFramerate(frame.dt));
-		(static_cast<Label*>(_controlTree[CONTROL_FRAMERATE]))
-		    ->setText(framerate);
+		std::string framerate = "Framerate : " + std::to_string(timeinfo::getFramerate(frame.dt));
+		frameLabel->setText(framerate);
 	}
-	if (_controlTree[CONTROL_POSITION]->getVisible())
+	if (positionLabel->getProcess())
 	{
 		std::string position = "Position : " + glm::to_string(_camera.getPos());
-		(static_cast<Label*>(_controlTree[CONTROL_POSITION]))
-		    ->setText(position);
+		positionLabel->setText(position);
 	}
-	if (_controlTree[CONTROL_RESOLUTION]->getVisible())
+	if (resolutionLabel->getProcess())
 	{
-		std::string resolution =
-		    "Resolution : " + glm::to_string(_window.getRes());
-		(static_cast<Label*>(_controlTree[CONTROL_RESOLUTION]))
-		    ->setText(resolution);
+		std::string resolution = "Resolution : " + glm::to_string(_window.getRes());
+		resolutionLabel->setText(resolution);
 	}
 }
 
@@ -169,26 +176,25 @@ void Engine::_render()
 	glClearColor(0.3f, 0.3f, 0.3f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	_render3d();
-	_renderControl();
+	_camera.processInput(frame.input, frame.dt);
+	_state.view = _camera.getViewMatrix();
+
+	_updateGUI(frame);
+}
+
+void Engine::_render()
+{
+	glClearColor(0.3f, 0.3f, 0.3f, 1.0f);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	RenderContext context;
+
+	context.mat3D = _state.projection * _state.view;
+
+	context.rect[2] = _window.getRes()[0];
+	context.rect[3] = _window.getRes()[1];
+
+	_root.recursiveDraw(context);
 
 	_window.swapBuffers();
 }
-
-void Engine::_render3d()
-{
-	glEnable(GL_DEPTH_TEST);
-
-	_chunk.draw(_state.projection * _state.view);
-}
-
-void Engine::_renderControl()
-{
-	glDisable(GL_DEPTH_TEST);
-
-	for (const std::pair<const CONTROL_ID, Control*>& control : _controlTree)
-	{
-		control.second->draw();
-	}
-}
-

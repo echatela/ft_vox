@@ -28,9 +28,9 @@ class Label : public Control
 		
 		void	_constructMesh();
 
-	public :
+		virtual void	_draw(RenderContext& context) const override;
 
-		virtual void	draw() const override;
+	public :
 
 		const std::string&	getText() const;
 		void                setText(const std::string& text);
