@@ -2,23 +2,25 @@
 
 void Control::_draw(RenderContext& context) const
 {
-	context._rect[0] += getPos().x;
-	context._rect[2] += getPos().x;
-	context._rect[1] += getPos().y;
-	context._rect[3] += getPos().y;
+	context.rect[0] += getPos().x;
+	context.rect[2] += getPos().x;
+	context.rect[1] += getPos().y;
+	context.rect[3] += getPos().y;
 
 	if (_material.shader == nullptr || _material.texture == nullptr)
 		return ;
 
-	glm::vec2 rect = {context._rect[2] - context._rect[0], context._rect[3] - context._rect[1]};
+	glm::vec2 rect = {context.rect[2] - context.rect[0], context.rect[3] - context.rect[1]};
 	// TODO : marging/anchor to calculate offset
-	glm::vec2 offset = {context._rect[0], context._rect[1]};
+	glm::vec2 offset = {context.rect[0], context.rect[1]};
 
 	_material.shader->use();
 	_material.texture->bind(0);
 	_material.shader->setUniform<int>("myTexture", 0);
 	_material.shader->setUniform<const glm::vec2 &>("offset", offset);
 	_material.shader->setUniform<const glm::vec2 &>("rect", rect);
+
+	glDisable(GL_DEPTH_TEST);
 	glDrawElements(GL_TRIANGLES, _mesh.getIndexes().size(), GL_UNSIGNED_INT, (void *)0);
 }
 

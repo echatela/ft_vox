@@ -5,8 +5,8 @@
 
 struct RenderContext
 {
-	// glm::mat4   3dMat = glm::mat4(1.0f); //Repere 3D
-	unsigned int       _rect[4];
+	glm::mat4          mat3D; //Repere 3D
+	unsigned int       rect[4] = {};
 };
 
 enum NodeId
@@ -28,7 +28,7 @@ class Node
 
 		std::map<NodeId, Node*>	_tree;
 		bool                    _process = true;
-	
+
 		virtual void	_draw(RenderContext& context) const;
 	
 	public:

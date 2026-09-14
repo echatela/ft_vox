@@ -66,15 +66,17 @@ void Chunk::_checkFace(uint8_t face, const glm::ivec3& pos)
 	}
 }
 
-void Chunk::draw(glm::mat4 matrix) const
+void Chunk::_draw(RenderContext& context) const
 {
-	matrix *= _model;
+	glBindVertexArray(_vao);
+
+	context.mat3D *= _model;
 	_material.shader->use();
-	_material.shader->setUniform<const glm::mat4x4&>("matrix", matrix);
+	_material.shader->setUniform<const glm::mat4x4&>("matrix", context.mat3D);
 	_material.texture->bind(0);
 	_material.shader->setUniform<int>("uBlocksTexture", 0);
 
-	glBindVertexArray(_vao);
+	glEnable(GL_DEPTH_TEST);
 	glDrawElements(GL_TRIANGLES, _indices.size(), GL_UNSIGNED_INT, 0);
 }
 

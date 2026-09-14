@@ -42,7 +42,7 @@ enum Face : uint8_t
 	kFaceCount
 };
 
-class Chunk /*: public Node*/
+class Chunk : public Node
 {
 	std::array<BlockId, kChunkSize> _voxels;
 
@@ -58,12 +58,13 @@ class Chunk /*: public Node*/
 	std::vector<Vertex>       _vertices;
 	std::vector<unsigned int> _indices;
 
+	void _draw(RenderContext &context) const;
+
 public:
 	Chunk(const glm::vec3& worldPos = glm::vec3(0, 0, 0),
 	      const Shader* shader = nullptr, const ATexture* texture = nullptr);
 
 	void build();
-	void draw(glm::mat4 matrix) const;
 
 private:
 	void _checkCube(const glm::ivec3& pos);

@@ -57,7 +57,7 @@ void Engine::_initWorld()
 	Chunk* chunk = new Chunk({0, 0, 0}, shaderPtr, texturePtr);
 	chunk->build();
 
-	// _root.append(CHUNK, chunk);
+	_root.append(NodeId::CHUNK, chunk);
 
 }
 
@@ -193,14 +193,9 @@ void Engine::_update(const Frame& frame)
 
 void Engine::_renderControl()
 {
-	glDisable(GL_DEPTH_TEST);
 
-	RenderContext context;
 
-	context._rect[2] = _window.getRes()[0];
-	context._rect[3] = _window.getRes()[1];
-
-	_root.recursiveDraw(context);
+	
 }
 
 void Engine::_render()
@@ -208,8 +203,14 @@ void Engine::_render()
 	glClearColor(0.3f, 0.3f, 0.3f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	// _render3d();
-	_renderControl();
+	RenderContext context;
+
+	context.mat3D = _state.projection * _state.view;
+
+	context.rect[2] = _window.getRes()[0];
+	context.rect[3] = _window.getRes()[1];
+
+	_root.recursiveDraw(context);
 
 	_window.swapBuffers();
 }
