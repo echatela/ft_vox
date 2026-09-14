@@ -4,7 +4,9 @@
 #include "loader/resource_manager.hpp"
 #include "render/texture_2d_array.hpp"
 #include "scene/material.hpp"
+#include "world/chunk.hpp"
 #include <exception>
+#include <utility>
 
 constexpr int kLoadDistance = 5;
 //constexpr int kViewDistance = 5;
@@ -16,6 +18,12 @@ ChunkManager::ChunkManager()
 	_material.texture = ResourceManager::instance().get<Texture2DArray>(
 	    ResourceId::TEXTURE_BLOCKS);
 	loadAround({0, 0, 0});
+}
+
+ChunkManager::~ChunkManager()
+{
+	for (auto& chunk : _chunks)
+		delete chunk.second;
 }
 
 void ChunkManager::loadAround(const glm::vec3& pos)
@@ -33,10 +41,9 @@ void ChunkManager::loadAround(const glm::vec3& pos)
 
 void ChunkManager::draw(glm::mat4 matrix) const
 {
-	// the const & is really important for performance !!!
 	for (const auto& chunkIt : _chunks)
 	{
-		chunkIt.second.draw(matrix);
+		chunkIt.second->draw(matrix);
 	}
 }
 
@@ -53,7 +60,10 @@ const Material& ChunkManager::getMaterial() const
 void ChunkManager::_loadChunk(const glm::i32vec2& pos)
 {
 	if (!_isLoaded(pos))
-		_chunks.insert({pos, Chunk(pos * 16, _material)});
+	{
+		Chunk* chunk = new Chunk(pos, _material);
+		_chunks.insert(std::make_pair(pos, chunk));
+	}
 }
 
 bool ChunkManager::_isLoaded(const glm::i32vec2& pos)

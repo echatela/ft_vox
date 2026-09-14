@@ -19,26 +19,6 @@ Chunk::Chunk(const glm::ivec2& pos, const Material& mat)
 	buildMesh();
 }
 
-Chunk::Chunk(const Chunk& src)
-    : _pos(src._pos),
-      _material(src._material)
-{
-	_load();
-	buildMesh();
-}
-
-// TODO: Probably a bad thing to do, maybe the mesh is created and rebuild at
-// copy
-Chunk& Chunk::operator=(const Chunk& rhs)
-{
-	if (this != &rhs)
-	{
-		_pos = rhs._pos;
-		_material = rhs._material;
-	}
-	return *this;
-}
-
 // hard coded generation, will need to implement a seed based generation
 void Chunk::_load()
 {

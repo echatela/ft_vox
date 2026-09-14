@@ -59,9 +59,10 @@ class Chunk
 public:
 	Chunk(const glm::ivec2& pos = {0, 0},
 	      const Material&   mat = {nullptr, nullptr});
+	~Chunk() = default;
 
-	Chunk(const Chunk& src);
-	Chunk& operator=(const Chunk& rhs);
+	Chunk(const Chunk&) = delete;
+	Chunk& operator=(const Chunk&) = delete;
 
 	void buildMesh();
 	void draw(glm::mat4 matrix) const;

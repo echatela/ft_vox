@@ -11,12 +11,13 @@
 
 class ChunkManager
 {
-	// TODO: maybe replace by <uint32_t, Chunk> for faster access
-	std::unordered_map<glm::i32vec2, Chunk> _chunks;
-	Material                                _material;
+	std::unordered_map<glm::i32vec2, Chunk*> _chunks;
+
+	Material _material;
 
 public:
 	ChunkManager();
+	~ChunkManager();
 
 	void loadAround(const glm::vec3& pos);
 	void draw(glm::mat4 matrix) const;
