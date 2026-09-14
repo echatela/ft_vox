@@ -121,6 +121,25 @@ void Engine::_processEvents(Frame& frame)
 	_window.consumeCursorOffset(&input.xOffset, &input.yOffset);
 }
 
+void Engine::_update(const Frame& frame)
+{
+	if (frame.resolution != _state.resolution)
+	{
+		float aspectRatio;
+
+		_state.resolution = frame.resolution;
+		aspectRatio = static_cast<float>(_state.resolution.x) /
+		              static_cast<float>(_state.resolution.y);
+		_state.projection =
+		    glm::perspective(glm::radians(kFov), aspectRatio, kZNear, kZFar);
+	}
+
+	_camera.processInput(frame.input, frame.dt);
+	_state.view = _camera.getViewMatrix();
+
+	_updateGUI(frame);
+}
+
 void Engine::_updateGUI(const Frame& frame)
 {
 	Control* menu = dynamic_cast<Control *>(_root[MENU]);
@@ -152,50 +171,15 @@ void Engine::_updateGUI(const Frame& frame)
 	}
 }
 
-void Engine::_update(const Frame& frame)
+void Engine::_render()
 {
-	if (frame.resolution != _state.resolution)
-	{
-		float aspectRatio;
-
-		_state.resolution = frame.resolution;
-		aspectRatio = static_cast<float>(_state.resolution.x) /
-		              static_cast<float>(_state.resolution.y);
-		_state.projection =
-		    glm::perspective(glm::radians(kFov), aspectRatio, kZNear, kZFar);
-	}
+	glClearColor(0.3f, 0.3f, 0.3f, 1.0f);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	_camera.processInput(frame.input, frame.dt);
 	_state.view = _camera.getViewMatrix();
 
 	_updateGUI(frame);
-}
-
-// void Engine::_render3d(const Frame& frame)
-// {
-// 	// render 3D
-// 	glEnable(GL_DEPTH_TEST);
-
-// 	// TODO : The shader used here and in _chunk.draw() are the same (as exactly the same, we use a ptr)
-// 	// Since chunk now has its texture, I moved the binding in _chunk.draw() function.
-// 	//
-// 	// Since we are in the _render3d(), maybe every 3D object should take the projection/view matrix
-// 	// as a parameter for the draw() function
-
-// 	ResourceManager& rm = ResourceManager::instance();
-// 	const Shader* shader = rm.get<Shader>(ResourceId::SHADER_CHUNK);
-// 	shader->use();
-// 	shader->setUniform<const glm::mat4&>("projection", _state.projection);
-// 	shader->setUniform<const glm::mat4&>("view", _state.view);
-
-// 	_chunk.draw();
-// }
-
-void Engine::_renderControl()
-{
-
-
-	
 }
 
 void Engine::_render()
@@ -214,12 +198,3 @@ void Engine::_render()
 
 	_window.swapBuffers();
 }
-
-// void Engine::_render3d()
-// {
-// 	glEnable(GL_DEPTH_TEST);
-
-// 	_chunk.draw(_state.projection * _state.view);
-// }
-
-
