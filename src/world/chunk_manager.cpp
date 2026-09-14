@@ -6,7 +6,8 @@
 #include "scene/material.hpp"
 #include <exception>
 
-constexpr int kViewDistance = 5;
+constexpr int kLoadDistance = 5;
+//constexpr int kViewDistance = 5;
 
 ChunkManager::ChunkManager()
 {
@@ -17,15 +18,15 @@ ChunkManager::ChunkManager()
 	loadAround({0, 0, 0});
 }
 
-void ChunkManager::loadAround(const glm::ivec3& pos)
+void ChunkManager::loadAround(const glm::vec3& pos)
 {
-	int y = pos.z - kViewDistance;
-	for (; y <= pos.z + kViewDistance; y++)
+	const int innerX = pos.x / 16;
+	const int innerZ = pos.z / 16;
+	for (int z = innerZ - kLoadDistance; z <= innerZ + kLoadDistance; z++)
 	{
-		int x = pos.x - kViewDistance;
-		for (; x <= pos.x + kViewDistance; x++)
+		for (int x = innerX - kLoadDistance; x <= innerX + kLoadDistance; x++)
 		{
-			_loadChunk({x, y});
+			_loadChunk({x, z});
 		}
 	}
 }

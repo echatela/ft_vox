@@ -18,7 +18,7 @@ class ChunkManager
 public:
 	ChunkManager();
 
-	void loadAround(const glm::ivec3& pos);
+	void loadAround(const glm::vec3& pos);
 	void draw(glm::mat4 matrix) const;
 
 	void            setMaterial(const Material& mat);

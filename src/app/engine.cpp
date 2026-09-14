@@ -45,7 +45,7 @@ void Engine::_initWorld()
 	_state.projection =
 	    glm::perspective(glm::radians(kFov), aspectRatio, kZNear, kZFar);
 
-	_camera.setPos(glm::vec3(0, 64, 0));
+	_camera.setPos(glm::vec3(0, 90, 0));
 
 	ResourceManager& rm = ResourceManager::instance();
 	const Shader*    shaderPtr = rm.get<Shader>(ResourceId::SHADER_CHUNK);
@@ -135,6 +135,7 @@ void Engine::_update(const Frame& frame)
 	_camera.processInput(frame.input, frame.dt);
 	_state.view = _camera.getViewMatrix();
 
+	_chunkManager.loadAround(_camera.getPos());
 	_updateGUI(frame);
 }
 
