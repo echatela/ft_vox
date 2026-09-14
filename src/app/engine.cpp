@@ -176,17 +176,6 @@ void Engine::_render()
 	glClearColor(0.3f, 0.3f, 0.3f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	_camera.processInput(frame.input, frame.dt);
-	_state.view = _camera.getViewMatrix();
-
-	_updateGUI(frame);
-}
-
-void Engine::_render()
-{
-	glClearColor(0.3f, 0.3f, 0.3f, 1.0f);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
 	RenderContext context;
 
 	context.mat3D = _state.projection * _state.view;
