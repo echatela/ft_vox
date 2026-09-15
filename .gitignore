@@ -13,3 +13,5 @@
 # --- Utils ---
 todo.txt
 vgcore*
+gmon.out
+out

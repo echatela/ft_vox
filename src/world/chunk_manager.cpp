@@ -6,7 +6,7 @@
 #include "scene/material.hpp"
 #include <exception>
 
-constexpr int kLoadDistance = 15;
+constexpr int kLoadDistance = 10;
 //constexpr int kViewDistance = 5;
 
 // TODO : Destructor should empty node and free map
@@ -103,6 +103,11 @@ void ChunkManager::setMaterial(const Material& mat)
 const Material& ChunkManager::getMaterial() const
 {
 	return _material;
+}
+
+unsigned int ChunkManager::getSize() const
+{
+	return _chunks.size();
 }
 
 void ChunkManager::_loadChunk(const glm::i32vec2& pos)

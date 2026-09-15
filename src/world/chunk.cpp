@@ -11,12 +11,16 @@
 #include <GLFW/glfw3.h>
 #include <stdexcept>
 
+#define AT(pos) _blocks[(pos.y * kChunkWidth + pos.z) * kChunkWidth + pos.x]
+#define VALID(pos) (pos.x >= 0 && pos.y >= 0 && pos.z >= 0 && pos.x < kChunkWidth && pos.y < kChunkHeight && pos.z < kChunkWidth)
+
 Chunk::Chunk(const glm::ivec2& pos, const Material& mat)
     : _pos(pos),
       _material(mat)
 {
 	_load();
 	buildMesh();
+
 }
 
 //NOTE : should the id be kept in this case and the operator= ?
@@ -46,53 +50,53 @@ Chunk& Chunk::operator=(const Chunk& rhs)
 void Chunk::_load()
 {
 	_blocks.fill(kBlockNone);
-	int y = 0;
-	for (; y < 64; y++)
+
+	glm::ivec3 vec = {0, 0, 0};
+	// int y = 0;
+	for (vec.y = 0; vec.y < 64; vec.y++)
 	{
-		for (int z = 0; z < kChunkWidth; z++)
+		for (vec.z = 0; vec.z < kChunkWidth; vec.z++)
 		{
-			for (int x = 0; x < kChunkWidth; x++)
-				at({x, y, z}) = kBlockStone;
+			for (vec.x = 0; vec.x < kChunkWidth; vec.x++)
+			{
+				AT(vec) = kBlockStone;
+			}
 		}
 	}
-	for (; y < 64 + 16; y++)
+	for (; vec.y < 64 + 16; vec.y++)
 	{
-		for (int z = 0; z < kChunkWidth; z++)
+		for (vec.z = 0; vec.z < kChunkWidth; vec.z++)
 		{
-			for (int x = 0; x < kChunkWidth; x++)
-				at({x, y, z}) = kBlockDirt;
+			for (vec.x = 0; vec.x < kChunkWidth; vec.x++)
+				AT(vec) = kBlockDirt;
 		}
 	}
 }
 
 void Chunk::buildMesh()
 {
-	for (int y = 0; y < kChunkHeight; y++)
+	// Need to check if these values are fixed or can become higher
+	_vertices.reserve(30000);
+	_indices.reserve(40000);
+
+	glm::ivec3 vec = {0, 0, 0};
+
+	for (vec.y = 0; vec.y < kChunkHeight; vec.y++)
 	{
-		for (int z = 0; z < kChunkWidth; z++)
+		for (vec.z = 0; vec.z < kChunkWidth; vec.z++)
 		{
-			for (int x = 0; x < kChunkWidth; x++)
-				_buildCube(glm::ivec3(x, y, z));
+			for (vec.x = 0; vec.x < kChunkWidth; vec.x++)
+				_buildCube(vec);
 		}
 	}
+	_vertices.shrink_to_fit();
+	_indices.shrink_to_fit();
 	_setupMesh();
 }
 
-// void Chunk::draw(glm::mat4 matrix) const
-// {
-// 	matrix *= glm::translate(glm::mat4(1.0f), {_pos.x, 0, _pos.y});
-// 	_material.shader->use();
-// 	_material.shader->setUniform<const glm::mat4x4&>("matrix", matrix);
-// 	_material.texture->bind(0);
-// 	_material.shader->setUniform<int>("uBlocksTexture", 0);
-
-// 	glBindVertexArray(_vao);
-// 	glDrawElements(GL_TRIANGLES, _indices.size(), GL_UNSIGNED_INT, 0);
-// }
-
 void Chunk::_buildCube(const glm::ivec3& pos)
 {
-	if (at(pos) != kBlockNone)
+	if (AT(pos) != kBlockNone)
 	{
 		for (uint8_t face = kFaceRight; face < kFaceCount; face++)
 			_buildFace(face, pos);
@@ -105,14 +109,15 @@ constexpr glm::ivec3 kNeighbours[6] = {
     glm::ivec3(1, 0, 0),  glm::ivec3(-1, 0, 0), glm::ivec3(0, 1, 0),
     glm::ivec3(0, -1, 0), glm::ivec3(0, 0, 1),  glm::ivec3(0, 0, -1)};
 
+//NOTE : maybe we can precalculate info for the next faces etc ?
 void Chunk::_buildFace(uint8_t face, const glm::ivec3& pos)
 {
 	glm::ivec3 neighbour = pos + kNeighbours[face];
 
-	if (!_isValid(neighbour) || !_isBlock(neighbour))
+	if (!VALID(neighbour) || !_isBlock(neighbour))
 	{
 		const unsigned int base = static_cast<unsigned int>(_vertices.size());
-		const BlockId      id = at(pos);
+		const BlockId      id = AT(pos);
 
 		for (uint8_t corner = 0; corner < 4; corner++)
 			_vertices.push_back({pos, face, corner, id});
@@ -142,14 +147,14 @@ int Chunk::_index(const glm::ivec3& pos) const
 
 BlockId& Chunk::at(const glm::ivec3& pos)
 {
-	if (!_isValid(pos))
+	if (!VALID(pos))
 		throw std::runtime_error("Chunk: position out of chunk");
 	return _blocks[_index(pos)];
 }
 
 BlockId Chunk::at(const glm::ivec3& pos) const
 {
-	if (!_isValid(pos))
+	if (!VALID(pos))
 		return kBlockNone;
 	return _blocks[_index(pos)];
 }
@@ -164,7 +169,7 @@ bool Chunk::_isValid(const glm::ivec3& pos) const
 
 bool Chunk::_isBlock(const glm::ivec3& pos) const
 {
-	if (at(pos) != kBlockNone)
+	if (AT(pos) != kBlockNone)
 		return true;
 	return false;
 }

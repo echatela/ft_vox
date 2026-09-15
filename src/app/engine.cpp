@@ -76,9 +76,14 @@ void Engine::_initGUI()
 	resolutionLabel->setPos({10, 80});
 	resolutionLabel->setProcess(false);
 
+	Label* chunkCountLabel = new Label("", 24, kColorWhite);
+	chunkCountLabel->setPos({10, 150});
+	chunkCountLabel->setProcess(false);
+
 	menu->append("label_framerate", frameLabel);
 	menu->append("label_position", positionLabel);
 	menu->append("label_resolution", resolutionLabel);
+	menu->append("label_chunkcount", chunkCountLabel);
 	
 	_root.append("menu", menu);
 
@@ -144,23 +149,49 @@ void Engine::_updateWorld()
 	((ChunkManager*)_root["chunk_manager"])->updateChunks(_camera.getPos());
 }
 
+constexpr auto kLowFramerate = 60;
+
 void Engine::_updateGUI(const Frame& frame)
 {
 	Control* menu = dynamic_cast<Control *>(_root["menu"]);
+	ChunkManager* chunkManager = dynamic_cast<ChunkManager *>(_root["chunk_manager"]);
+
+	static int lastframerate;
+	static int tick;
 
 	Label* frameLabel = 		dynamic_cast<Label *>((*menu)["label_framerate"]);
 	Label* positionLabel = 		dynamic_cast<Label *>((*menu)["label_position"]);
 	Label* resolutionLabel = 	dynamic_cast<Label *>((*menu)["label_resolution"]);
+	Label* chunkCountLabel = 	dynamic_cast<Label *>((*menu)["label_chunkcount"]);
 
 	if (frame.input.toggleInfo)
 	{
 		frameLabel->toggleProcess();
 		positionLabel->toggleProcess();
 		resolutionLabel->toggleProcess();
+		chunkCountLabel->toggleProcess();
 	}
 	if (frameLabel->getProcess())
 	{
-		std::string framerate = "Framerate : " + std::to_string(timeinfo::getFramerate(frame.dt));
+		int frames = timeinfo::getFramerate(frame.dt);
+		if (tick > 10)
+			tick = 0;
+		if (frames < kLowFramerate)
+		{
+			frameLabel->setColor(kColorRed);
+		}
+		else if (frames <= lastframerate)
+		{
+			tick ++;
+			frameLabel->setColor(kColorOrange);
+		}
+		
+		else if (!tick)
+			frameLabel->setColor(kColorWhite);
+
+		lastframerate = frames;
+
+		std::string framerate = "Framerate : " + std::to_string(frames);
 		frameLabel->setText(framerate);
 	}
 	if (positionLabel->getProcess())
@@ -172,6 +203,11 @@ void Engine::_updateGUI(const Frame& frame)
 	{
 		std::string resolution = "Resolution : " + glm::to_string(_window.getRes());
 		resolutionLabel->setText(resolution);
+	}
+	if (chunkCountLabel->getProcess())
+	{
+		std::string chunkcount = "Chunk count : " + std::to_string(chunkManager->getSize());
+		chunkCountLabel->setText(chunkcount);
 	}
 }
 

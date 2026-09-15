@@ -30,6 +30,8 @@ public:
 	void            setMaterial(const Material& mat);
 	const Material& getMaterial() const;
 
+	unsigned int 	getSize() const;
+
 private:
 	void _loadChunk(const glm::i32vec2& pos);
 

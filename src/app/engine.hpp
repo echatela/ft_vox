@@ -18,6 +18,7 @@ constexpr int   kWidth = 800;
 constexpr int   kHeight = 600;
 
 constexpr glm::vec3 kColorWhite = glm::vec3(0.9, 0.9, 0.9);
+constexpr glm::vec3 kColorOrange = glm::vec3(1.0, 0.6, 0);
 constexpr glm::vec3 kColorRed = glm::vec3(1.0, 0.0, 0.0);
 
 constexpr auto kVert = "shaders/control_vert.glsl";
