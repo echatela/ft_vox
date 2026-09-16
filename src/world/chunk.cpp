@@ -20,10 +20,9 @@ Chunk::Chunk(const glm::ivec2& pos, const Material& mat)
 {
 	_load();
 	buildMesh();
-
 }
 
-//NOTE : should the id be kept in this case and the operator= ?
+//NOTE : do we really use that constructor ?
 Chunk::Chunk(const Chunk& src)
     : _pos(src._pos),
       _material(src._material)
@@ -33,15 +32,16 @@ Chunk::Chunk(const Chunk& src)
 	buildMesh();
 }
 
-// TODO: Probably a bad thing to do, maybe the mesh is created and rebuild at
-// copy
+
 Chunk& Chunk::operator=(const Chunk& rhs)
 {
 	if (this != &rhs)
 	{
-		_ID = rhs.getID();
 		_pos = rhs._pos;
 		_material = rhs._material;
+		
+		_vertices = rhs._vertices;
+		_indices = rhs._indices;
 	}
 	return *this;
 }

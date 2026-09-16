@@ -18,8 +18,9 @@ class ChunkManager : public Node
 	void _draw(RenderContext& context) const;
 	
 	void _loadAround(const glm::ivec2& pos);
-	void _unloadFurther(const glm::ivec2& pos);
 
+	void _swapRange(const glm::ivec2& oldPos, const glm::ivec2& newPos);
+	void _swapChunk(const glm::ivec2& oldPos, const glm::ivec2& newPos);
 
 public:
 	ChunkManager();

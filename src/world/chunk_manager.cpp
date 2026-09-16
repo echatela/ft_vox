@@ -16,8 +16,60 @@ ChunkManager::ChunkManager()
 	    ResourceManager::instance().get<Shader>(ResourceId::SHADER_CHUNK);
 	_material.texture = ResourceManager::instance().get<Texture2DArray>(
 	    ResourceId::TEXTURE_BLOCKS);
+
 	updateChunks({0, 0, 0}, true);
 	// loadAround({0, 0, 0});
+
+}
+
+constexpr auto kLoadRange = kLoadDistance * 2 + 1;
+
+// Iterate on the new range (to be loaded) and the old range (to delete)
+void ChunkManager::_swapRange(const glm::ivec2& oldPos, const glm::ivec2& newPos)
+{
+	glm::ivec2 diff = newPos - oldPos;
+	glm::ivec2 loadPos, unloadPos;
+
+	if (diff.x)
+	{
+		loadPos = glm::ivec2(newPos.x + diff.x * kLoadDistance, newPos.y - kLoadDistance);
+		unloadPos = glm::ivec2(oldPos.x - diff.x * kLoadDistance, oldPos.y - kLoadDistance);
+
+		for (unsigned int i = 0; i < kLoadRange; i++)
+		{
+			_swapChunk(unloadPos, loadPos);
+
+			loadPos.y ++;
+			unloadPos.y ++;
+		}
+	}
+	if (diff.y)
+	{
+		loadPos = glm::ivec2(newPos.x - kLoadDistance, newPos.y + diff.y * kLoadDistance );
+		unloadPos = glm::ivec2(oldPos.x - kLoadDistance, oldPos.y - diff.y * kLoadDistance );
+		
+		for (unsigned int i = 0; i < kLoadRange; i++)
+		{
+			_swapChunk(unloadPos, loadPos);
+
+			loadPos.x ++;
+			unloadPos.x ++;
+		}
+	}
+}
+
+// Load + Unload a chunk, keeping the old allocated Chunk pointer
+// No need to remove from _tree because it uses the Chunk*
+void ChunkManager::_swapChunk(const glm::ivec2& oldPos, const glm::ivec2& newPos)
+{
+	auto it = _chunks.find(oldPos);
+
+	//reuse allocated chunk
+	*(it->second) = Chunk(newPos * 16, _material);
+
+	//insert new pair & remove old
+	_chunks[newPos] = it->second;
+	_chunks.erase(it);
 
 }
 
@@ -25,62 +77,32 @@ void ChunkManager::updateChunks(const glm::vec3 &pos, bool preload)
 {
 	static glm::ivec2 lastPos;
 
-	glm::ivec2 chunkPos = glm::ivec2{std::floor(pos.x / 16), std::floor(pos.z / 16)};
+	glm::ivec2 newPos = glm::ivec2{std::floor(pos.x / 16), std::floor(pos.z / 16)};
 
-	if (chunkPos != lastPos || preload)
+	if (preload)
 	{
-		lastPos = chunkPos;
-
-		_unloadFurther(chunkPos);
-		_loadAround(chunkPos);
-		// _filterRenderedChunks(chunkPos);
-
-		// std::cout << "NEED UPDATE" << std::endl;
+		_chunks.reserve(kLoadDistance * kLoadDistance + 1);
+		_loadAround(newPos);
 	}
 
-}
-
-void ChunkManager::_unloadFurther(const glm::ivec2& pos)
-{
-	// TODO : I think this is bad
-	for (auto it = _chunks.begin(); it != _chunks.end(); )
+	else if (newPos != lastPos)
 	{
-		const glm::ivec2 chunkPos = it->first;
-		const glm::ivec2 dist = glm::ivec2(pos - chunkPos);
-
-		if (abs(dist.x) > kLoadDistance || abs(dist.y) > kLoadDistance)
-		{
-
-			// remove from rendered
-			std::string id = "chunk" + std::to_string(it->second->getID());
-
-			// std::cout << "ERASED CHUNK " << id << std::endl;
-
-			auto loadedChunk = _tree.find(id);
-			if (loadedChunk != _tree.end())
-				_tree.erase(loadedChunk);
-			
-			// remove from loaded
-			delete it->second;
-			it = _chunks.erase(it);
-		}
-		else
-			it++;
+		_swapRange(lastPos, newPos);
 	}
-}
+	
+	lastPos = newPos;
 
-// void ChunkManager::_filterRenderedChunks(const glm::ivec2& pos)
-// {
-	// 
-// }
+}
 
 void ChunkManager::_loadAround(const glm::ivec2& pos)
 {
-	for (int z = pos.y - kLoadDistance; z <= pos.y + kLoadDistance; z++)
+	glm::ivec2 vec = {0, 0};
+
+	for (vec.y = pos.y - kLoadDistance; vec.y <= pos.y + kLoadDistance; vec.y++)
 	{
-		for (int x = pos.x - kLoadDistance; x <= pos.x + kLoadDistance; x++)
+		for (vec.x = pos.x - kLoadDistance; vec.x <= pos.x + kLoadDistance; vec.x++)
 		{
-			_loadChunk({x, z});
+			_loadChunk(vec);
 		}
 	}
 }
@@ -126,6 +148,16 @@ void ChunkManager::_loadChunk(const glm::i32vec2& pos)
 		chunkCount++;
 	}
 }
+
+// void ChunkManager::_loadAndReplaceChunk(const glm::i32vec2& pos, chunk_it spot)
+// {
+// 	*(spot->second) = Chunk(pos * 16, _material);
+
+// 	auto pair = _chunks.extract(spot->first);
+
+// 	pair.key() = pos;
+// 	_chunks.insert(std::move(pair));
+// }
 
 
 bool ChunkManager::_isLoaded(const glm::i32vec2& pos)
