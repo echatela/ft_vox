@@ -6,7 +6,7 @@
 #include "scene/material.hpp"
 #include <exception>
 
-constexpr int kLoadDistance = 10;
+constexpr int kLoadDistance = 1;
 //constexpr int kViewDistance = 5;
 
 // TODO : Destructor should empty node and free map
@@ -63,6 +63,9 @@ void ChunkManager::_swapRange(const glm::ivec2& oldPos, const glm::ivec2& newPos
 void ChunkManager::_swapChunk(const glm::ivec2& oldPos, const glm::ivec2& newPos)
 {
 	auto it = _chunks.find(oldPos);
+
+	if (it == _chunks.end())
+		return;
 
 	//reuse allocated chunk
 	*(it->second) = Chunk(newPos * 16, _material);

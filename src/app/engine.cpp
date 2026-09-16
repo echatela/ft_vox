@@ -85,6 +85,12 @@ void Engine::_initGUI()
 	menu->append("label_resolution", resolutionLabel);
 	menu->append("label_chunkcount", chunkCountLabel);
 	
+	frameLabel->toggleProcess();
+	positionLabel->toggleProcess();
+	resolutionLabel->toggleProcess();
+	chunkCountLabel->toggleProcess();
+	// menu->toggleProcess();
+
 	_root.append("menu", menu);
 
 }
@@ -166,12 +172,9 @@ void Engine::_updateGUI(const Frame& frame)
 
 	if (frame.input.toggleInfo)
 	{
-		frameLabel->toggleProcess();
-		positionLabel->toggleProcess();
-		resolutionLabel->toggleProcess();
-		chunkCountLabel->toggleProcess();
+		menu->toggleProcess();
 	}
-	if (frameLabel->getProcess())
+	if (menu->getProcess())
 	{
 		int frames = timeinfo::getFramerate(frame.dt);
 		if (tick > 10)
@@ -193,21 +196,24 @@ void Engine::_updateGUI(const Frame& frame)
 
 		std::string framerate = "Framerate : " + std::to_string(frames);
 		frameLabel->setText(framerate);
-	}
-	if (positionLabel->getProcess())
-	{
-		std::string position = "Position : " + glm::to_string(_camera.getPos());
+
+		std::string camPos = 	std::to_string((int)_camera.getPos().x) + ", " + 
+								std::to_string((int)_camera.getPos().y) + ", " +
+								std::to_string((int)_camera.getPos().z);
+
+		std::string chunkPos = 	std::to_string(std::floor(_camera.getPos().x / 16)) + ", " +
+								std::to_string(std::floor(_camera.getPos().z / 16));
+
+		std::string position = "Position : (" + camPos + ") | (" + chunkPos + ")";
+
 		positionLabel->setText(position);
-	}
-	if (resolutionLabel->getProcess())
-	{
+
 		std::string resolution = "Resolution : " + glm::to_string(_window.getRes());
 		resolutionLabel->setText(resolution);
-	}
-	if (chunkCountLabel->getProcess())
-	{
+
 		std::string chunkcount = "Chunk count : " + std::to_string(chunkManager->getSize());
 		chunkCountLabel->setText(chunkcount);
+
 	}
 }
 

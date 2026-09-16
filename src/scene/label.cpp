@@ -91,7 +91,10 @@ static const std::map<const char, Letter> letterMap = {
 		{'(', Letter(408, 5)},
 		{')', Letter(413, 5)},
 		{'@', Letter(418, 8)},
-		{' ', Letter(425, 3)}
+		{'-', Letter(426, 4)},
+		{'+', Letter(430, 4)},
+		{'|', Letter(433, 3)},
+		{' ', Letter{436, 3}}
 
 	};
 
