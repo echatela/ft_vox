@@ -56,9 +56,9 @@ void Camera::processInput(const InputIntent& input, float dt)
 	_yaw += input.xOffset * _mouseSensitivity;
 	_pitch += input.yOffset * _mouseSensitivity;
 
-	if (_pitch > 89.9f)
-		_pitch = 89.9f;
-	if (_pitch < -89.9f)
+	// if (_pitch > 89.9f)
+	// 	_pitch = 89.9f;
+	// if (_pitch < -89.9f)
 		_pitch = -89.9f;
 
 	updateVectors();

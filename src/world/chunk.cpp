@@ -27,9 +27,15 @@ Chunk::Chunk(const Chunk& src)
     : _pos(src._pos),
       _material(src._material)
 {
-	_ID = src.getID();
-	_load();
-	buildMesh();
+	// _ID = src.getID();
+
+	_pos = src._pos;
+	_material = src._material;
+	
+	_vertices = src._vertices;
+	_indices = src._indices;
+	// _load();
+	// buildMesh();
 }
 
 

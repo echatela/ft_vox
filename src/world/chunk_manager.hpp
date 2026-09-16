@@ -35,6 +35,7 @@ public:
 
 private:
 	void _loadChunk(const glm::i32vec2& pos);
+	void _unloadChunk(const glm::i32vec2& pos);
 
 	bool _isLoaded(const glm::i32vec2& pos);
 };
