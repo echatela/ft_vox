@@ -12,6 +12,7 @@
 class ChunkManager : public Node
 {
 	// TODO: maybe replace by <uint32_t, Chunk> for faster access
+	Chunk* _chunkMemory = nullptr;
 	std::unordered_map<glm::i32vec2, Chunk*> _chunks;
 	Material                                _material;
 

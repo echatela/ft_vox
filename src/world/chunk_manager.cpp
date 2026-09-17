@@ -8,6 +8,7 @@
 
 constexpr int kLoadDistance = 10;
 constexpr auto kLoadRange = kLoadDistance * 2 + 1;
+constexpr auto kLoadCount = kLoadRange * kLoadRange;
 
 //constexpr int kViewDistance = 5;
 
@@ -19,6 +20,8 @@ ChunkManager::ChunkManager()
 	_material.texture = ResourceManager::instance().get<Texture2DArray>(
 	    ResourceId::TEXTURE_BLOCKS);
 
+	std::cout << std::to_string(kLoadCount) << std::endl;
+	_chunkMemory = new Chunk[kLoadRange * kLoadRange];
 	updateChunks({0, 0, 0}, true);
 	// loadAround({0, 0, 0});
 
