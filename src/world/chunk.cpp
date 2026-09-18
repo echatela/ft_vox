@@ -22,6 +22,21 @@ Chunk::Chunk(const glm::ivec2& pos, const Material& mat)
 	buildMesh();
 }
 
+void Chunk::rebuild(const glm::ivec2 &pos)
+{
+	_pos = pos;
+	_vertices.clear();
+	_indices.clear();
+
+	glDeleteVertexArrays(1, &_vao);
+	glDeleteBuffers(1, &_vbo);
+	glDeleteBuffers(1, &_ebo);
+
+	_load();
+	buildMesh();
+}
+
+
 //NOTE : do we really use that constructor ?
 Chunk::Chunk(const Chunk& src)
     : _pos(src._pos),
@@ -38,7 +53,7 @@ Chunk::Chunk(const Chunk& src)
 	// buildMesh();
 }
 
-
+// TODO : this just functions because its the same chunk
 Chunk& Chunk::operator=(const Chunk& rhs)
 {
 	if (this != &rhs)
@@ -46,8 +61,9 @@ Chunk& Chunk::operator=(const Chunk& rhs)
 		_pos = rhs._pos;
 		_material = rhs._material;
 		
-		_vertices = rhs._vertices;
-		_indices = rhs._indices;
+		buildMesh();
+		// _vertices = rhs._vertices;
+		// _indices = rhs._indices;
 	}
 	return *this;
 }

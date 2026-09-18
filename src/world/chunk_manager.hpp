@@ -25,6 +25,7 @@ class ChunkManager : public Node
 
 public:
 	ChunkManager();
+	~ChunkManager();
 
 	void updateChunks(const glm::vec3& pos, bool preload = false);
 

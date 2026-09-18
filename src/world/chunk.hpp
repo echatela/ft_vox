@@ -69,6 +69,8 @@ public:
 
 	void buildMesh();
 
+	void rebuild(const glm::ivec2 &pos);
+
 	BlockId& at(const glm::ivec3& pos);
 	BlockId  at(const glm::ivec3& pos) const;
 
