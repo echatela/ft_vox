@@ -47,6 +47,7 @@ class Chunk : public Node
 {
 	unsigned int					_ID;
 	glm::ivec2                      _pos;
+	std::array<bool, kChunkSize> 	_boolBlock = {false};
 	std::array<BlockId, kChunkSize> _blocks;
 	Material                        _material;
 
@@ -61,8 +62,11 @@ class Chunk : public Node
 	void _draw(RenderContext &context) const;
 
 public:
-	Chunk(const glm::ivec2& pos = {0, 0},
-	      const Material&   mat = {nullptr, nullptr});
+
+	Chunk();
+
+	Chunk(const glm::ivec2& pos,
+	      const Material&   mat);
 
 	Chunk(const Chunk& src);
 	Chunk& operator=(const Chunk& rhs);
@@ -76,6 +80,8 @@ public:
 
 	unsigned int getID() const;
 	void		 setID(unsigned int ID);
+
+	void	setMaterial(const Material& mat);
 
 private:
 	void _load();

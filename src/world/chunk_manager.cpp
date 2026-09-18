@@ -36,9 +36,9 @@ ChunkManager::~ChunkManager()
 
 void ChunkManager::_swapRange(const glm::ivec2& oldPos, const glm::ivec2& newPos)
 {
+
 	glm::ivec2 move = newPos - oldPos;
 	glm::ivec2 loadPos, unloadPos;
-
 
 	const int		xSign = move.x >= 0 ? 1 : -1;
 	const int		ySign = move.y >= 0 ? 1 : -1;
@@ -73,7 +73,6 @@ void ChunkManager::_swapRange(const glm::ivec2& oldPos, const glm::ivec2& newPos
 // No need to remove from _tree because it uses the Chunk*
 void ChunkManager::_swapChunk(const glm::ivec2& oldPos, const glm::ivec2& newPos)
 {
-
 	Chunk* chunk = _chunks[oldPos];
 
 	//reuse allocated chunk
@@ -82,7 +81,6 @@ void ChunkManager::_swapChunk(const glm::ivec2& oldPos, const glm::ivec2& newPos
 	//insert new pair & remove old
 	_chunks[newPos] = chunk;
 	_chunks.erase(oldPos);
-
 }
 
 void ChunkManager::updateChunks(const glm::vec3 &pos, bool preload)
@@ -152,7 +150,8 @@ void ChunkManager::_loadChunk(const glm::i32vec2& pos)
 	{
 		Chunk* chunk = &(_chunkMemory[chunkCount]);
 
-		*chunk = Chunk(pos * 16, _material);
+		chunk->setMaterial(_material);
+		chunk->rebuild(pos * 16);
 		chunk->setID(chunkCount);
 		_chunks.insert({pos, chunk});
 
