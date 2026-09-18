@@ -7,18 +7,28 @@
 #include "platform/glfw_context.hpp"
 #include "platform/window.hpp"
 
+#include "time.hpp"
+
 int main()
 {
 	try
 	{
+		timeinfo::startTimer();		
+
 		GlfwContext glfw;
 		Window      window;
 		GladContext glad;
 		ResourceManagerGuard rmGuard;
 
+
 		Engine engine(window);
 		
 		engine.init();
+
+		timeinfo::stopTimer();
+		std::cout << "Init time is : " << timeinfo::timeStr() << std::endl;
+
+		// exit(0);
 		engine.loop();
 	}
 	catch (const std::exception& e)

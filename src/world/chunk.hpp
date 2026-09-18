@@ -5,14 +5,15 @@
 #include <vector>
 
 #include "glm/ext/matrix_float4x4.hpp"
+#include "glm/ext/vector_int2.hpp"
+#include "glm/ext/vector_int3.hpp"
 #include "glm/fwd.hpp"
-#include "render/shader.hpp"
 #include "scene/material.hpp"
 #include "scene/node.hpp"
 
 constexpr int kChunkWidth = 16;
 constexpr int kChunkHeight = 256;
-constexpr int kChunkSize = kChunkWidth * kChunkHeight * kChunkWidth;
+constexpr int kChunkSize = kChunkWidth * kChunkWidth * kChunkHeight;
 
 struct Vertex
 {
@@ -44,13 +45,12 @@ enum Face : uint8_t
 
 class Chunk : public Node
 {
-	std::array<BlockId, kChunkSize> _voxels;
+	unsigned int					_ID;
+	glm::ivec2                      _pos;
+	std::array<BlockId, kChunkSize> _blocks;
+	Material                        _material;
 
-	glm::vec3 _worldPos;
-	glm::mat4 _model;
-
-	Material _material;
-
+	// TODO: Mesh3D
 	unsigned int _vao;
 	unsigned int _vbo;
 	unsigned int _ebo;
@@ -61,19 +61,29 @@ class Chunk : public Node
 	void _draw(RenderContext &context) const;
 
 public:
-	Chunk(const glm::vec3& worldPos = glm::vec3(0, 0, 0),
-	      const Shader* shader = nullptr, const ATexture* texture = nullptr);
+	Chunk(const glm::ivec2& pos = {0, 0},
+	      const Material&   mat = {nullptr, nullptr});
 
-	void build();
+	Chunk(const Chunk& src);
+	Chunk& operator=(const Chunk& rhs);
+
+	void buildMesh();
+
+	BlockId& at(const glm::ivec3& pos);
+	BlockId  at(const glm::ivec3& pos) const;
+
+	unsigned int getID() const;
+	void		 setID(unsigned int ID);
 
 private:
-	void _checkCube(const glm::ivec3& pos);
-	void _checkFace(uint8_t face, const glm::ivec3& pos);
-	void _setupMesh();
+	void _load();
 
-	BlockId& _index(const glm::ivec3& pos);
-	BlockId  _index(const glm::ivec3& pos) const;
+	void _buildCube(const glm::ivec3& pos);
+	void _buildFace(uint8_t face, const glm::ivec3& pos);
+	void _setupMesh();
 
 	bool _isValid(const glm::ivec3& pos) const;
 	bool _isBlock(const glm::ivec3& pos) const;
+
+	int _index(const glm::ivec3& pos) const;
 };

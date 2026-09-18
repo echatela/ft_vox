@@ -10,10 +10,8 @@
 #define GLM_ENABLE_EXPERIMENTAL // Needed for string_cast.hpp
 #include <glm/gtx/string_cast.hpp>
 
-#include "loader/resource_manager.hpp"
 #include "app/frame.hpp"
 #include "render/shader.hpp"
-#include "render/a_texture.hpp"
 #include "time.hpp"
 #include "scene/label.hpp"
 
@@ -47,17 +45,17 @@ void Engine::_initWorld()
 	_state.projection =
 	    glm::perspective(glm::radians(kFov), aspectRatio, kZNear, kZFar);
 
-	_camera.setPos(glm::vec3(0, 0, -3));
+	_camera.setPos(glm::vec3(0, 140, 0));
 
-	ResourceManager& rm = ResourceManager::instance();
-	const Shader*    shaderPtr = rm.get<Shader>(ResourceId::SHADER_CHUNK);
-	const ATexture*   texturePtr =
-	    rm.get<ATexture>(ResourceId::TEXTURE_BLOCKS);
+	// ResourceManager& rm = ResourceManager::instance();
+	// const Shader*    shaderPtr = rm.get<Shader>(ResourceId::SHADER_CHUNK);
+	// const ATexture*   texturePtr =
+	//     rm.get<ATexture>(ResourceId::TEXTURE_BLOCKS);
 
-	Chunk* chunk = new Chunk({0, 0, 0}, shaderPtr, texturePtr);
-	chunk->build();
+	ChunkManager* chunk = new ChunkManager();
+	// chunk->build();
 
-	_root.append(NodeId::CHUNK, chunk);
+	_root.append("chunk_manager", chunk);
 
 }
 
@@ -78,11 +76,22 @@ void Engine::_initGUI()
 	resolutionLabel->setPos({10, 80});
 	resolutionLabel->setProcess(false);
 
-	menu->append(NodeId::LABEL_FRAMERATE, frameLabel);
-	menu->append(NodeId::LABEL_POSITION, positionLabel);
-	menu->append(NodeId::LABEL_RESOLUTION, resolutionLabel);
+	Label* chunkCountLabel = new Label("", 24, kColorWhite);
+	chunkCountLabel->setPos({10, 150});
+	chunkCountLabel->setProcess(false);
+
+	menu->append("label_framerate", frameLabel);
+	menu->append("label_position", positionLabel);
+	menu->append("label_resolution", resolutionLabel);
+	menu->append("label_chunkcount", chunkCountLabel);
 	
-	_root.append(NodeId::MENU, menu);
+	frameLabel->toggleProcess();
+	positionLabel->toggleProcess();
+	resolutionLabel->toggleProcess();
+	chunkCountLabel->toggleProcess();
+	// menu->toggleProcess();
+
+	_root.append("menu", menu);
 
 }
 
@@ -137,41 +146,78 @@ void Engine::_update(const Frame& frame)
 	_camera.processInput(frame.input, frame.dt);
 	_state.view = _camera.getViewMatrix();
 
+	_updateWorld();
 	_updateGUI(frame);
 }
 
+void Engine::_updateWorld()
+{
+	((ChunkManager*)_root["chunk_manager"])->updateChunks(_camera.getPos());
+}
+
+constexpr auto kLowFramerate = 60;
+
 void Engine::_updateGUI(const Frame& frame)
 {
-	Control* menu = dynamic_cast<Control *>(_root[MENU]);
+	Control* menu = dynamic_cast<Control *>(_root["menu"]);
+	ChunkManager* chunkManager = dynamic_cast<ChunkManager *>(_root["chunk_manager"]);
 
-	Label* frameLabel = 		dynamic_cast<Label *>((*menu)[LABEL_FRAMERATE]);
-	Label* positionLabel = 		dynamic_cast<Label *>((*menu)[LABEL_POSITION]);
-	Label* resolutionLabel = 	dynamic_cast<Label *>((*menu)[LABEL_RESOLUTION]);
+	static int lastframerate;
+	static int tick;
+
+	Label* frameLabel = 		dynamic_cast<Label *>((*menu)["label_framerate"]);
+	Label* positionLabel = 		dynamic_cast<Label *>((*menu)["label_position"]);
+	Label* resolutionLabel = 	dynamic_cast<Label *>((*menu)["label_resolution"]);
+	Label* chunkCountLabel = 	dynamic_cast<Label *>((*menu)["label_chunkcount"]);
 
 	if (frame.input.toggleInfo)
 	{
-		frameLabel->toggleProcess();
-		positionLabel->toggleProcess();
-		resolutionLabel->toggleProcess();
+		menu->toggleProcess();
 	}
-	if (frameLabel->getProcess())
+	if (menu->getProcess())
 	{
-		std::string framerate = "Framerate : " + std::to_string(timeinfo::getFramerate(frame.dt));
+		int frames = timeinfo::getFramerate(frame.dt);
+		if (tick > 10)
+			tick = 0;
+		if (frames < kLowFramerate)
+		{
+			frameLabel->setColor(kColorRed);
+		}
+		else if (frames <= lastframerate)
+		{
+			tick ++;
+			frameLabel->setColor(kColorOrange);
+		}
+		
+		else if (!tick)
+			frameLabel->setColor(kColorWhite);
+
+		lastframerate = frames;
+
+		std::string framerate = "Framerate : " + std::to_string(frames);
 		frameLabel->setText(framerate);
-	}
-	if (positionLabel->getProcess())
-	{
-		std::string position = "Position : " + glm::to_string(_camera.getPos());
+
+		std::string camPos = 	std::to_string((int)_camera.getPos().x) + ", " + 
+								std::to_string((int)_camera.getPos().y) + ", " +
+								std::to_string((int)_camera.getPos().z);
+
+		std::string chunkPos = 	std::to_string(std::floor(_camera.getPos().x / 16)) + ", " +
+								std::to_string(std::floor(_camera.getPos().z / 16));
+
+		std::string position = "Position : (" + camPos + ") | (" + chunkPos + ")";
+
 		positionLabel->setText(position);
-	}
-	if (resolutionLabel->getProcess())
-	{
+
 		std::string resolution = "Resolution : " + glm::to_string(_window.getRes());
 		resolutionLabel->setText(resolution);
+
+		std::string chunkcount = "Chunk count : " + std::to_string(chunkManager->getSize());
+		chunkCountLabel->setText(chunkcount);
+
 	}
 }
 
-void Engine::_render()
+void Engine::_render() const
 {
 	glClearColor(0.3f, 0.3f, 0.3f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);

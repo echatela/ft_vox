@@ -14,9 +14,9 @@ void	Node::recursiveDraw(RenderContext context) const
 	}
 }
 
-void Node::append(NodeId id, Node *ptr)
+void Node::append(const std::string &id, Node *ptr)
 {
-	_tree[id] = ptr;
+	_tree.insert({id, ptr});
 }
 
 // draw rajoute un argument pour la relativite du mvmt
@@ -42,7 +42,7 @@ void Node::toggleProcess()
 }
 
 
-Node* Node::operator[](NodeId id)
+Node* Node::operator[](const std::string& id)
 {
 	auto i = _tree.find(id);
 

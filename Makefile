@@ -12,9 +12,9 @@ GLAD_DIR   := $(EXT_DIR)/glad
 GLM_DIR    := $(EXT_DIR)/glm
 STB_DIR    := $(EXT_DIR)/stb_image
 
-CXXFLAGS   := -Wall -Wextra -Werror -std=$(CXXSTD) -MMD -MP
-CPPFLAGS   := -I$(SRC_DIR) -I$(GLAD_DIR)/include -I$(GLM_DIR) -I$(STB_DIR)
-LDFLAGS    :=
+CXXFLAGS   := -Wall -Wextra -Werror -std=$(CXXSTD) -MMD -MP -g3 #-pg #-flto -finline-functions
+CPPFLAGS   := -I$(SRC_DIR) -I$(GLAD_DIR)/include -I$(GLM_DIR) -I$(STB_DIR) 
+LDFLAGS    := #-pg
 LDLIBS     := -lglfw
 
 SRCS       := $(addprefix src/, main.cpp time.cpp\
@@ -23,7 +23,7 @@ SRCS       := $(addprefix src/, main.cpp time.cpp\
 		$(addprefix platform/, glfw_context.cpp window.cpp glad_context.cpp) \
 		$(addprefix render/, shader.cpp a_texture.cpp texture_2d.cpp texture_2d_array.cpp) \
 		$(addprefix scene/, control.cpp label.cpp mesh_2d.cpp node.cpp) \
-		$(addprefix world/, camera.cpp chunk.cpp))
+		$(addprefix world/, camera.cpp chunk.cpp chunk_manager.cpp))
 OBJS       := $(SRCS:$(SRC_DIR)/%.cpp=$(OBJ_DIR)/%.o)
 GLAD_OBJ   := $(OBJ_DIR)/glad.o
 DEPS       := $(OBJS:.o=.d)
