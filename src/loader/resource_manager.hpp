@@ -11,6 +11,7 @@ enum class ResourceId
 	SHADER_CONTROL,
 	TEXTURE_FONT,
 	TEXTURE_BLOCKS,
+	TEXTURE_HOTBAR_SELECTOR
 };
 
 constexpr const unsigned int kMaxPaths = 8;
@@ -53,7 +54,13 @@ constexpr ResourceInfo data[] = {
 		"assets/block/cobblestone.png",
 		"assets/block/oak_planks.png"},
 		16, 16, true
+	},
+	{
+		ResourceId::TEXTURE_HOTBAR_SELECTOR,
+		ResourceType::TEXTURE_2D,
+		{"assets/hud/Hotbar_selector.png"}
 	}
+
 };
 
 class ResourceManager {
