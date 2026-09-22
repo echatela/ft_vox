@@ -13,8 +13,28 @@
 
 #define INDEX(pos) ((pos.y * kChunkWidth + pos.z) * kChunkWidth + pos.x)
 #define AT(pos) _blocks[INDEX(pos)]
-#define BOOL_AT(pos) _boolBlock[INDEX(pos)]
+// #define BOOL_AT(pos) (_bitBlock[INDEX(pos) / 8])
 #define VALID(pos) (pos.x >= 0 && pos.y >= 0 && pos.z >= 0 && pos.x < kChunkWidth && pos.y < kChunkHeight && pos.z < kChunkWidth)
+
+// #define IS_EDGE(i) (i & 0b1111 == 0 || i & 0b1111 == 0b1111 || i & 0b11110000 == 0b11110000 || i & 0b11110000 == 0b00000000) 
+	#define IS_EDGE(i) (((i & 0xF) == 0) || ((i & 0xF) == 0xF) || (((i >> 4) & 0xF) == 0) || (((i >> 4) & 0xF) == 0xF) || (((i >> 8) & 0xFF) == 0) || (((i >> 8) & 0xFF) == 0xFF))
+
+#define FACE_EDGE(i) ((((i & 0xF) == 0) << kFaceLeft) +\
+ 					 (((i & 0xF) == 0xF) << kFaceRight ) +\
+					 ((((i >> 4) & 0xF) == 0) << kFaceBack) +\
+					 ((((i >> 4) & 0xF) == 0xF) << kFaceFront) +\
+					 ((((i >> 8) & 0xFF) == 0) << kFaceDown) +\
+					 ((((i >> 8) & 0xFF) == 0xFF) << kFaceUp))
+
+
+//  yyyy yyyy zzzz xxxx
+
+// typedef struct chunkIndex
+// {
+// 	uint16_t	x : 4;
+// 	uint16_t	z : 4;
+// 	uint16_t	y : 8;
+// }	chunkIndex;
 
 Chunk::Chunk()
 {
@@ -79,9 +99,11 @@ Chunk& Chunk::operator=(const Chunk& rhs)
 void Chunk::_load()
 {
 	_blocks.fill(kBlockNone);
-	_boolBlock.fill(false);
+	_bitBlocks.reset();
 
 	glm::ivec3 vec = {0, 0, 0};
+
+	uint16_t i = 0;
 	// int y = 0;
 	for (vec.y = 0; vec.y < 64; vec.y++)
 	{
@@ -90,7 +112,11 @@ void Chunk::_load()
 			for (vec.x = 0; vec.x < kChunkWidth; vec.x++)
 			{
 				AT(vec) = kBlockStone;
-				BOOL_AT(vec) = true;
+
+				_blocks[i] = kBlockStone;
+				_bitBlocks.set(i, true);
+				i++;
+				// BOOL_AT(vec) = true;
 			}
 		}
 	}
@@ -99,34 +125,28 @@ void Chunk::_load()
 		for (vec.z = 0; vec.z < kChunkWidth; vec.z++)
 		{
 			for (vec.x = 0; vec.x < kChunkWidth; vec.x++)
-				AT(vec) = kBlockDirt;
-				BOOL_AT(vec) = true;
+			{
+				_blocks[i] = kBlockDirt;
+				_bitBlocks.set(i, true);
+				i++;
+				// AT(vec) = kBlockDirt;
+				// _bitBlocks.set(INDEX(vec), true);
+			}
 		}
 	}
 }
 
 void Chunk::buildMesh()
 {
-	// static unsigned int i = 0;
 	// Need to check if these values are fixed or can become higher
 	_vertices.reserve(30000);
 	_indices.reserve(40000);
 
-	glm::ivec3 vec = {0, 0, 0};
-
-	for (vec.y = 0; vec.y < kChunkHeight; vec.y++)
+	for (unsigned int i = 0; i < kChunkSize; i++)
 	{
-		for (vec.z = 0; vec.z < kChunkWidth; vec.z++)
-		{
-			for (vec.x = 0; vec.x < kChunkWidth; vec.x++)
-				_buildCube(vec);
-		}
+		if (_bitBlocks[i])
+			_buildCube(i);
 	}
-
-	// std::cerr << "Build mesh done : " << i + 1<< std::endl;
-
-	// i++;
-
 	_vertices.shrink_to_fit();
 	_indices.shrink_to_fit();
 	_setupMesh();
@@ -134,114 +154,40 @@ void Chunk::buildMesh()
 
 constexpr unsigned int kQuadIndices[6] = {0, 1, 2, 0, 2, 3};
 
-constexpr glm::ivec3 kNeighbours[6] = {
-    glm::ivec3(1, 0, 0),  glm::ivec3(-1, 0, 0), glm::ivec3(0, 1, 0),
-    glm::ivec3(0, -1, 0), glm::ivec3(0, 0, 1),  glm::ivec3(0, 0, -1)};
+// constexpr glm::ivec3 kNeighbours[6] = {
+//     glm::ivec3(1, 0, 0),  glm::ivec3(-1, 0, 0), glm::ivec3(0, 1, 0),
+//     glm::ivec3(0, -1, 0), glm::ivec3(0, 0, 1),  glm::ivec3(0, 0, -1)};
 
+constexpr int kNeighbourOffset[6] = {
+	1, -1,
+	kChunkHeight, -kChunkHeight,
+	kChunkWidth, -kChunkWidth
+};
 
 // pas moyen de faire une fonction recursive ?
 
-// travailler a l'echelle du bit
-
-void Chunk::_buildCube(const glm::ivec3& pos)
+void Chunk::_buildCube(uint16_t i)
 {
-	const BlockId id = AT(pos);
 
-	if (id != kBlockNone)
+	const BlockId id = _blocks[i]; //AT(pos);
+	Vertex        vertex = {i, 0, 0, id};
+	uint8_t       isEdge = FACE_EDGE(i);
+
+	for (vertex.face = kFaceRight; vertex.face < kFaceCount; vertex.face++)
 	{
-		Vertex vertex = {pos, 0, 0, id};
-		
-		for (vertex.face = kFaceRight; vertex.face < kFaceCount; vertex.face++)
-		{
-			const unsigned int base = static_cast<unsigned int>(_vertices.size());
-			glm::ivec3 neighbour = pos + kNeighbours[vertex.face];
+		unsigned int  base = _vertices.size();
 
-			// 1) if (!VALID(neighbour) || !(AT(neighbour) >> 7)) // Not kBlockNone - Somehow slower
-			// if (!VALID(neighbour) || !BOOL_AT(neighbour)) // Not kBlockNone - Somehow slower
-			if (!VALID(neighbour) || AT(neighbour) == kBlockNone) 
-			{	
-				for (vertex.corner = 0; vertex.corner < 4; vertex.corner++)
-					_vertices.push_back(vertex);
-				for (int j = 0; j < 6; j++)
-					_indices.push_back(base + kQuadIndices[j]);
-			}
+		unsigned int nIndex = i + kNeighbourOffset[vertex.face];
+
+		if (((isEdge >> vertex.face) & 1) || !_bitBlocks[nIndex])
+		{	
+			for (vertex.corner = 0; vertex.corner < 4; vertex.corner++)
+				_vertices.push_back(vertex);
+			for (int j = 0; j < 6; j++)
+				_indices.push_back(base + kQuadIndices[j]);
 		}
 	}
 }
-
-// constexpr int kNeighboursOffset[6] = {
-// 	1, -1, 256, -256, 16, -16
-// };
-
-// // TODO : check if faster by transmitting Vertex instead of reconstructiong
-// void Chunk::_buildFace(uint8_t face, const glm::ivec3& pos, const BlockId id, Vertex &vertex)
-// {
-	
-// }
-
-// void Chunk::_buildFace(uint8_t face, const glm::ivec3& pos)
-// {
-// 	glm::ivec3 neighbour = pos + kNeighbours[face];
-
-// 	if (!VALID(neighbour) || !_isBlock(neighbour))
-// 	{
-// 		const unsigned int base = static_cast<unsigned int>(_vertices.size());
-// 		const BlockId      id = AT(pos);
-
-// 		for (uint8_t corner = 0; corner < 4; corner++)
-// 			_vertices.push_back({pos, face, corner, id});
-// 		for (int j = 0; j < 6; j++)
-// 			_indices.push_back(base + kQuadIndices[j]);
-// 	}
-// }
-
-// void Chunk::buildMesh()
-// {
-// 	// static unsigned int i = 0;
-// 	// Need to check if these values are fixed or can become higher
-// 	_vertices.reserve(30000);
-// 	_indices.reserve(40000);
-
-// 	glm::ivec3 vec = {0, 0, 0};
-
-// 	for (vec.y = 0; vec.y < kChunkHeight; vec.y++)
-// 	{
-// 		for (vec.z = 0; vec.z < kChunkWidth; vec.z++)
-// 		{
-// 			for (vec.x = 0; vec.x < kChunkWidth; vec.x++)
-// 			{
-// 				const BlockId id = AT(vec);
-
-// 				if (id != kBlockNone)
-// 				{
-// 					Vertex vertex = {vec, 0, 0, id};
-
-// 					for (vertex.face = kFaceRight; vertex.face < kFaceCount; vertex.face++)
-// 					{
-// 						const unsigned int base = static_cast<unsigned int>(_vertices.size());
-// 						glm::ivec3 neighbour = vec + kNeighbours[vertex.face];
-					
-// 						if (!VALID(neighbour) || AT(neighbour) == kBlockNone) 
-// 						{	
-// 							for (vertex.corner = 0; vertex.corner < 4; vertex.corner++)
-// 								_vertices.push_back(vertex);
-// 							for (int j = 0; j < 6; j++)
-// 								_indices.push_back(base + kQuadIndices[j]);
-// 						}
-// 					}
-// 				}
-// 			}
-// 		}
-// 	}
-
-// 	// std::cerr << "Build mesh done : " << i + 1<< std::endl;
-
-// 	// i++;
-
-// 	_vertices.shrink_to_fit();
-// 	_indices.shrink_to_fit();
-// 	_setupMesh();
-// }
 
 void Chunk::_draw(RenderContext& context) const
 {
@@ -324,7 +270,7 @@ void Chunk::_setupMesh()
 	             GL_STATIC_DRAW);
 
 	// position attribute
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)0);
+	glVertexAttribIPointer(0, 1, GL_UNSIGNED_SHORT, sizeof(Vertex), (void*)0);
 	glEnableVertexAttribArray(0);
 	// face attribute
 	glVertexAttribIPointer(1, 1, GL_UNSIGNED_BYTE, sizeof(Vertex),

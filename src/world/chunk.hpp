@@ -3,6 +3,7 @@
 #include <array>
 #include <cstdint>
 #include <vector>
+#include <bitset>
 
 #include "glm/ext/matrix_float4x4.hpp"
 #include "glm/ext/vector_int2.hpp"
@@ -14,13 +15,15 @@
 constexpr int kChunkWidth = 16;
 constexpr int kChunkHeight = 256;
 constexpr int kChunkSize = kChunkWidth * kChunkWidth * kChunkHeight;
+constexpr int kChunkBytes = kChunkSize / sizeof(uint8_t);
 
 struct Vertex
 {
-	glm::vec3 pos;
-	uint8_t   face;
-	uint8_t   corner;
-	uint8_t   id;
+	// glm::vec3 pos;
+	uint16_t pos;
+	uint8_t face;
+	uint8_t corner;
+	uint8_t id;
 };
 
 enum BlockId : uint8_t
@@ -45,11 +48,12 @@ enum Face : uint8_t
 
 class Chunk : public Node
 {
-	unsigned int					_ID;
-	glm::ivec2                      _pos;
-	std::array<bool, kChunkSize> 	_boolBlock = {false};
-	std::array<BlockId, kChunkSize> _blocks;
-	Material                        _material;
+	unsigned int					 _ID;
+	glm::ivec2                       _pos;
+	// std::array<uint8_t, kChunkBytes> _bitBlock = {false};
+	std::bitset<kChunkSize>			 _bitBlocks;
+	std::array<BlockId, kChunkSize>  _blocks;
+	Material                         _material;
 
 	// TODO: Mesh3D
 	unsigned int _vao;
@@ -86,7 +90,7 @@ public:
 private:
 	void _load();
 
-	void _buildCube(const glm::ivec3& pos);
+	void _buildCube(uint16_t i);
 	void _buildFace(uint8_t face, const glm::ivec3& pos);
 	void _setupMesh();
 
