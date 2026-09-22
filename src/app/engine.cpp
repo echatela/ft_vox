@@ -117,8 +117,23 @@ void Engine::_processEvents(Frame& frame)
 	input.left = keys[GLFW_KEY_A];
 	input.up = keys[GLFW_KEY_SPACE];
 	input.sprint = keys[GLFW_KEY_LEFT_SHIFT];
-	input.toggleInfo = keys[GLFW_KEY_F5];
 
+	if (keys[GLFW_KEY_F5])
+	{
+		if (!input.toggleInfo)
+		{
+			input.info = true;
+			input.toggleInfo = true;
+		}
+		else
+		{
+			input.info = false;
+		}
+	}
+	else if (input.toggleInfo && !keys[GLFW_KEY_F5])
+	{
+		input.toggleInfo = false;
+	}
 	_window.consumeCursorOffset(&input.xOffset, &input.yOffset);
 }
 
@@ -162,7 +177,7 @@ void Engine::_updateGUI(const Frame& frame)
 	Label* resolutionLabel = 	dynamic_cast<Label *>((*menu)["label_resolution"]);
 	Label* chunkCountLabel = 	dynamic_cast<Label *>((*menu)["label_chunkcount"]);
 
-	if (frame.input.toggleInfo)
+	if (frame.input.info)
 	{
 		menu->toggleProcess();
 	}
