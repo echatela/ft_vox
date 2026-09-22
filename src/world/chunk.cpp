@@ -26,15 +26,13 @@
 					 ((((i >> 8) & 0xFF) == 0) << kFaceDown) +\
 					 ((((i >> 8) & 0xFF) == 0xFF) << kFaceUp))
 
+constexpr unsigned int kQuadIndices[6] = {0, 1, 2, 0, 2, 3};
 
-//  yyyy yyyy zzzz xxxx
-
-// typedef struct chunkIndex
-// {
-// 	uint16_t	x : 4;
-// 	uint16_t	z : 4;
-// 	uint16_t	y : 8;
-// }	chunkIndex;
+constexpr int kNeighbourOffset[6] = {
+	1, -1,
+	kChunkHeight, -kChunkHeight,
+	kChunkWidth, -kChunkWidth
+};
 
 Chunk::Chunk()
 {
@@ -116,7 +114,6 @@ void Chunk::_load()
 				_blocks[i] = kBlockStone;
 				_bitBlocks.set(i, true);
 				i++;
-				// BOOL_AT(vec) = true;
 			}
 		}
 	}
@@ -129,8 +126,6 @@ void Chunk::_load()
 				_blocks[i] = kBlockDirt;
 				_bitBlocks.set(i, true);
 				i++;
-				// AT(vec) = kBlockDirt;
-				// _bitBlocks.set(INDEX(vec), true);
 			}
 		}
 	}
@@ -151,20 +146,6 @@ void Chunk::buildMesh()
 	_indices.shrink_to_fit();
 	_setupMesh();
 }
-
-constexpr unsigned int kQuadIndices[6] = {0, 1, 2, 0, 2, 3};
-
-// constexpr glm::ivec3 kNeighbours[6] = {
-//     glm::ivec3(1, 0, 0),  glm::ivec3(-1, 0, 0), glm::ivec3(0, 1, 0),
-//     glm::ivec3(0, -1, 0), glm::ivec3(0, 0, 1),  glm::ivec3(0, 0, -1)};
-
-constexpr int kNeighbourOffset[6] = {
-	1, -1,
-	kChunkHeight, -kChunkHeight,
-	kChunkWidth, -kChunkWidth
-};
-
-// pas moyen de faire une fonction recursive ?
 
 void Chunk::_buildCube(uint16_t i)
 {
