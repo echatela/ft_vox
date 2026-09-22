@@ -50,8 +50,14 @@ void Camera::processInput(const InputIntent& input, float dt)
 		dir += _right;
 	if (input.left == true)
 		dir -= _right;
+
+	if (input.up == true)
+		dir.y = 1;
+
 	if (glm::length(dir) > 0.0001f)
 		_position += glm::normalize(dir) * velocity;
+	
+
 
 	_yaw += input.xOffset * _mouseSensitivity;
 	_pitch += input.yOffset * _mouseSensitivity;

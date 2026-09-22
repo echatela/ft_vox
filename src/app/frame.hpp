@@ -8,6 +8,7 @@ struct InputIntent
 	bool backward = false;
 	bool right = false;
 	bool left = false;
+	bool up = false;
 
 	bool sprint = false;
 	bool toggleInfo = false;

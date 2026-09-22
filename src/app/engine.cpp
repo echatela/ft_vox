@@ -115,6 +115,7 @@ void Engine::_processEvents(Frame& frame)
 	input.backward = keys[GLFW_KEY_S];
 	input.right = keys[GLFW_KEY_D];
 	input.left = keys[GLFW_KEY_A];
+	input.up = keys[GLFW_KEY_SPACE];
 	input.sprint = keys[GLFW_KEY_LEFT_SHIFT];
 	input.toggleInfo = keys[GLFW_KEY_F5];
 
