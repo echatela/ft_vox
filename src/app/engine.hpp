@@ -44,7 +44,7 @@ class Engine
 
 	EngineState  _state;
 	Camera       _camera;
-	ChunkManager _chunkManager;
+	// ChunkManager _chunkManager;
 
 	Node _root;
 

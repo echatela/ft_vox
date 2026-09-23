@@ -1,5 +1,5 @@
 #version 460 core
-layout (location = 0) in vec3 aPos;
+layout (location = 0) in uint aPos;
 layout (location = 1) in int aFace;
 layout (location = 2) in int aCorner;
 layout (location = 3) in int aId;
@@ -21,7 +21,8 @@ const vec2 kUVs[4] = {vec2(0,0),vec2(1,0),vec2(1,1),vec2(0,1)};
 
 void main()
 {
-	gl_Position = matrix * vec4(aPos + kCorners[aFace][aCorner], 1.0f);
+	vec3 pos = vec3(aPos & 15u, (aPos >> 8u) & 255u, (aPos >> 4u) & 15u);
+	gl_Position = matrix * vec4(pos + kCorners[aFace][aCorner], 1.0f);
     vUV = kUVs[aCorner];
     vLayer = aId;
 }

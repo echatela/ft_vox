@@ -8,6 +8,7 @@
 
 constexpr int kLoadDistance = 10;
 constexpr auto kLoadRange = kLoadDistance * 2 + 1;
+constexpr auto kLoadCount = kLoadRange * kLoadRange;
 
 //constexpr int kViewDistance = 5;
 
@@ -19,43 +20,56 @@ ChunkManager::ChunkManager()
 	_material.texture = ResourceManager::instance().get<Texture2DArray>(
 	    ResourceId::TEXTURE_BLOCKS);
 
+	std::cout << std::to_string(kLoadCount) << std::endl;
+	_chunkMemory = new Chunk[kLoadCount];
 	updateChunks({0, 0, 0}, true);
 	// loadAround({0, 0, 0});
 
 }
 
+ChunkManager::~ChunkManager()
+{
+	delete [] _chunkMemory;
+
+	_tree.clear();
+}
 
 void ChunkManager::_swapRange(const glm::ivec2& oldPos, const glm::ivec2& newPos)
 {
-	glm::ivec2 move = newPos - oldPos;
-	glm::ivec2 loadPos; //, unloadPos;
 
+	glm::ivec2 move = newPos - oldPos;
+	glm::ivec2 loadPos, unloadPos;
 
 	const int		xSign = move.x >= 0 ? 1 : -1;
 	const int		ySign = move.y >= 0 ? 1 : -1;
 
 	unsigned int fullRow = std::min(std::abs(move.y), kLoadRange);
 
+	loadPos = glm::ivec2(	newPos.x + -kLoadDistance,
+							newPos.y + (kLoadDistance) * ySign);
 	// Processing each full row
-	for (uint row = 0; row < fullRow; row ++)
+	for (uint row = 0; row < fullRow; row++)
 	{
-		for (int xRange = -kLoadDistance; xRange <= kLoadDistance; xRange++)
+		for (; loadPos.x <= newPos.x + kLoadDistance; loadPos.x++)
 		{
-			loadPos = glm::ivec2(	newPos.x + xRange,
-									newPos.y + (kLoadDistance - row) * ySign);
-			_loadChunk(loadPos);
-			_unloadChunk(oldPos - (loadPos - newPos)); // symmetrical unload
+			unloadPos = oldPos - (loadPos - newPos);
+			_swapChunk(unloadPos, loadPos);
 		}
+		loadPos.y -= ySign;
 	}
 	//Processing the leftovers
 	for (uint yLeft = 0; yLeft < kLoadRange - fullRow; yLeft++)
 	{
+		loadPos = glm::ivec2
+		(
+			newPos.x + (kLoadDistance) * xSign,
+			newPos.y - (kLoadDistance - yLeft) * ySign
+		);
 		for (uint xLeft = 0; xLeft < (uint)abs(move.x); xLeft ++)
 		{
-			loadPos = glm::ivec2(	newPos.x + (kLoadDistance - xLeft) * xSign,
-									newPos.y - (kLoadDistance - yLeft) * ySign);
-			_loadChunk(loadPos);
-			_unloadChunk(oldPos - (loadPos - newPos));
+			unloadPos = oldPos - (loadPos - newPos);
+			_swapChunk(unloadPos, loadPos);
+			loadPos.x -= xSign;
 		}
 	}
 }
@@ -64,18 +78,14 @@ void ChunkManager::_swapRange(const glm::ivec2& oldPos, const glm::ivec2& newPos
 // No need to remove from _tree because it uses the Chunk*
 void ChunkManager::_swapChunk(const glm::ivec2& oldPos, const glm::ivec2& newPos)
 {
-	auto it = _chunks.find(oldPos);
-
-	if (it == _chunks.end())
-		return;
+	Chunk* chunk = _chunks[oldPos];
 
 	//reuse allocated chunk
-	*(it->second) = Chunk(newPos * 16, _material);
+	chunk->rebuild(newPos * 16);
 
 	//insert new pair & remove old
-	_chunks[newPos] = it->second;
-	_chunks.erase(it);
-
+	_chunks[newPos] = chunk;
+	_chunks.erase(oldPos);
 }
 
 void ChunkManager::updateChunks(const glm::vec3 &pos, bool preload)
@@ -143,7 +153,10 @@ void ChunkManager::_loadChunk(const glm::i32vec2& pos)
 
 	if (!_isLoaded(pos))
 	{
-		Chunk* chunk = new Chunk(pos * 16, _material);
+		Chunk* chunk = &(_chunkMemory[chunkCount]);
+
+		chunk->setMaterial(_material);
+		chunk->rebuild(pos * 16);
 		chunk->setID(chunkCount);
 		_chunks.insert({pos, chunk});
 
@@ -162,7 +175,6 @@ void ChunkManager::_unloadChunk(const glm::i32vec2& pos)
 
 		_chunks.extract(pos);
 		_tree.extract("chunk" + std::to_string(ptr->getID()));
-		delete ptr;
 	}
 	else
 	{
