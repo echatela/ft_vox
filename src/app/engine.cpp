@@ -120,19 +120,19 @@ void Engine::_processEvents(Frame& frame)
 
 	if (keys[GLFW_KEY_F5])
 	{
-		if (!input.toggleInfo)
+		if (!input.infoKeyHold)
 		{
-			input.info = true;
-			input.toggleInfo = true;
+			input.infoToggle = true;
+			input.infoKeyHold = true;
 		}
 		else
 		{
-			input.info = false;
+			input.infoToggle = false;
 		}
 	}
 	else if (input.toggleInfo && !keys[GLFW_KEY_F5])
 	{
-		input.toggleInfo = false;
+		input.infoKeyHold = false;
 	}
 	_window.consumeCursorOffset(&input.xOffset, &input.yOffset);
 }
