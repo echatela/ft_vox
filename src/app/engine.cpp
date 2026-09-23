@@ -130,7 +130,7 @@ void Engine::_processEvents(Frame& frame)
 			input.infoToggle = false;
 		}
 	}
-	else if (input.toggleInfo && !keys[GLFW_KEY_F5])
+	else if (input.infoKeyHold && !keys[GLFW_KEY_F5])
 	{
 		input.infoKeyHold = false;
 	}
@@ -162,7 +162,8 @@ void Engine::_updateWorld()
 	((ChunkManager*)_root["chunk_manager"])->updateChunks(_camera.getPos());
 }
 
-constexpr auto kLowFramerate = 60;
+constexpr auto kLowFramerate = 30;
+constexpr auto kFrameDrop = kLowFramerate / 10;
 
 void Engine::_updateGUI(const Frame& frame)
 {
@@ -170,7 +171,7 @@ void Engine::_updateGUI(const Frame& frame)
 	ChunkManager* chunkManager = dynamic_cast<ChunkManager *>(_root["chunk_manager"]);
 
 	static int lastframerate;
-	static int tick;
+	static int tick = 0;
 
 	Label* frameLabel = 		dynamic_cast<Label *>((*menu)["label_framerate"]);
 	Label* positionLabel = 		dynamic_cast<Label *>((*menu)["label_position"]);
@@ -183,25 +184,29 @@ void Engine::_updateGUI(const Frame& frame)
 	}
 	if (menu->getProcess())
 	{
-		int frames = timeinfo::getFramerate(frame.dt);
-		if (tick > 10)
-			tick = 0;
-		if (frames < kLowFramerate)
+		int currFramerate = timeinfo::getFramerate(frame.dt);
+
+		if (currFramerate < kLowFramerate)
 		{
 			frameLabel->setColor(kColorRed);
 		}
-		else if (frames <= lastframerate)
+		else if (currFramerate + kFrameDrop < lastframerate)
 		{
-			tick ++;
+			if (!tick)
+				tick = 60;
 			frameLabel->setColor(kColorOrange);
 		}
-		
-		else if (!tick)
+		else
+		{
+			if (tick)
+				tick--;
+		}
+		if (!tick)
 			frameLabel->setColor(kColorWhite);
 
-		lastframerate = frames;
+		lastframerate = currFramerate;
 
-		std::string framerate = "Framerate : " + std::to_string(frames);
+		std::string framerate = "Framerate : " + std::to_string(currFramerate);
 		frameLabel->setText(framerate);
 
 		std::string camPos = 	std::to_string((int)_camera.getPos().x) + ", " + 
