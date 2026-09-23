@@ -11,8 +11,8 @@ struct InputIntent
 	bool up = false;
 
 	bool sprint = false;
-	bool toggleInfo = false;
-	bool info = false;
+	bool infoKeyHold = false;
+	bool infoToggle = false;
 
 	float xOffset = 0.0f;
 	float yOffset = 0.0f;
