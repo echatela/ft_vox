@@ -8,9 +8,11 @@ struct InputIntent
 	bool backward = false;
 	bool right = false;
 	bool left = false;
+	bool up = false;
 
 	bool sprint = false;
-	bool toggleInfo = false;
+	bool infoKeyHold = false;
+	bool infoToggle = false;
 
 	float xOffset = 0.0f;
 	float yOffset = 0.0f;
