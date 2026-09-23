@@ -177,7 +177,7 @@ void Engine::_updateGUI(const Frame& frame)
 	Label* resolutionLabel = 	dynamic_cast<Label *>((*menu)["label_resolution"]);
 	Label* chunkCountLabel = 	dynamic_cast<Label *>((*menu)["label_chunkcount"]);
 
-	if (frame.input.info)
+	if (frame.input.infoToggle)
 	{
 		menu->toggleProcess();
 	}
