@@ -2,7 +2,7 @@
 
 void Control::_draw(RenderContext& context) const
 {
-	std::cout << "Control::_draw" << std::endl;
+	// std::cout << "Control::_draw" << std::endl;
 
 	context.rect[0] += getPos().x;
 	context.rect[2] += getPos().x;
@@ -12,11 +12,60 @@ void Control::_draw(RenderContext& context) const
 	if (_material.shader == nullptr || _material.texture == nullptr)
 		return ;
 
-	std::cout << "valid" << std::endl;
+	// std::cout << "valid" << std::endl;
 
 	glm::vec2 rect = {context.rect[2] - context.rect[0], context.rect[3] - context.rect[1]};
+	glm::vec2 offset;
+
 	// TODO : marging/anchor to calculate offset
-	glm::vec2 offset = {context.rect[0], context.rect[1]};
+	switch (_transform.anchor)
+	{
+		case Anchor::TOP_LEFT :
+		{
+			offset = {context.rect[0], context.rect[1]};
+			break;
+		}
+		case Anchor::TOP_CENTER : //
+		{
+			offset = {context.rect[0], context.rect[1]};
+			break;
+		}
+		case Anchor::TOP_RIGHT : //
+		{
+			offset = {-context.rect[0], context.rect[1]};
+			break;
+		}
+		case Anchor::CENTER_LEFT : // 
+		{
+			offset = {context.rect[0], context.rect[1]};
+			break;
+		}
+		case Anchor::CENTER : //
+		{
+			offset = {context.rect[0], context.rect[1]};
+			break;
+		}
+		case Anchor::CENTER_RIGHT : //
+		{
+			offset = {context.rect[0], context.rect[1]};
+			break;
+		}
+		case Anchor::BOTTOM_LEFT : //
+		{
+			offset = {context.rect[0], context.rect[1]};
+			break;
+		}
+		case Anchor::BOTTOM_CENTER : //
+		{
+			offset = {context.rect[0], context.rect[1]};
+			break;
+		}
+		case Anchor::BOTTOM_RIGHT : //
+		{
+			offset = {context.rect[0], context.rect[1]};
+			break;
+		}
+	}
 
 	_mesh.bind();
 	_material.shader->use();

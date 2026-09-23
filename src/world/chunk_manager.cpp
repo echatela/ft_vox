@@ -20,7 +20,7 @@ ChunkManager::ChunkManager()
 	_material.texture = ResourceManager::instance().get<Texture2DArray>(
 	    ResourceId::TEXTURE_BLOCKS);
 
-	std::cout << std::to_string(kLoadCount) << std::endl;
+	// std::cout << std::to_string(kLoadCount) << std::endl;
 	_chunkMemory = new Chunk[kLoadCount];
 	updateChunks({0, 0, 0}, true);
 	// loadAround({0, 0, 0});

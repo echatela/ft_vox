@@ -6,9 +6,9 @@
 
 void Mesh2d::generateGPUBuffers()
 {
-	std::cout << "HERE\n";
-	std::cout << _coords.size() << std::endl;
-	std::cout << _indexes.size() << std::endl;
+	// std::cout << "HERE\n";
+	// std::cout << _coords.size() << std::endl;
+	// std::cout << _indexes.size() << std::endl;
 
 	if (_activeBuffers)
 	{
