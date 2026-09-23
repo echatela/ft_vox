@@ -13,11 +13,9 @@
 
 #define INDEX(pos) ((pos.y * kChunkWidth + pos.z) * kChunkWidth + pos.x)
 #define AT(pos) _blocks[INDEX(pos)]
-// #define BOOL_AT(pos) (_bitBlock[INDEX(pos) / 8])
 #define VALID(pos) (pos.x >= 0 && pos.y >= 0 && pos.z >= 0 && pos.x < kChunkWidth && pos.y < kChunkHeight && pos.z < kChunkWidth)
 
-// #define IS_EDGE(i) (i & 0b1111 == 0 || i & 0b1111 == 0b1111 || i & 0b11110000 == 0b11110000 || i & 0b11110000 == 0b00000000) 
-	#define IS_EDGE(i) (((i & 0xF) == 0) || ((i & 0xF) == 0xF) || (((i >> 4) & 0xF) == 0) || (((i >> 4) & 0xF) == 0xF) || (((i >> 8) & 0xFF) == 0) || (((i >> 8) & 0xFF) == 0xFF))
+#define IS_EDGE(i) (((i & 0xF) == 0) || ((i & 0xF) == 0xF) || (((i >> 4) & 0xF) == 0) || (((i >> 4) & 0xF) == 0xF) || (((i >> 8) & 0xFF) == 0) || (((i >> 8) & 0xFF) == 0xFF))
 
 #define FACE_EDGE(i) ((((i & 0xF) == 0) << kFaceLeft) +\
  					 (((i & 0xF) == 0xF) << kFaceRight ) +\
@@ -77,7 +75,6 @@ Chunk::Chunk(const Chunk& src)
 	// buildMesh();
 }
 
-// TODO : this just functions because its the same chunk
 Chunk& Chunk::operator=(const Chunk& rhs)
 {
 	if (this != &rhs)
@@ -87,8 +84,6 @@ Chunk& Chunk::operator=(const Chunk& rhs)
 		
 		std::cout << "Chunk::operator=" << std::endl;
 		buildMesh();
-		// _vertices = rhs._vertices;
-		// _indices = rhs._indices;
 	}
 	return *this;
 }
@@ -109,8 +104,6 @@ void Chunk::_load()
 		{
 			for (vec.x = 0; vec.x < kChunkWidth; vec.x++)
 			{
-				AT(vec) = kBlockStone;
-
 				_blocks[i] = kBlockStone;
 				_bitBlocks.set(i, true);
 				i++;
