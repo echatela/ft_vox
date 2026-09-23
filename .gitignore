@@ -14,4 +14,6 @@
 todo.txt
 vgcore*
 gmon.out
-out
+out*
+graph*
+callgrind*

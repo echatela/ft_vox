@@ -27,8 +27,8 @@ Engine::~Engine()
 void Engine::init()
 {
 	_initRenderSettings();
-	_initWorld();
 	_initGUI();
+	_initWorld();
 }
 
 void Engine::_initRenderSettings() const
@@ -67,30 +67,20 @@ void Engine::_initGUI()
 
 	Label* frameLabel = new Label("", 24, kColorWhite);
 	frameLabel->setPos({10, 10});
-	frameLabel->setProcess(false);
-
+	
 	Label* positionLabel = new Label("", 24, kColorWhite);
 	positionLabel->setPos({10, 45});
-	positionLabel->setProcess(false);
-
+	
 	Label* resolutionLabel = new Label("", 24, kColorWhite);
 	resolutionLabel->setPos({10, 80});
-	resolutionLabel->setProcess(false);
-
+	
 	Label* chunkCountLabel = new Label("", 24, kColorWhite);
 	chunkCountLabel->setPos({10, 150});
-	chunkCountLabel->setProcess(false);
-
+	
 	menu->append("label_framerate", frameLabel);
-	menu->append("label_position", positionLabel);
+	menu->append("label_position",  positionLabel);
 	menu->append("label_resolution", resolutionLabel);
 	menu->append("label_chunkcount", chunkCountLabel);
-	
-	frameLabel->toggleProcess();
-	positionLabel->toggleProcess();
-	resolutionLabel->toggleProcess();
-	chunkCountLabel->toggleProcess();
-	// menu->toggleProcess();
 
 	_root.append("menu", menu);
 
