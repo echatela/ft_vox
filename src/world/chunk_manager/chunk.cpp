@@ -6,33 +6,15 @@
 #include "render/shader.hpp"
 #include "scene/material.hpp"
 
-#include <cstdint>
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <stdexcept>
 
-#define INDEX(pos) ((pos.y * kChunkWidth + pos.z) * kChunkWidth + pos.x)
+#define INDEX(pos) pos.y*kStrideY + pos.z*kStrideZ + pos.x*kStrideX
 #define AT(pos) _blocks[INDEX(pos)]
 #define VALID(pos)                                                             \
 	(pos.x >= 0 && pos.y >= 0 && pos.z >= 0 && pos.x < kChunkWidth &&          \
 	 pos.y < kChunkHeight && pos.z < kChunkWidth)
-
-#define IS_EDGE(i)                                                             \
-	(((i & 0xF) == 0) || ((i & 0xF) == 0xF) || (((i >> 4) & 0xF) == 0) ||      \
-	 (((i >> 4) & 0xF) == 0xF) || (((i >> 8) & 0xFF) == 0) ||                  \
-	 (((i >> 8) & 0xFF) == 0xFF))
-
-#define FACE_EDGE(i)                                                           \
-	((((i & 0xF) == 0) << kFaceLeft) + (((i & 0xF) == 0xF) << kFaceRight) +    \
-	 ((((i >> 4) & 0xF) == 0) << kFaceBack) +                                  \
-	 ((((i >> 4) & 0xF) == 0xF) << kFaceFront) +                               \
-	 ((((i >> 8) & 0xFF) == 0) << kFaceDown) +                                 \
-	 ((((i >> 8) & 0xFF) == 0xFF) << kFaceUp))
-
-constexpr unsigned int kQuadIndices[6] = {0, 1, 2, 0, 2, 3};
-
-constexpr int kNeighbourOffset[6] = {
-    1, -1, kChunkHeight, -kChunkHeight, kChunkWidth, -kChunkWidth};
 
 Chunk::Chunk()
 {
@@ -42,27 +24,13 @@ Chunk::Chunk(const glm::ivec2& pos, const Material& mat)
     : _pos(pos),
       _material(mat)
 {
-	_load();
-	buildMesh();
 }
 
-void Chunk::rebuild(const glm::ivec2& pos)
+void Chunk::generate(const glm::ivec2& pos, unsigned int seed)
 {
+	(void)seed;
 	_pos = pos;
-	_vertices.clear();
-	_indices.clear();
 
-	glDeleteVertexArrays(1, &_vao);
-	glDeleteBuffers(1, &_vbo);
-	glDeleteBuffers(1, &_ebo);
-
-	_load();
-	buildMesh();
-}
-
-// hard coded generation, will need to implement a seed based generation
-void Chunk::_load()
-{
 	int i;
 
 	_blocks.fill(kBlockNone);
@@ -81,42 +49,14 @@ void Chunk::_load()
 	}
 }
 
-void Chunk::buildMesh()
+void Chunk::clear()
 {
-	// Need to check if these values are fixed or can become higher
-	_vertices.reserve(30000);
-	_indices.reserve(40000);
-
-	for (unsigned int i = 0; i < kChunkSize; i++)
-	{
-		if (_bitBlocks[i])
-			_buildCube(i);
-	}
-	_vertices.shrink_to_fit();
-	_indices.shrink_to_fit();
-	_setupMesh();
-}
-
-void Chunk::_buildCube(uint16_t i)
-{
-	const BlockId id = _blocks[i]; // AT(pos);
-	Vertex        vertex = {i, 0, 0, id};
-	uint8_t       isEdge = FACE_EDGE(i);
-
-	for (vertex.face = kFaceRight; vertex.face < kFaceCount; vertex.face++)
-	{
-		unsigned int base = _vertices.size();
-
-		unsigned int nIndex = i + kNeighbourOffset[vertex.face];
-
-		if (((isEdge >> vertex.face) & 1) || !_bitBlocks[nIndex])
-		{
-			for (vertex.corner = 0; vertex.corner < 4; vertex.corner++)
-				_vertices.push_back(vertex);
-			for (int j = 0; j < 6; j++)
-				_indices.push_back(base + kQuadIndices[j]);
-		}
-	}
+	_pos = {0, 0};
+	_vertices.clear();
+	_indices.clear();
+	glDeleteVertexArrays(1, &_vao);
+	glDeleteBuffers(1, &_vbo);
+	glDeleteBuffers(1, &_ebo);
 }
 
 void Chunk::_draw(RenderContext& context) const

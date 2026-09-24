@@ -1,15 +1,10 @@
 #pragma once
 
-# include <map>
-# include "glm/vec3.hpp"
-# include "glm/mat4x4.hpp"
-
 #include "platform/window.hpp"
 #include "scene/node.hpp"
 #include "world/camera.hpp"
 #include "app/frame.hpp"
 #include "glm/ext/matrix_float4x4.hpp"
-#include "world/chunk_manager.hpp"
 
 constexpr float kZNear = 0.1f;
 constexpr float kZFar = 10000.0f;
@@ -44,7 +39,6 @@ class Engine
 
 	EngineState  _state;
 	Camera       _camera;
-	// ChunkManager _chunkManager;
 
 	Node _root;
 

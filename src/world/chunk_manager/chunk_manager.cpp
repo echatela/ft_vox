@@ -1,8 +1,11 @@
 #include "chunk_manager.hpp"
+#include "glm/ext/vector_int2.hpp"
 #include "glm/ext/vector_int2_sized.hpp"
 #include "loader/resource_manager.hpp"
 #include "render/texture_2d_array.hpp"
 #include "scene/material.hpp"
+#include "world/chunk_manager/chunk.hpp"
+#include "world/chunk_manager/chunk_mesher.hpp"
 
 constexpr int  kLoadDistance = 10;
 constexpr auto kLoadRange = kLoadDistance * 2 + 1;
@@ -10,8 +13,7 @@ constexpr auto kLoadCount = kLoadRange * kLoadRange;
 
 // constexpr int kViewDistance = 5;
 
-// TODO : Destructor should empty node and free map
-ChunkManager::ChunkManager()
+ChunkManager::ChunkManager(const glm::vec3& worldPos)
 {
 	_material.shader =
 	    ResourceManager::instance().get<Shader>(ResourceId::SHADER_CHUNK);
@@ -20,7 +22,7 @@ ChunkManager::ChunkManager()
 
 	_chunkMemory = new Chunk[kLoadCount];
 	_chunks.reserve(kLoadCount);
-	_loadAround({0, 0});
+	_loadAround(worldPos);
 }
 
 ChunkManager::~ChunkManager()
@@ -36,7 +38,8 @@ void ChunkManager::updateChunks(const glm::vec3& pos)
 {
 	static glm::ivec2 lastPos(0);
 
-	glm::ivec2 newPos = {std::floor(pos.x / 16), std::floor(pos.z / 16)};
+	glm::ivec2 newPos = {std::floor(pos.x / kChunkWidth),
+	                     std::floor(pos.z / kChunkWidth)};
 
 	if (newPos != lastPos)
 	{
@@ -46,9 +49,11 @@ void ChunkManager::updateChunks(const glm::vec3& pos)
 	lastPos = newPos;
 }
 
-void ChunkManager::_loadAround(const glm::ivec2& pos)
+void ChunkManager::_loadAround(const glm::vec3& worldPos)
 {
-	glm::ivec2 vec = {0, 0};
+	const glm::i32vec2 pos(worldPos.x / kChunkWidth, worldPos.z / kChunkWidth);
+
+	glm::ivec2 vec;
 
 	for (vec.y = pos.y - kLoadDistance; vec.y <= pos.y + kLoadDistance; vec.y++)
 	{
@@ -57,6 +62,27 @@ void ChunkManager::_loadAround(const glm::ivec2& pos)
 		{
 			_loadChunk(vec);
 		}
+	}
+}
+
+void ChunkManager::_loadChunk(const glm::i32vec2& pos)
+{
+	static unsigned int chunkCount = 0;
+
+	if (!_isLoaded(pos))
+	{
+		Chunk* chunk = &(_chunkMemory[chunkCount]);
+
+		chunk->setMaterial(_material);
+		chunk->setID(chunkCount);
+
+		chunk->generate(pos, 0);
+		ChunkMesher::build(*chunk, _neighbours(pos));
+		_chunks.insert({pos, chunk});
+
+		append("chunk" + std::to_string(chunkCount), chunk);
+
+		chunkCount++;
 	}
 }
 
@@ -99,40 +125,41 @@ void ChunkManager::_swapRange(const glm::ivec2& oldPos,
 
 // Load + Unload a chunk, keeping the old allocated Chunk pointer
 // No need to remove from _tree because it uses the Chunk*
-void ChunkManager::_swapChunk(const glm::ivec2& oldPos,
-                              const glm::ivec2& newPos)
+void ChunkManager::_swapChunk(const glm::i32vec2& oldPos,
+                              const glm::i32vec2& newPos)
 {
 	Chunk* chunk = _chunks[oldPos];
 
 	// reuse allocated chunk
-	chunk->rebuild(newPos);
+	chunk->clear();
+	chunk->generate(newPos, 0);
+	ChunkMesher::build(*chunk, _neighbours(newPos));
 
 	// insert new pair & remove old
 	_chunks.erase(oldPos);
 	_chunks[newPos] = chunk;
 }
 
-void ChunkManager::_loadChunk(const glm::i32vec2& pos)
+namespace
 {
-	static unsigned int chunkCount = 0;
+constexpr Face kFaceSide[4] = {kFaceRight, kFaceLeft, kFaceDown, kFaceBack};
+constexpr glm::i32vec2 kSideOffset[4] = {{1, 0}, {-1, 0}, {0, 1}, {0, -1}};
+} // namespace
 
-	if (!_isLoaded(pos))
+Neighbours ChunkManager::_neighbours(const glm::i32vec2& pos)
+{
+	Neighbours n{};
+
+	for (int i = 0; i < 4; i++)
 	{
-		Chunk* chunk = &(_chunkMemory[chunkCount]);
-
-		chunk->setMaterial(_material);
-		chunk->setID(chunkCount);
-
-		chunk->rebuild(pos);
-		_chunks.insert({pos, chunk});
-
-		append("chunk" + std::to_string(chunkCount), chunk);
-
-		chunkCount++;
+		auto it = _chunks.find(pos + kSideOffset[i]);
+		if (it != _chunks.end())
+			n[kFaceSide[i]] = it->second;
 	}
+	return n;
 }
 
-//void ChunkManager::_unloadChunk(const glm::i32vec2& pos)
+// void ChunkManager::_unloadChunk(const glm::i32vec2& pos)
 //{
 //	if (_isLoaded(pos))
 //	{
@@ -145,7 +172,7 @@ void ChunkManager::_loadChunk(const glm::i32vec2& pos)
 //	{
 //		std::cerr << "Tried to unload unloaded chunk" << std::endl;
 //	}
-//}
+// }
 
 ////////////////////////////////////////////////////////////////////////////////
 

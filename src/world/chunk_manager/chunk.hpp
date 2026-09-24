@@ -14,7 +14,12 @@
 constexpr int kChunkWidth = 16;
 constexpr int kChunkHeight = 256;
 constexpr int kChunkSize = kChunkWidth * kChunkWidth * kChunkHeight;
-constexpr int kChunkBytes = kChunkSize / sizeof(uint8_t);
+
+// memory layout : index = y*kStrideY + z*kStrideZ + x*kStrideX
+// bits          : [y:8][z:4][x:4]
+constexpr int kStrideX = 1;
+constexpr int kStrideZ = kChunkWidth;
+constexpr int kStrideY = kChunkWidth * kChunkWidth;
 
 struct Vertex
 {
@@ -35,32 +40,32 @@ enum BlockId : uint8_t
 
 enum Face : uint8_t
 {
-	kFaceRight,
-	kFaceLeft,
-	kFaceUp,
-	kFaceDown,
-	kFaceFront,
-	kFaceBack,
+	kFaceRight, // +X
+	kFaceLeft,  // -X
+	kFaceUp,    // +Y
+	kFaceDown,  // -Y
+	kFaceFront, // +Z
+	kFaceBack,  // -Z
 	kFaceCount
 };
 
+class ChunkMesher;
+
 class Chunk : public Node
 {
-	unsigned int                    _ID;
-	glm::ivec2                      _pos;
-	std::bitset<kChunkSize>         _bitBlocks;
-	std::array<BlockId, kChunkSize> _blocks;
-	Material                        _material;
+	unsigned int                    _ID = -1;
+	glm::ivec2                      _pos = {0, 0};
+	std::bitset<kChunkSize>         _bitBlocks{false};
+	std::array<BlockId, kChunkSize> _blocks{kBlockNone};
+	Material                        _material = {nullptr, nullptr};
 
 	// TODO: Mesh3D
-	unsigned int _vao;
-	unsigned int _vbo;
-	unsigned int _ebo;
+	unsigned int _vao = 0;
+	unsigned int _vbo = 0;
+	unsigned int _ebo = 0;
 
 	std::vector<Vertex>       _vertices;
 	std::vector<unsigned int> _indices;
-
-	void _draw(RenderContext& context) const;
 
 public:
 	Chunk();
@@ -70,9 +75,8 @@ public:
 	Chunk(const Chunk& src);
 	Chunk& operator=(const Chunk& rhs);
 
-	void buildMesh();
-
-	void rebuild(const glm::ivec2& pos);
+	void generate(const glm::ivec2& pos, unsigned int seed);
+	void clear();
 
 	BlockId& at(const glm::ivec3& pos);
 	BlockId  at(const glm::ivec3& pos) const;
@@ -83,7 +87,7 @@ public:
 	void setMaterial(const Material& mat);
 
 private:
-	void _load();
+	void _draw(RenderContext& context) const;
 
 	void _buildCube(uint16_t i);
 	void _buildFace(uint8_t face, const glm::ivec3& pos);
@@ -93,4 +97,6 @@ private:
 	bool _isBlock(const glm::ivec3& pos) const;
 
 	int _index(const glm::ivec3& pos) const;
+
+	friend ChunkMesher;
 };

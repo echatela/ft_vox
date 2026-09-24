@@ -1,5 +1,6 @@
 #include "app/engine.hpp"
 #include "glm/ext/vector_float3.hpp"
+#include "world/chunk_manager/chunk_manager.hpp"
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
@@ -11,7 +12,6 @@
 #include <glm/gtx/string_cast.hpp>
 
 #include "app/frame.hpp"
-#include "render/shader.hpp"
 #include "time.hpp"
 #include "scene/label.hpp"
 

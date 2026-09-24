@@ -21,6 +21,7 @@ const vec2 kUVs[4] = {vec2(0,0),vec2(1,0),vec2(1,1),vec2(0,1)};
 
 void main()
 {
+    // index : [y:8][z:4][x:4]
 	vec3 pos = vec3(aPos & 15u, (aPos >> 8u) & 255u, (aPos >> 4u) & 15u);
 	gl_Position = matrix * vec4(pos + kCorners[aFace][aCorner], 1.0f);
     vUV = kUVs[aCorner];
