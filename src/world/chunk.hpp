@@ -5,7 +5,6 @@
 #include <vector>
 #include <bitset>
 
-#include "glm/ext/matrix_float4x4.hpp"
 #include "glm/ext/vector_int2.hpp"
 #include "glm/ext/vector_int3.hpp"
 #include "glm/fwd.hpp"
@@ -19,11 +18,10 @@ constexpr int kChunkBytes = kChunkSize / sizeof(uint8_t);
 
 struct Vertex
 {
-	// glm::vec3 pos;
 	uint16_t pos;
-	uint8_t face;
-	uint8_t corner;
-	uint8_t id;
+	uint8_t  face;
+	uint8_t  corner;
+	uint8_t  id;
 };
 
 enum BlockId : uint8_t
@@ -48,12 +46,11 @@ enum Face : uint8_t
 
 class Chunk : public Node
 {
-	unsigned int					 _ID;
-	glm::ivec2                       _pos;
-	// std::array<uint8_t, kChunkBytes> _bitBlock = {false};
-	std::bitset<kChunkSize>			 _bitBlocks;
-	std::array<BlockId, kChunkSize>  _blocks;
-	Material                         _material;
+	unsigned int                    _ID;
+	glm::ivec2                      _pos;
+	std::bitset<kChunkSize>         _bitBlocks;
+	std::array<BlockId, kChunkSize> _blocks;
+	Material                        _material;
 
 	// TODO: Mesh3D
 	unsigned int _vao;
@@ -63,29 +60,27 @@ class Chunk : public Node
 	std::vector<Vertex>       _vertices;
 	std::vector<unsigned int> _indices;
 
-	void _draw(RenderContext &context) const;
+	void _draw(RenderContext& context) const;
 
 public:
-
 	Chunk();
 
-	Chunk(const glm::ivec2& pos,
-	      const Material&   mat);
+	Chunk(const glm::ivec2& pos, const Material& mat);
 
 	Chunk(const Chunk& src);
 	Chunk& operator=(const Chunk& rhs);
 
 	void buildMesh();
 
-	void rebuild(const glm::ivec2 &pos);
+	void rebuild(const glm::ivec2& pos);
 
 	BlockId& at(const glm::ivec3& pos);
 	BlockId  at(const glm::ivec3& pos) const;
 
 	unsigned int getID() const;
-	void		 setID(unsigned int ID);
+	void         setID(unsigned int ID);
 
-	void	setMaterial(const Material& mat);
+	void setMaterial(const Material& mat);
 
 private:
 	void _load();

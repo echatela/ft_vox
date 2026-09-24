@@ -1,6 +1,5 @@
 #pragma once
 
-#include "glm/ext/matrix_float4x4.hpp"
 #include "scene/material.hpp"
 #include <glm/ext/vector_int2_sized.hpp>
 #define GLM_ENABLE_EXPERIMENTAL
@@ -12,12 +11,12 @@
 class ChunkManager : public Node
 {
 	// TODO: maybe replace by <uint32_t, Chunk> for faster access
-	Chunk* _chunkMemory = nullptr;
+	Chunk*                                   _chunkMemory = nullptr;
 	std::unordered_map<glm::i32vec2, Chunk*> _chunks;
-	Material                                _material;
+	Material                                 _material;
 
 	void _draw(RenderContext& context) const;
-	
+
 	void _loadAround(const glm::ivec2& pos);
 
 	void _swapRange(const glm::ivec2& oldPos, const glm::ivec2& newPos);
@@ -27,13 +26,12 @@ public:
 	ChunkManager();
 	~ChunkManager();
 
-	void updateChunks(const glm::vec3& pos, bool preload = false);
-
+	void updateChunks(const glm::vec3& pos);
 
 	void            setMaterial(const Material& mat);
 	const Material& getMaterial() const;
 
-	unsigned int 	getSize() const;
+	unsigned int getSize() const;
 
 private:
 	void _loadChunk(const glm::i32vec2& pos);

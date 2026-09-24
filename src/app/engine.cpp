@@ -40,7 +40,6 @@ void Engine::_initRenderSettings() const
 
 void Engine::_initWorld()
 {
-
 	const float aspectRatio = static_cast<float>(_state.resolution.x) /
 	                          static_cast<float>(_state.resolution.y);
 	_state.projection =
@@ -48,16 +47,9 @@ void Engine::_initWorld()
 
 	_camera.setPos(glm::vec3(0, 140, 0));
 
-	// ResourceManager& rm = ResourceManager::instance();
-	// const Shader*    shaderPtr = rm.get<Shader>(ResourceId::SHADER_CHUNK);
-	// const ATexture*   texturePtr =
-	//     rm.get<ATexture>(ResourceId::TEXTURE_BLOCKS);
+	ChunkManager* chunkManager = new ChunkManager();
 
-	ChunkManager* chunk = new ChunkManager();
-	// chunk->build();
-
-	_root.append("chunk_manager", chunk);
-
+	_root.append("chunk_manager", chunkManager);
 }
 
 void Engine::_initGUI()
@@ -67,23 +59,22 @@ void Engine::_initGUI()
 
 	Label* frameLabel = new Label("", 24, kColorWhite);
 	frameLabel->setPos({10, 10});
-	
+
 	Label* positionLabel = new Label("", 24, kColorWhite);
 	positionLabel->setPos({10, 45});
-	
+
 	Label* resolutionLabel = new Label("", 24, kColorWhite);
 	resolutionLabel->setPos({10, 80});
-	
+
 	Label* chunkCountLabel = new Label("", 24, kColorWhite);
 	chunkCountLabel->setPos({10, 150});
-	
+
 	menu->append("label_framerate", frameLabel);
 	menu->append("label_position",  positionLabel);
 	menu->append("label_resolution", resolutionLabel);
 	menu->append("label_chunkcount", chunkCountLabel);
 
 	_root.append("menu", menu);
-
 }
 
 void Engine::loop()
@@ -209,7 +200,7 @@ void Engine::_updateGUI(const Frame& frame)
 		std::string framerate = "Framerate : " + std::to_string(currFramerate);
 		frameLabel->setText(framerate);
 
-		std::string camPos = 	std::to_string((int)_camera.getPos().x) + ", " + 
+		std::string camPos = 	std::to_string((int)_camera.getPos().x) + ", " +
 								std::to_string((int)_camera.getPos().y) + ", " +
 								std::to_string((int)_camera.getPos().z);
 
