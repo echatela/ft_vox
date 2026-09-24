@@ -9,6 +9,7 @@ enum class ResourceId
 	SHADER_2D,
 	SHADER_CHUNK,
 	SHADER_CONTROL,
+	SHADER_LABEL,
 	TEXTURE_FONT,
 	TEXTURE_BLOCKS,
 	TEXTURE_HOTBAR_SELECTOR
@@ -40,6 +41,11 @@ constexpr ResourceInfo data[] = {
 	{	ResourceId::SHADER_CONTROL,
 		ResourceType::SHADER,
 		{"shaders/control_vert.glsl", "shaders/control_frag.glsl"}
+	},
+	{
+		ResourceId::SHADER_LABEL,
+		ResourceType::SHADER,
+		{"shaders/label_vert.glsl", "shaders/label_frag.glsl"}
 	},
 	{
 		ResourceId::TEXTURE_FONT,

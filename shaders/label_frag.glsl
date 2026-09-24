@@ -8,5 +8,6 @@ uniform vec3 myColor;
 
 void main()
 {
-	FragColor = texture(myTexture, UV);
+	float alpha = texture(myTexture, UV).a;
+	FragColor = vec4(myColor, alpha);
 }

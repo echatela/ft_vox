@@ -20,7 +20,7 @@ Texture2DArray::Texture2DArray()
       _imageFormat(GL_RGB),
       _wrapS(GL_REPEAT),
       _wrapT(GL_REPEAT),
-      _filterMin(GL_NEAREST_MIPMAP_LINEAR),
+      _filterMin(GL_LINEAR_MIPMAP_LINEAR),
       _filterMax(GL_NEAREST)
 {
 }
@@ -36,7 +36,7 @@ Texture2DArray::Texture2DArray(const std::vector<std::string>& texFiles,
       _imageFormat(alpha ? GL_RGBA : GL_RGB),
       _wrapS(GL_REPEAT),
       _wrapT(GL_REPEAT),
-      _filterMin(GL_NEAREST_MIPMAP_LINEAR),
+      _filterMin(GL_LINEAR_MIPMAP_LINEAR),
       _filterMax(GL_NEAREST)
 {
 	load(texFiles, width, height, alpha);
