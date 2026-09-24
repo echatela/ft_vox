@@ -27,6 +27,12 @@ constexpr uint8_t edgeMask(unsigned int i)
 	        (z == kChunkWidth - 1) << kFaceFront | (z == 0) << kFaceBack);
 }
 
+constexpr int kWrapOffset[kFaceCount] = {
+    -(kChunkWidth - 1) * kStrideX,  +(kChunkWidth - 1) * kStrideX,
+    -(kChunkHeight - 1) * kStrideY, +(kChunkHeight - 1) * kStrideY,
+    -(kChunkWidth - 1) * kStrideZ,  +(kChunkWidth - 1) * kStrideZ,
+};
+
 void ChunkMesher::build(Chunk& chunk, const Neighbours& neighbours)
 {
 	Vertex  v;
@@ -42,27 +48,22 @@ void ChunkMesher::build(Chunk& chunk, const Neighbours& neighbours)
 
 			for (v.face = kFaceRight; v.face < kFaceCount; v.face++)
 			{
-				unsigned int baseIndex = chunk._vertices.size();
-				unsigned int neighbourIndex = i + kNeighbourOffset[v.face];
-
 				if ((edges >> v.face) & 1)
 				{
-					if (!neighbours[v.face])
-					{
-						for (v.corner = 0; v.corner < 4; v.corner++)
-							chunk._vertices.push_back(v);
-						for (int j = 0; j < 6; j++)
-							chunk._indices.push_back(baseIndex +
-							                         kQuadIndices[j]);
-					}
+					const Chunk* n = neighbours[v.face];
+
+					if (n && n->_bitBlocks[i + kWrapOffset[v.face]])
+						continue;
 				}
-				else if (!chunk._bitBlocks[neighbourIndex])
-				{
-					for (v.corner = 0; v.corner < 4; v.corner++)
-						chunk._vertices.push_back(v);
-					for (int j = 0; j < 6; j++)
-						chunk._indices.push_back(baseIndex + kQuadIndices[j]);
-				}
+				else if (chunk._bitBlocks[i + kNeighbourOffset[v.face]])
+					continue;
+
+				unsigned int baseIndex = chunk._vertices.size();
+
+				for (v.corner = 0; v.corner < 4; v.corner++)
+					chunk._vertices.push_back(v);
+				for (int j = 0; j < 6; j++)
+					chunk._indices.push_back(baseIndex + kQuadIndices[j]);
 			}
 		}
 	}
