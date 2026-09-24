@@ -25,6 +25,8 @@ class Control : public Node {
 
 		void			 setPos(glm::vec2 pos);
 		const glm::vec2& getPos() const;
+		void			 setAnchor(Anchor anchor);
+		Anchor			 getAnchor() const;
 
 				Control(const Shader* shader, const ATexture* texture, const glm::vec2& textureRes);
 				Control();

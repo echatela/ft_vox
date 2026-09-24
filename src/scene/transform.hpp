@@ -18,9 +18,9 @@ struct ControlTransform {
 
 	// unsigned int rect[4] = {};
 	Anchor       anchor;
-	glm::vec2	 position;
-	glm::vec2	 rect;
-	glm::vec2	 scale;
+	glm::vec2	 position = {0, 0};
+	glm::vec2	 rect = {0, 0};
+	glm::vec2	 scale = {1, 1};
 	unsigned int zIndex;
 
 };

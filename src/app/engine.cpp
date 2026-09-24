@@ -86,15 +86,15 @@ void Engine::_initGUI()
 	// menu->append("label_chunkcount", chunkCountLabel);
 
 	ResourceManager &rm = ResourceManager::instance();
+
 	Control* hotbar = new Control(rm.get<Shader>(ResourceId::SHADER_CONTROL),
                                   rm.get<Texture2D>(ResourceId::TEXTURE_HOTBAR_SELECTOR),
-								  glm::vec2(_window.getWidth() / 2, _window.getHeight() / 10));
-
-	hotbar->setPos(_window.getRes() / 2);
+								  glm::vec2(_window.getWidth() / 3, _window.getHeight() / 15));
+	
+	hotbar->setAnchor(Anchor::BOTTOM_CENTER);
 	menu->append("hotbar", hotbar);
 
 	_root.append("menu", menu);
-
 }
 
 void Engine::loop()
@@ -243,9 +243,9 @@ void Engine::_render() const
 	RenderContext context;
 
 	context.mat3D = _state.projection * _state.view;
-
-	context.rect[2] = _window.getRes()[0];
-	context.rect[3] = _window.getRes()[1];
+	context.res = _window.getRes();
+	context.rect[2] = context.res.x;
+	context.rect[3] = context.res.y;
 
 	_root.recursiveDraw(context);
 

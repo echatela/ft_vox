@@ -2,22 +2,11 @@
 
 void Control::_draw(RenderContext& context) const
 {
-	// std::cout << "Control::_draw" << std::endl;
-
-	context.rect[0] += getPos().x;
-	context.rect[2] += getPos().x;
-	context.rect[1] += getPos().y;
-	context.rect[3] += getPos().y;
-
 	if (_material.shader == nullptr || _material.texture == nullptr)
 		return ;
 
-	// std::cout << "valid" << std::endl;
-
-	glm::vec2 rect = {context.rect[2] - context.rect[0], context.rect[3] - context.rect[1]};
 	glm::vec2 offset;
 
-	// TODO : marging/anchor to calculate offset
 	switch (_transform.anchor)
 	{
 		case Anchor::TOP_LEFT :
@@ -25,54 +14,61 @@ void Control::_draw(RenderContext& context) const
 			offset = {context.rect[0], context.rect[1]};
 			break;
 		}
-		case Anchor::TOP_CENTER : //
+		case Anchor::TOP_CENTER :
 		{
-			offset = {context.rect[0], context.rect[1]};
+			offset = {context.rect[0] + (context.rect[2] - context.rect[0]) / 2 - _transform.rect.x / 2, context.rect[1]};
 			break;
 		}
-		case Anchor::TOP_RIGHT : //
+		case Anchor::TOP_RIGHT :
 		{
-			offset = {-context.rect[0], context.rect[1]};
+			offset = {context.rect[0] + (context.rect[2] - context.rect[0]) - _transform.rect.x, context.rect[1]};
 			break;
 		}
-		case Anchor::CENTER_LEFT : // 
+		case Anchor::CENTER_LEFT : 
 		{
-			offset = {context.rect[0], context.rect[1]};
+			offset = {context.rect[0], context.rect[1] + context.rect[3] / 2 - _transform.rect.y / 2};
 			break;
 		}
-		case Anchor::CENTER : //
+		case Anchor::CENTER :
 		{
-			offset = {context.rect[0], context.rect[1]};
+			offset = {context.rect[0] + ((context.rect[2] - context.rect[0]) / 2) - _transform.rect.x / 2, context.rect[1] + context.rect[3] / 2 - _transform.rect.y / 2};
 			break;
 		}
-		case Anchor::CENTER_RIGHT : //
+		case Anchor::CENTER_RIGHT :
 		{
-			offset = {context.rect[0], context.rect[1]};
+			offset = {context.rect[0] + (context.rect[2] - context.rect[0]) - _transform.rect.x, context.rect[1] + context.rect[3] / 2 - _transform.rect.y / 2};
 			break;
 		}
-		case Anchor::BOTTOM_LEFT : //
+		case Anchor::BOTTOM_LEFT :
 		{
-			offset = {context.rect[0], context.rect[1]};
+			offset = {context.rect[0], context.rect[1] + (context.rect[3] - _transform.rect.y)};
 			break;
 		}
-		case Anchor::BOTTOM_CENTER : //
+		case Anchor::BOTTOM_CENTER :
 		{
-			offset = {context.rect[0], context.rect[1]};
+			offset = {context.rect[0] + (context.rect[2] - context.rect[0]) / 2 - _transform.rect.x / 2, context.rect[1] + (context.rect[3] - _transform.rect.y)};
 			break;
 		}
-		case Anchor::BOTTOM_RIGHT : //
+		case Anchor::BOTTOM_RIGHT :
 		{
-			offset = {context.rect[0], context.rect[1]};
+			offset = {context.rect[0] + (context.rect[2] - context.rect[0]) - _transform.rect.x, context.rect[1] + (context.rect[3] - _transform.rect.y)};
 			break;
 		}
 	}
+
+	offset += getPos();
+
+	context.rect[0] = offset.x;
+	context.rect[2] = offset.x + _transform.rect.x;
+	context.rect[1] = offset.y;
+	context.rect[3] = offset.y + _transform.rect.y;
 
 	_mesh.bind();
 	_material.shader->use();
 	_material.texture->bind(0);
 	_material.shader->setUniform<int>("myTexture", 0);
 	_material.shader->setUniform<const glm::vec2 &>("offset", offset);
-	_material.shader->setUniform<const glm::vec2 &>("rect", rect);
+	_material.shader->setUniform<const glm::vec2 &>("res", context.res);
 
 	//temp
 	_material.shader->setUniform<const glm::vec3&>("myColor", glm::vec3(0, 0, 0));
@@ -133,6 +129,16 @@ void	Control::setPos(glm::vec2 pos)
 const glm::vec2& Control::getPos() const
 {
 	return (_transform.position);
+}
+
+void	Control::setAnchor(Anchor anchor)
+{
+	_transform.anchor = anchor;
+}
+
+Anchor Control::getAnchor() const
+{
+	return (_transform.anchor);
 }
 
 Control::Control(const Shader* shader, const ATexture* texture, const glm::vec2& textureRes)
