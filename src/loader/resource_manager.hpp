@@ -12,6 +12,7 @@ enum class ResourceId
 	SHADER_LABEL,
 	TEXTURE_FONT,
 	TEXTURE_BLOCKS,
+	TEXTURE_HOTBAR,
 	TEXTURE_HOTBAR_SELECTOR
 };
 
@@ -62,9 +63,14 @@ constexpr ResourceInfo data[] = {
 		16, 16, true
 	},
 	{
+		ResourceId::TEXTURE_HOTBAR,
+		ResourceType::TEXTURE_2D,
+		{"assets/hud/hotbar.png"}
+	},
+	{
 		ResourceId::TEXTURE_HOTBAR_SELECTOR,
 		ResourceType::TEXTURE_2D,
-		{"assets/hud/Hotbar_selector.png"}
+		{"assets/hud/hotbar_selector.png"}
 	}
 
 };

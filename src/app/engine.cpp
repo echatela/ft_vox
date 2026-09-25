@@ -63,8 +63,9 @@ void Engine::_initWorld()
 
 }
 
-void Engine::_initGUI()
+constexpr auto kHotbarSelectorPadding = 4;
 
+void Engine::_initGUI()
 {
 	Node* menu = new Control();
 
@@ -79,9 +80,6 @@ void Engine::_initGUI()
 	
 	Label* chunkCountLabel = new Label("", 24, kColorWhite);
 	chunkCountLabel->setPos({10, 150});
-
-	Label* hotbarLabel = new Label("hotbar", 24, kColorWhite);
-	hotbarLabel->setAnchor(Anchor::BOTTOM_CENTER);
 	
 	menu->append("label_framerate", frameLabel);
 	menu->append("label_position",  positionLabel);
@@ -91,25 +89,19 @@ void Engine::_initGUI()
 	ResourceManager &rm = ResourceManager::instance();
 
 	Control* hotbar = new Control(rm.get<Shader>(ResourceId::SHADER_CONTROL),
-                                  rm.get<Texture2D>(ResourceId::TEXTURE_HOTBAR_SELECTOR),
+                                  rm.get<Texture2D>(ResourceId::TEXTURE_HOTBAR),
 								  glm::vec2(_window.getWidth() / 3, _window.getHeight() / 15));
 
-	Control* hotbar2 = new Control(rm.get<Shader>(ResourceId::SHADER_CONTROL),
+	Control* hotbarSelector = new Control(
+								  rm.get<Shader>(ResourceId::SHADER_CONTROL),
                                   rm.get<Texture2D>(ResourceId::TEXTURE_HOTBAR_SELECTOR),
-								  glm::vec2(_window.getWidth() / 4, _window.getHeight() / 20));
-
-	Control* hotbar3 = new Control(rm.get<Shader>(ResourceId::SHADER_CONTROL),
-                                  rm.get<Texture2D>(ResourceId::TEXTURE_HOTBAR_SELECTOR),
-								  glm::vec2(_window.getWidth() / 5, _window.getHeight() / 25));
-
-	hotbar3->setAnchor(Anchor::TOP_RIGHT);
-	hotbar2->append("hotbar3", hotbar3);
-
-	hotbar2->setAnchor(Anchor::BOTTOM_LEFT);
-	hotbar->append("hotbar2", hotbar2);
+								  glm::vec2(_window.getWidth() / (3 * 9) + kHotbarSelectorPadding, _window.getHeight() / 15 + kHotbarSelectorPadding));			  
 	
 	hotbar->setAnchor(Anchor::BOTTOM_CENTER);
-	hotbar3->append("hotbar_label", hotbarLabel);
+	hotbarSelector->setAnchor(Anchor::CENTER_LEFT);
+	hotbarSelector->setPos({-kHotbarSelectorPadding / 2, 0});
+
+	hotbar->append("hotbar_selector", hotbarSelector);
 	menu->append("hotbar", hotbar);
 
 	_root.append("menu", menu);
@@ -139,6 +131,16 @@ void Engine::_processEvents(Frame& frame)
 
 	if (keys[GLFW_KEY_ESCAPE])
 		_window.setShouldClose();
+
+	input.numpad1 = keys[GLFW_KEY_1];
+	input.numpad2 = keys[GLFW_KEY_2];
+	input.numpad3 = keys[GLFW_KEY_3];
+	input.numpad4 = keys[GLFW_KEY_4];
+	input.numpad5 = keys[GLFW_KEY_5];
+	input.numpad6 = keys[GLFW_KEY_6];
+	input.numpad7 = keys[GLFW_KEY_7];
+	input.numpad8 = keys[GLFW_KEY_8];
+	input.numpad9 = keys[GLFW_KEY_9];
 
 	input.forward = keys[GLFW_KEY_W];
 	input.backward = keys[GLFW_KEY_S];
@@ -205,6 +207,28 @@ void Engine::_updateGUI(const Frame& frame)
 	Label* positionLabel = 		dynamic_cast<Label *>((*menu)["label_position"]);
 	Label* resolutionLabel = 	dynamic_cast<Label *>((*menu)["label_resolution"]);
 	Label* chunkCountLabel = 	dynamic_cast<Label *>((*menu)["label_chunkcount"]);
+
+	Control* hotbarSelector =	dynamic_cast<Control *>((*(*menu)["hotbar"])["hotbar_selector"]);
+
+	for (int i = 0; i < 9; i++)
+	{
+		if (*(&frame.input.numpad1 + sizeof(bool) * i))
+		{
+			hotbarSelector->setPos({-(kHotbarSelectorPadding / 2) + (hotbarSelector->getTransform().rect.x -(kHotbarSelectorPadding)) * i, 0});
+			break ;
+		}
+	}
+
+	Control* hotbarSelector =	dynamic_cast<Control *>((*(*menu)["hotbar"])["hotbar_selector"]);
+
+	for (int i = 0; i < 9; i++)
+	{
+		if (*(&frame.input.numpad1 + sizeof(bool) * i))
+		{
+			hotbarSelector->setPos({-(kHotbarSelectorPadding / 2) + (hotbarSelector->getTransform().rect.x -(kHotbarSelectorPadding)) * i, 0});
+			break ;
+		}
+	}
 
 	if (frame.input.infoToggle)
 	{

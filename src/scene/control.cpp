@@ -60,10 +60,6 @@ void Control::_draw(RenderContext& context) const
 
 	offset += getPos();
 
-	// std::cout << "--------------------------------------" << std::endl;
-	// std::cout << offset.x << " | " << offset.y << std::endl;
-	// std::cout << _transform.rect.x << " | " << _transform.rect.y << std::endl;
-
 	context.rect[0] = offset.x;
 	context.rect[2] = offset.x + _transform.rect.x;
 	context.rect[1] = offset.y;
