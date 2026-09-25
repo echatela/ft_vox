@@ -7,11 +7,12 @@
 #include "world/chunk_manager/chunk.hpp"
 #include "world/chunk_manager/chunk_mesher.hpp"
 
-constexpr int  kLoadDistance = 10;
-constexpr auto kLoadRange = kLoadDistance * 2 + 1;
-constexpr auto kLoadCount = kLoadRange * kLoadRange;
-
-// constexpr int kViewDistance = 5;
+constexpr int kLoadDistance = 10;
+constexpr int kLoadRange = kLoadDistance * 2 + 1;
+constexpr int kLoadCount = kLoadRange * kLoadRange;
+// constexpr int kPreloadDistance = 11;
+// constexpr int kPreloadRange = kPreloadDistance * 2 + 1;
+// constexpr int kPreloadCount = kPreloadRange * kPreloadRange;
 
 ChunkManager::ChunkManager(const glm::vec3& worldPos)
 {
@@ -34,56 +35,18 @@ ChunkManager::~ChunkManager()
 
 ////////////////////////////////////////////////////////////////////////////////
 
-void ChunkManager::updateChunks(const glm::vec3& pos)
+void ChunkManager::updateChunks(const glm::vec3& worldPos)
 {
-	static glm::ivec2 lastPos(0);
+	static glm::i32vec2 lastPos = {0, 0};
+	const glm::i32vec2  chunkPos = {std::floor(worldPos.x / kChunkWidth),
+	                                std::floor(worldPos.z / kChunkWidth)};
 
-	glm::ivec2 newPos = {std::floor(pos.x / kChunkWidth),
-	                     std::floor(pos.z / kChunkWidth)};
-
-	if (newPos != lastPos)
+	if (chunkPos != lastPos)
 	{
-		_swapRange(lastPos, newPos);
+		_swapRange(lastPos, chunkPos);
 	}
 
-	lastPos = newPos;
-}
-
-void ChunkManager::_loadAround(const glm::vec3& worldPos)
-{
-	const glm::i32vec2 pos(worldPos.x / kChunkWidth, worldPos.z / kChunkWidth);
-
-	glm::ivec2 vec;
-
-	for (vec.y = pos.y - kLoadDistance; vec.y <= pos.y + kLoadDistance; vec.y++)
-	{
-		for (vec.x = pos.x - kLoadDistance; vec.x <= pos.x + kLoadDistance;
-		     vec.x++)
-		{
-			_loadChunk(vec);
-		}
-	}
-}
-
-void ChunkManager::_loadChunk(const glm::i32vec2& pos)
-{
-	static unsigned int chunkCount = 0;
-
-	if (!_isLoaded(pos))
-	{
-		Chunk* chunk = &(_chunkMemory[chunkCount]);
-
-		chunk->setMaterial(_material);
-		chunk->setID(chunkCount);
-
-		chunk->generate(pos, 0);
-		ChunkMesher::build(*chunk, _neighbours(pos));
-		_chunks.insert({pos, chunk});
-
-		append("chunk" + std::to_string(chunkCount), chunk);
-
-		chunkCount++;
-	}
+	lastPos = chunkPos;
 }
 
 void ChunkManager::_swapRange(const glm::ivec2& oldPos,
@@ -140,12 +103,52 @@ void ChunkManager::_swapChunk(const glm::i32vec2& oldPos,
 	_chunks[newPos] = chunk;
 }
 
+void ChunkManager::_loadAround(const glm::vec3& worldPos)
+{
+	const glm::i32vec2 chunkPos = {std::floor(worldPos.x / kChunkWidth),
+	                               std::floor(worldPos.z / kChunkWidth)};
+	const glm::i32vec2 startPos = chunkPos - kLoadDistance;
+	const glm::i32vec2 endPos = chunkPos + kLoadDistance;
+
+	glm::i32vec2 v;
+	for (v.y = startPos.y; v.y <= endPos.y; v.y++)
+	{
+		for (v.x = startPos.x; v.x <= endPos.x; v.x++)
+		{
+			_loadChunk(v);
+		}
+	}
+}
+
+void ChunkManager::_loadChunk(const glm::i32vec2& pos)
+{
+	static unsigned int chunkCount = 0;
+
+	if (!_isLoaded(pos))
+	{
+		Chunk* chunk = &(_chunkMemory[chunkCount]);
+
+		chunk->setMaterial(_material);
+		chunk->setID(chunkCount);
+
+		chunk->generate(pos, 0);
+		ChunkMesher::build(*chunk, _neighbours(pos));
+		_chunks.insert({pos, chunk});
+
+		append("chunk" + std::to_string(chunkCount), chunk);
+
+		chunkCount++;
+	}
+}
+
 namespace
 {
 constexpr Face kFaceSide[4] = {kFaceRight, kFaceLeft, kFaceDown, kFaceBack};
 constexpr glm::i32vec2 kSideOffset[4] = {{1, 0}, {-1, 0}, {0, 1}, {0, -1}};
 } // namespace
 
+// NOTE: for now up and down are nullptr but if we implement the 16 16 16 chunk
+// it will not be the case anymore
 Neighbours ChunkManager::_neighbours(const glm::i32vec2& pos)
 {
 	Neighbours n{};
