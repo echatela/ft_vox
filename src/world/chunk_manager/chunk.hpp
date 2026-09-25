@@ -49,6 +49,13 @@ enum Face : uint8_t
 	kFaceCount
 };
 
+enum class ChunkState : uint8_t
+{
+	NONE,
+	PRELOADED,
+	LOADED
+};
+
 class ChunkMesher;
 
 class Chunk : public Node
@@ -63,6 +70,8 @@ class Chunk : public Node
 	unsigned int _vao = 0;
 	unsigned int _vbo = 0;
 	unsigned int _ebo = 0;
+
+	ChunkState _state = ChunkState::NONE;
 
 	std::vector<Vertex>       _vertices;
 	std::vector<unsigned int> _indices;

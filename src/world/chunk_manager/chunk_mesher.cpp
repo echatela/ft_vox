@@ -46,15 +46,19 @@ void ChunkMesher::build(Chunk& chunk, const Neighbours& neighbours)
 			v.id = chunk._blocks.at(i);
 			edges = edgeMask(i);
 
+			// For each face
 			for (v.face = kFaceRight; v.face < kFaceCount; v.face++)
 			{
+				// If face is on chunk edge
 				if ((edges >> v.face) & 1)
 				{
 					const Chunk* n = neighbours[v.face];
 
+					// if neighbour chunk found AND neighbour cube is full -> skip to not draw face
 					if (n && n->_bitBlocks[i + kWrapOffset[v.face]])
 						continue;
 				}
+				// Face is not edge... we check if neighbour cube is full
 				else if (chunk._bitBlocks[i + kNeighbourOffset[v.face]])
 					continue;
 
@@ -70,4 +74,5 @@ void ChunkMesher::build(Chunk& chunk, const Neighbours& neighbours)
 	chunk._vertices.shrink_to_fit();
 	chunk._indices.shrink_to_fit();
 	chunk._setupMesh();
+	chunk._state = ChunkState::LOADED;
 }

@@ -47,6 +47,7 @@ void Chunk::generate(const glm::ivec2& pos, unsigned int seed)
 		_blocks[i] = kBlockDirt;
 		_bitBlocks.set(i, true);
 	}
+	_state = ChunkState::PRELOADED;
 }
 
 void Chunk::clear()
@@ -54,6 +55,7 @@ void Chunk::clear()
 	_pos = {0, 0};
 	_vertices.clear();
 	_indices.clear();
+	_state = ChunkState::NONE;
 	glDeleteVertexArrays(1, &_vao);
 	glDeleteBuffers(1, &_vbo);
 	glDeleteBuffers(1, &_ebo);
@@ -61,6 +63,9 @@ void Chunk::clear()
 
 void Chunk::_draw(RenderContext& context) const
 {
+	if (_state != ChunkState::LOADED)
+		return ;
+		
 	glBindVertexArray(_vao);
 
 	context.mat3D *= glm::translate(

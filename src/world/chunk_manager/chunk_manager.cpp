@@ -8,11 +8,11 @@
 #include "world/chunk_manager/chunk_mesher.hpp"
 
 constexpr int kLoadDistance = 10;
-constexpr int kLoadRange = kLoadDistance * 2 + 1;
-constexpr int kLoadCount = kLoadRange * kLoadRange;
-// constexpr int kPreloadDistance = 11;
-// constexpr int kPreloadRange = kPreloadDistance * 2 + 1;
-// constexpr int kPreloadCount = kPreloadRange * kPreloadRange;
+// constexpr int kLoadRange = kLoadDistance * 2 + 1;
+// constexpr int kLoadCount = kLoadRange * kLoadRange;
+constexpr int kPreloadDistance = kLoadDistance + 1;
+constexpr int kPreloadRange = kPreloadDistance * 2 + 1;
+constexpr int kPreloadCount = kPreloadRange * kPreloadRange;
 
 ChunkManager::ChunkManager(const glm::vec3& worldPos)
 {
@@ -21,8 +21,8 @@ ChunkManager::ChunkManager(const glm::vec3& worldPos)
 	_material.texture = ResourceManager::instance().get<Texture2DArray>(
 	    ResourceId::TEXTURE_BLOCKS);
 
-	_chunkMemory = new Chunk[kLoadCount];
-	_chunks.reserve(kLoadCount);
+	_chunkMemory = new Chunk[kPreloadCount];
+	_chunks.reserve(kPreloadCount);
 	_loadAround(worldPos);
 }
 
@@ -49,41 +49,115 @@ void ChunkManager::updateChunks(const glm::vec3& worldPos)
 	lastPos = chunkPos;
 }
 
-void ChunkManager::_swapRange(const glm::ivec2& oldPos,
-                              const glm::ivec2& newPos)
+#include <queue>
+
+// constexpr auto kLoadDiff = kPreloadDistance - kLoadDistance;
+
+void ChunkManager::_swapRange(const glm::i32vec2& oldPos,
+                              const glm::i32vec2& newPos)
 {
-	glm::ivec2 move = newPos - oldPos;
-	glm::ivec2 loadPos, unloadPos;
+	glm::i32vec2 move = newPos - oldPos;
+	glm::i32vec2 loadPos, unloadPos;
+
+	static std::vector<glm::i32vec2> lastPreloaded;
+
+	std::vector<glm::i32vec2> unloadPull;
+	std::vector<glm::i32vec2> preloadPull;
+	std::vector<glm::i32vec2> loadPull;
 
 	const int xSign = move.x >= 0 ? 1 : -1;
 	const int ySign = move.y >= 0 ? 1 : -1;
 
-	unsigned int fullRow = std::min(std::abs(move.y), kLoadRange);
+	unsigned int fullRow = std::min(std::abs(move.y), kPreloadRange);
+
+	int iload = 0;
+	int ipreload = 0;
 
 	loadPos =
-	    glm::ivec2(newPos.x + -kLoadDistance, newPos.y + (kLoadDistance)*ySign);
+	    glm::i32vec2(newPos.x + -kPreloadDistance, newPos.y + (kPreloadDistance) * ySign);
 	// Processing each full row
 	for (uint row = 0; row < fullRow; row++)
 	{
-		for (; loadPos.x <= newPos.x + kLoadDistance; loadPos.x++)
+		for (; loadPos.x <= newPos.x + kPreloadDistance; loadPos.x++)
 		{
 			unloadPos = oldPos - (loadPos - newPos);
-			_swapChunk(unloadPos, loadPos);
+
+			if (loadPos.x > newPos.x - kLoadDistance && loadPos.x < newPos.x + kLoadDistance && 
+				loadPos.y > newPos.y - kLoadDistance && loadPos.y < newPos.y + kLoadDistance)
+			{
+				loadPull.push_back(loadPos);
+				iload ++;
+			}
+			else
+			{
+				preloadPull.push_back(loadPos);
+				ipreload ++;
+			}
+			unloadPull.push_back(unloadPos);
 		}
 		loadPos.y -= ySign;
 	}
 	// Processing the leftovers
-	for (uint yLeft = 0; yLeft < kLoadRange - fullRow; yLeft++)
+	for (uint yLeft = 0; yLeft < kPreloadRange - fullRow; yLeft++)
 	{
-		loadPos = glm::ivec2(newPos.x + (kLoadDistance)*xSign,
-		                     newPos.y - (kLoadDistance - yLeft) * ySign);
+		loadPos = glm::i32vec2(newPos.x + (kPreloadDistance) * xSign,
+		                     newPos.y - (kPreloadDistance - yLeft) * ySign);
 		for (uint xLeft = 0; xLeft < (uint)abs(move.x); xLeft++)
 		{
 			unloadPos = oldPos - (loadPos - newPos);
-			_swapChunk(unloadPos, loadPos);
+
+			if (loadPos.x > newPos.x - kLoadDistance && loadPos.x < newPos.x + kLoadDistance && 
+				loadPos.y > newPos.y - kLoadDistance && loadPos.y < newPos.y + kLoadDistance)
+			{
+				loadPull.push_back(loadPos);
+				iload ++;
+			}
+			else
+			{
+				preloadPull.push_back(loadPos);
+				ipreload ++;
+			}
+			unloadPull.push_back(unloadPos);
+
 			loadPos.x -= xSign;
 		}
 	}
+
+	std::cout << "Loaded " << iload << "\n";
+	std::cout << "Preloaded " << ipreload << "\n";
+
+	unsigned int i = 0;
+	for (glm::i32vec2 pos : unloadPull)
+	{
+
+		Chunk* chunk = _chunks[pos];
+
+		// reuse allocated chunk
+		chunk->clear();
+		// insert new pair & remove old
+		_chunks.erase(pos);
+
+		if (i < preloadPull.size())
+		{
+			chunk->generate(preloadPull[i], 0);
+			_chunks[preloadPull[i]] = chunk;
+		}
+
+		else
+		{
+			chunk->generate(loadPull[i], 0);
+			_chunks[loadPull[i]] = chunk;
+		}
+		i++;
+	}
+
+	for (glm::i32vec2 pos : loadPull)
+	{
+		ChunkMesher::build(*_chunks[pos], _neighbours(pos));
+	}
+
+	lastPreloaded = preloadPull;
+
 }
 
 // Load + Unload a chunk, keeping the old allocated Chunk pointer
@@ -107,8 +181,8 @@ void ChunkManager::_loadAround(const glm::vec3& worldPos)
 {
 	const glm::i32vec2 chunkPos = {std::floor(worldPos.x / kChunkWidth),
 	                               std::floor(worldPos.z / kChunkWidth)};
-	const glm::i32vec2 startPos = chunkPos - kLoadDistance;
-	const glm::i32vec2 endPos = chunkPos + kLoadDistance;
+	const glm::i32vec2 startPos = chunkPos - kPreloadDistance;
+	const glm::i32vec2 endPos = chunkPos + kPreloadDistance;
 
 	glm::i32vec2 v;
 	for (v.y = startPos.y; v.y <= endPos.y; v.y++)
