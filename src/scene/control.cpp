@@ -9,7 +9,6 @@ glm::vec2 Control::_computeOffsetFromAnchor(unsigned int rect[4]) const
 		case 0 : offset.x = rect[0]; 												break;
 		case 1 : offset.x = rect[0] + (rect[2] - rect[0] - _transform.rect.x) / 2; 	break;
 		case 2 : offset.x = rect[2] - _transform.rect.x; 							break;
-		default: __builtin_unreachable();
 	}
 
 	switch ((int)_transform.anchor / 3)
@@ -17,6 +16,7 @@ glm::vec2 Control::_computeOffsetFromAnchor(unsigned int rect[4]) const
 		case 0 : offset.y = rect[1]; 												break;
 		case 1 : offset.y = rect[1] + (rect[3] - rect[1] - _transform.rect.y) / 2;	break;
 		case 2 : offset.y = rect[3] - _transform.rect.y;							break;
+		default: __builtin_unreachable();
 	}
 
 	return offset;
