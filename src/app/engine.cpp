@@ -267,7 +267,7 @@ void Engine::_updateGuiInfo(const Frame& frame)
 {
 	Control* info =             dynamic_cast<Control *>(_root["info"]);
 
-	if (frame.input.info)
+	if (frame.input.infoToggle)
 		info->toggleProcess();
 	if (!info->getProcess())
 		return ;
