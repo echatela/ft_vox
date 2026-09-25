@@ -1,64 +1,33 @@
 #include "control.hpp"
 
+glm::vec2 Control::_computeOffsetFromAnchor(unsigned int rect[4]) const
+{
+	glm::vec2 offset;
+
+	switch ((int)_transform.anchor % 3)
+	{
+		case 0 : offset.x = rect[0]; 												break;
+		case 1 : offset.x = rect[0] + (rect[2] - rect[0] - _transform.rect.x) / 2; 	break;
+		case 2 : offset.x = rect[2] - _transform.rect.x; 							break;
+		default: __builtin_unreachable();
+	}
+
+	switch ((int)_transform.anchor / 3)
+	{
+		case 0 : offset.y = rect[1]; 												break;
+		case 1 : offset.y = rect[1] + (rect[3] - rect[1] - _transform.rect.y) / 2;	break;
+		case 2 : offset.y = rect[3] - _transform.rect.y;							break;
+	}
+
+	return offset;
+}
+
 void Control::_draw(RenderContext& context) const
 {
 	if (_material.shader == nullptr || _material.texture == nullptr)
 		return ;
 
-	glm::vec2 offset;
-
-	switch (_transform.anchor)
-	{
-		case Anchor::TOP_LEFT :
-		{
-			offset = {context.rect[0], context.rect[1]};
-			break;
-		}
-		case Anchor::TOP_CENTER :
-		{
-			offset = {context.rect[0] + (context.rect[2] - context.rect[0]) / 2 - _transform.rect.x / 2, context.rect[1]};
-			break;
-		}
-		case Anchor::TOP_RIGHT :
-		{
-			offset = {context.rect[0] + (context.rect[2] - context.rect[0]) - _transform.rect.x, context.rect[1]};
-			break;
-		}
-		case Anchor::CENTER_LEFT : 
-		{
-			offset = {context.rect[0], context.rect[1] + (context.rect[3] - context.rect[1]) / 2 - _transform.rect.y / 2};
-			break;
-		}
-		case Anchor::CENTER :
-		{
-			offset = {context.rect[0] + ((context.rect[2] - context.rect[0]) / 2) - _transform.rect.x / 2, context.rect[1] + (context.rect[3] - context.rect[1]) / 2 - _transform.rect.y / 2};
-			break;
-		}
-		case Anchor::CENTER_RIGHT :
-		{
-			offset = {context.rect[0] + (context.rect[2] - context.rect[0]) - _transform.rect.x, context.rect[1] + (context.rect[3] - context.rect[1]) / 2 - _transform.rect.y / 2};
-			break;
-		}
-		case Anchor::BOTTOM_LEFT :
-		{
-			offset = {context.rect[0], (context.rect[3] - _transform.rect.y)};
-			break;
-		}
-		case Anchor::BOTTOM_CENTER :
-		{
-			offset = {context.rect[0] + (context.rect[2] - context.rect[0]) / 2 - _transform.rect.x / 2, (context.rect[3] - _transform.rect.y)};
-			break;
-		}
-		case Anchor::BOTTOM_RIGHT :
-		{
-			offset = {context.rect[0] + (context.rect[2] - context.rect[0]) - _transform.rect.x, (context.rect[3] - _transform.rect.y)};
-			break;
-		}
-		default:
-			__builtin_unreachable();
-	}
-
-	offset += getPos();
+	glm::vec2 offset = _computeOffsetFromAnchor(context.rect) + getPos();
 
 	context.rect[0] = offset.x;
 	context.rect[2] = offset.x + _transform.rect.x;

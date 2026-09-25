@@ -15,6 +15,10 @@ class Control : public Node {
 
 		virtual void _draw(RenderContext& context) const;
 		virtual void _constructMesh();
+	
+	private:
+
+		glm::vec2 _computeOffsetFromAnchor(unsigned int rect[4]) const;
 
 	public:
 
