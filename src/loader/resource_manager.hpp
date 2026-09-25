@@ -9,8 +9,11 @@ enum class ResourceId
 	SHADER_2D,
 	SHADER_CHUNK,
 	SHADER_CONTROL,
+	SHADER_LABEL,
 	TEXTURE_FONT,
 	TEXTURE_BLOCKS,
+	TEXTURE_HOTBAR,
+	TEXTURE_HOTBAR_SELECTOR
 };
 
 constexpr const unsigned int kMaxPaths = 8;
@@ -41,6 +44,11 @@ constexpr ResourceInfo data[] = {
 		{"shaders/control_vert.glsl", "shaders/control_frag.glsl"}
 	},
 	{
+		ResourceId::SHADER_LABEL,
+		ResourceType::SHADER,
+		{"shaders/label_vert.glsl", "shaders/label_frag.glsl"}
+	},
+	{
 		ResourceId::TEXTURE_FONT,
 		ResourceType::TEXTURE_2D,
 		{"assets/font/texture_mipmap_font.png"}
@@ -53,7 +61,18 @@ constexpr ResourceInfo data[] = {
 		"assets/block/cobblestone.png",
 		"assets/block/oak_planks.png"},
 		16, 16, true
+	},
+	{
+		ResourceId::TEXTURE_HOTBAR,
+		ResourceType::TEXTURE_2D,
+		{"assets/hud/hotbar.png"}
+	},
+	{
+		ResourceId::TEXTURE_HOTBAR_SELECTOR,
+		ResourceType::TEXTURE_2D,
+		{"assets/hud/hotbar_selector.png"}
 	}
+
 };
 
 class ResourceManager {

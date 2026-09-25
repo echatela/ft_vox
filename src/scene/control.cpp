@@ -1,28 +1,73 @@
 #include "control.hpp"
 
+glm::vec2 Control::_computeOffsetFromAnchor(unsigned int rect[4]) const
+{
+	glm::vec2 offset;
+
+	switch ((int)_transform.anchor % 3)
+	{
+		case 0 : offset.x = rect[0]; 												break;
+		case 1 : offset.x = rect[0] + (rect[2] - rect[0] - _transform.rect.x) / 2; 	break;
+		case 2 : offset.x = rect[2] - _transform.rect.x; 							break;
+	}
+
+	switch ((int)_transform.anchor / 3)
+	{
+		case 0 : offset.y = rect[1]; 												break;
+		case 1 : offset.y = rect[1] + (rect[3] - rect[1] - _transform.rect.y) / 2;	break;
+		case 2 : offset.y = rect[3] - _transform.rect.y;							break;
+		default: __builtin_unreachable();
+	}
+
+	return offset;
+}
+
 void Control::_draw(RenderContext& context) const
 {
-	context.rect[0] += getPos().x;
-	context.rect[2] += getPos().x;
-	context.rect[1] += getPos().y;
-	context.rect[3] += getPos().y;
-
 	if (_material.shader == nullptr || _material.texture == nullptr)
 		return ;
 
-	glm::vec2 rect = {context.rect[2] - context.rect[0], context.rect[3] - context.rect[1]};
-	// TODO : marging/anchor to calculate offset
-	glm::vec2 offset = {context.rect[0], context.rect[1]};
+	glm::vec2 offset = _computeOffsetFromAnchor(context.rect) + getPos();
 
+	context.rect[0] = offset.x;
+	context.rect[2] = offset.x + _transform.rect.x;
+	context.rect[1] = offset.y;
+	context.rect[3] = offset.y + _transform.rect.y;
+
+	_mesh.bind();
 	_material.shader->use();
 	_material.texture->bind(0);
 	_material.shader->setUniform<int>("myTexture", 0);
 	_material.shader->setUniform<const glm::vec2 &>("offset", offset);
-	_material.shader->setUniform<const glm::vec2 &>("rect", rect);
+	_material.shader->setUniform<const glm::vec2 &>("res", context.res);
 
 	glDisable(GL_DEPTH_TEST);
 	glDrawElements(GL_TRIANGLES, _mesh.getIndexes().size(), GL_UNSIGNED_INT, (void *)0);
 }
+
+void Control::_constructMesh()
+{
+	std::vector<glm::vec2> 		coords;
+	std::vector<unsigned int> 	indexes;
+
+	//v1
+	coords.push_back(glm::vec2(0, 0));
+	coords.push_back(glm::vec2(0, 0));
+	//v2
+	coords.push_back(glm::vec2(_transform.rect.x, 0));
+	coords.push_back(glm::vec2(1, 0));
+	//v3
+	coords.push_back(glm::vec2(_transform.rect.x, -_transform.rect.y));
+	coords.push_back(glm::vec2(1, 1));
+	//v4
+	coords.push_back(glm::vec2(0, -_transform.rect.y));
+	coords.push_back(glm::vec2(0, 1));
+
+	for (const int vertIndex : {0, 1, 3, 1, 2, 3})
+		indexes.push_back(vertIndex);
+
+	setMesh({coords, indexes});
+};
 
 const ControlTransform&	Control::getTransform() const
 {
@@ -53,6 +98,26 @@ const glm::vec2& Control::getPos() const
 {
 	return (_transform.position);
 }
+
+void	Control::setAnchor(Anchor anchor)
+{
+	_transform.anchor = anchor;
+}
+
+Anchor Control::getAnchor() const
+{
+	return (_transform.anchor);
+}
+
+Control::Control(const Shader* shader, const ATexture* texture, const glm::vec2& textureRes)
+{
+	_material.shader = shader;
+	_material.texture = texture;
+
+	_transform.rect = textureRes;
+	_constructMesh();
+}
+
 
 Control::Control()
 {
