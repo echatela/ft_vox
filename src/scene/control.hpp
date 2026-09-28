@@ -26,6 +26,8 @@ class Control : public Node {
 		void                    setTransform(const ControlTransform& transform);
 		const Mesh2d&			getMesh() const;
 		void					setMesh(const Mesh2d& mesh);
+		const Material&			getMaterial() const;
+		void					setMaterial(const Material& material);
 
 		void			 setPos(glm::vec2 pos);
 		const glm::vec2& getPos() const;

@@ -19,6 +19,53 @@ Texture2D::Texture2D(const std::string& path)
 	load(path);
 }
 
+/*
+*	The noise function should produce values in between [-1, 1]
+*/
+Texture2D::Texture2D(int res, float f(float x, float y))
+    : ATexture(GL_TEXTURE_2D)
+{
+	noise(res, f);
+}
+
+#include <iostream>
+
+void Texture2D::noise(int res, float f(float x, float y))
+{
+	unsigned char* data = new unsigned char [res * res  * 3];
+	unsigned int   i = 0;
+
+	for (int x = 0; x < res; x++)
+	{
+		for (int y = 0; y < res; y++)
+		{
+			for (int j = 0; j < 3; j++)
+			{
+				float value = (f(x, y) + 1) / 2 * 255;
+
+				// std::cout << value << std::endl;
+
+				data[i] = (int)value;
+				i++;
+			}
+		}
+	}
+
+	glBindTexture(GL_TEXTURE_2D, _id);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
+	                GL_NEAREST_MIPMAP_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, res, res, 0, GL_RGB,
+	             GL_UNSIGNED_BYTE, data);
+	
+	glGenerateMipmap(GL_TEXTURE_2D);
+	
+	delete [] data;
+}
+
 void Texture2D::load(const std::string& path)
 {
 	unsigned char* data;

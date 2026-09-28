@@ -6,7 +6,7 @@
 #include "scene/material.hpp"
 #include <exception>
 
-constexpr int kLoadDistance = 10;
+constexpr int kLoadDistance = 0;
 constexpr auto kLoadRange = kLoadDistance * 2 + 1;
 constexpr auto kLoadCount = kLoadRange * kLoadRange;
 

@@ -88,6 +88,8 @@ Chunk& Chunk::operator=(const Chunk& rhs)
 	return *this;
 }
 
+#include "glm/gtc/noise.hpp"
+
 // hard coded generation, will need to implement a seed based generation
 void Chunk::_load()
 {
@@ -107,6 +109,9 @@ void Chunk::_load()
 				_blocks[i] = kBlockStone;
 				_bitBlocks.set(i, true);
 				i++;
+
+				// double noise = glm::perlin(glm::vec2({(vec.x + 1) / 100.f, (vec.z + 1) / 100.f}));
+				// std::cout << noise << "\n";
 			}
 		}
 	}
@@ -119,6 +124,9 @@ void Chunk::_load()
 				_blocks[i] = kBlockDirt;
 				_bitBlocks.set(i, true);
 				i++;
+
+				// double noise = glm::perlin(glm::vec2({(vec.x + 1) / 100.f, (vec.z + 1) / 100.f}));
+				// std::cout << noise << "\n";
 			}
 		}
 	}

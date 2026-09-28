@@ -119,6 +119,17 @@ Control::Control(const Shader* shader, const ATexture* texture, const glm::vec2&
 }
 
 
+const Material&	Control::getMaterial() const
+{
+	return (_material);
+}
+
+void Control::setMaterial(const Material& material)
+{
+	_material = material;
+}
+
+
 Control::Control()
 {
 }

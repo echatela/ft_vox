@@ -27,18 +27,40 @@ Engine::~Engine()
 {
 }
 
+#include "render/texture_2d.hpp"
+#include "glm/gtc/noise.hpp"
+#include "loader/resource_manager.hpp"
+
+float temp_noise(float x, float y)
+{
+	float noise = glm::perlin(glm::vec2({x / 100, y / 100}));
+
+	// float noise = noise::
+
+	return (noise);
+}
+
 void Engine::init()
 {
 	_initRenderSettings();
-	_initGUI();
+	// _initGUI();
 	_initWorld();
+	
+	ResourceManager &rm = ResourceManager::instance();
+
+	const Texture2D* texture = new Texture2D(512, temp_noise);
+	const Shader* shader = rm.get<Shader>(ResourceId::SHADER_CONTROL);
+
+	Control* noise = new Control(shader, texture, glm::vec2(512, 512));
+
+	noise->setAnchor(Anchor::CENTER);
+	_root.append("noise", noise);
 }
 
 void Engine::_initRenderSettings() const
 {
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
 }
 
 void Engine::_initWorld()
@@ -200,7 +222,7 @@ void Engine::_update(const Frame& frame)
 	_state.view = _camera.getViewMatrix();
 
 	_updateWorld();
-	_updateGUI(frame);
+	// _updateGUI(frame);
 }
 
 void Engine::_updateWorld()
