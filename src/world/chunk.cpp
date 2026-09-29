@@ -82,7 +82,7 @@ Chunk& Chunk::operator=(const Chunk& rhs)
 		_pos = rhs._pos;
 		_material = rhs._material;
 		
-		std::cout << "Chunk::operator=" << std::endl;
+		// std::cout << "Chunk::operator=" << std::endl;
 		buildMesh();
 	}
 	return *this;

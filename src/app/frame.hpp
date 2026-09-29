@@ -4,6 +4,16 @@
 
 struct InputIntent
 {
+	bool numpad1 = false;
+	bool numpad2 = false;
+	bool numpad3 = false;
+	bool numpad4 = false;
+	bool numpad5 = false;
+	bool numpad6 = false;
+	bool numpad7 = false;
+	bool numpad8 = false;
+	bool numpad9 = false;
+
 	bool forward = false;
 	bool backward = false;
 	bool right = false;

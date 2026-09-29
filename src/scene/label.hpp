@@ -26,7 +26,7 @@ class Label : public Control
 		unsigned int _size;
 		glm::vec3    _color;
 		
-		void	_constructMesh();
+		void	_constructMesh() override;
 
 		virtual void	_draw(RenderContext& context) const override;
 

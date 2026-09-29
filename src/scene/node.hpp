@@ -8,6 +8,7 @@ struct RenderContext
 {
 	glm::mat4          mat3D; //Repere 3D
 	unsigned int       rect[4] = {};
+	glm::vec2		   res = {};
 };
 
 class Node 

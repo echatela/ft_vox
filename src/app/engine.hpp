@@ -10,6 +10,7 @@
 #include "app/frame.hpp"
 #include "glm/ext/matrix_float4x4.hpp"
 #include "world/chunk_manager.hpp"
+#include "scene/label.hpp"
 
 constexpr float kZNear = 0.1f;
 constexpr float kZFar = 10000.0f;
@@ -44,11 +45,11 @@ class Engine
 
 	EngineState  _state;
 	Camera       _camera;
-	// ChunkManager _chunkManager;
 
 	Node _root;
 
 public:
+
 	Engine(Window& window);
 
 	void init();
@@ -57,15 +58,27 @@ public:
 	~Engine();
 
 private:
+
 	void _initRenderSettings() const;
 	void _initWorld();
 	void _initGUI();
 
+	void _initGuiInfo();
+	void _initGuiHud();
+
 	void _processEvents(Frame& frame);
 
 	void _update(const Frame& frame);
-	void _updateGUI(const Frame& frame);
 	void _updateWorld();
+	void _updateGUI(const Frame& frame);
+
+	void _updateGuiInfo(const Frame& frame);
+	void _updateGuiInfoFramerate(const Frame& frame, Label* label);
+	void _updateGuiInfoPosition(Label* label);
+	void _updateGuiInfoResolution(Label* label);
+	void _updateGuiInfoChunkCount(Label *label);
+
+	void _updateGuiHud(const Frame& frame);
 
 	void _render() const;
 	void _render3d() const;

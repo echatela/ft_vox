@@ -134,17 +134,17 @@ void Label::_constructMesh()
 		endX += xStep;
 
 		// v0
-		coords.push_back(glm::vec2(floor(startX), startY));
-		coords.push_back(glm::vec2(letter.offset / kBitmapWidth, 1));
-		// v1
-		coords.push_back(glm::vec2(floor(endX), startY));
-		coords.push_back(glm::vec2((letter.offset + letter.width) / kBitmapWidth, 1));
-		// v2
-		coords.push_back(glm::vec2(floor(endX), endY));
-		coords.push_back(glm::vec2((letter.offset + letter.width) / kBitmapWidth, 0));
-		// v3
-		coords.push_back(glm::vec2(floor(startX), endY));
+		coords.push_back(glm::vec2(startX, endY));
 		coords.push_back(glm::vec2(letter.offset / kBitmapWidth, 0));
+		// v1
+		coords.push_back(glm::vec2(endX, endY));
+		coords.push_back(glm::vec2((letter.offset + letter.width) / kBitmapWidth, 0));
+		// v2
+		coords.push_back(glm::vec2(endX, startY));
+		coords.push_back(glm::vec2((letter.offset + letter.width) / kBitmapWidth, 1));
+		// v3
+		coords.push_back(glm::vec2(startX, startY));
+		coords.push_back(glm::vec2(letter.offset / kBitmapWidth, 1));
 
 		for (const int vertIndex : {0, 1, 3, 1, 2, 3})
 			indexes.push_back(i + vertIndex);
@@ -152,6 +152,7 @@ void Label::_constructMesh()
 		i += 4;
 	}
 
+	_transform.rect = {floor(endX), _size};
 	setMesh({coords, indexes});
 }
 
@@ -205,7 +206,7 @@ Label::Label(std::string text, unsigned int size, glm::vec3 color)
 
 	ResourceManager& rm = ResourceManager::instance();
 	const ATexture* texturePtr = rm.get<ATexture>(ResourceId::TEXTURE_FONT);
-	const Shader* shaderPtr= rm.get<Shader>(ResourceId::SHADER_CONTROL);
+	const Shader* shaderPtr= rm.get<Shader>(ResourceId::SHADER_LABEL);
 	_material.texture = texturePtr;
 	_material.shader = shaderPtr;
 }
