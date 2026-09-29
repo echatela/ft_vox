@@ -81,6 +81,5 @@ private:
 	void _updateGuiHud(const Frame& frame);
 
 	void _render() const;
-	void _render3d() const;
-	void _renderControl() const;
+
 };

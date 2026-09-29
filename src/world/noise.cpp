@@ -1,8 +1,9 @@
 
 # include <cmath>
+# include "noise.hpp"
 
 /*
-*	The smoothstep function is a classic in videogames, often used in animation. 
+*	The smoothstep function is a classic in videogames, often used in animation.
 * 	It is used to both clamp (keep a value in between two thresholds)
 *	and to lerp values (interpolate, create a smoother curve of distribution)
 *	based on a ratio (hence the step).
@@ -16,9 +17,9 @@
 float	smoothstep(float value)
 {
 	if (value <= 0.0) return (0.0f);
-	if (value >= 1.0)  return (0.0f);
+	if (value >= 1.0)  return (1.0f);
 
-	return (value * value * 3.0 - 2.0 * value);
+	return (value * value * (3.0 - 2.0 * value));
 }
 
 /*
@@ -29,9 +30,18 @@ float	lerp(float start, float end, float weight)
 	return (start + (end - start) * smoothstep(weight));
 }
 
-constexpr auto kNoiseResolution = 512;
+/*
+*	Replacement of the lerp function for improved perlin
+*/
+float	fade(float value)
+{
+	return ((6*value - 15)*value + 10)*value*value*value;
+}
 
-// constexpr auto kGradientVectors = {{}}
+#include "glm/vec2.hpp"
+
+constexpr auto kGradientVectorsEntries = 3;
+constexpr int kGradientVectors[kGradientVectorsEntries] = {-1, 0, 1};
 
 typedef float t_gradientsGrid[kNoiseResolution][kNoiseResolution][2];
 
@@ -40,18 +50,21 @@ typedef float t_gradientsGrid[kNoiseResolution][kNoiseResolution][2];
 *	to compute or coord noise value.
 *	Therefore, modifying the distribution allows to modify the final result.
 */
-// void generateGradients(t_gradientsGrid &gradients)
-// {
-// 	for (unsigned int y = 0; y < kNoiseResolution; y++)
-// 	{
-// 		for (unsigned int x = 0; x < kNoiseResolution; x++)
-// 		{
+void generateGradients(t_gradientsGrid &gradients)
+{
+	for (unsigned int y = 0; y < kNoiseResolution; y++)
+	{
+		for (unsigned int x = 0; x < kNoiseResolution; x++)
+		{
 
-// 			for (unsigned int i = 0; i < 2; i++)
-// 			gradients[y][x][i] = 
-// 		}
-// 	}
-// }
+			for (unsigned int i = 0; i < 2; i++)
+			{
+				int r = rand() % kGradientVectorsEntries;
+				gradients[y][x][i] = kGradientVectors[r];
+			}
+		}
+	}
+}
 
 /*	
 *	Scalar product of two vectors :
@@ -60,9 +73,8 @@ typedef float t_gradientsGrid[kNoiseResolution][kNoiseResolution][2];
 */
 float gradientScalar(int xCorner, int yCorner, float x, float y)
 {
-	// There will probably be the need to % the xInt/yInt to ensure it's :
-	// 1 - under kNoiseResolution
-	// 2 - positive ?
+	// Currently I % the xCorner and the yCorner but we might need to find another solution
+	// for contiguous noises
 
 	static t_gradientsGrid gradients;
 	static bool	 generated = false;
@@ -77,11 +89,31 @@ float gradientScalar(int xCorner, int yCorner, float x, float y)
 	float xCeiled = x - xCorner;
 	float yCeiled = y - yCorner;
 
-	return (xCeiled * gradients[yCorner][xCorner][0] + yCeiled * gradients[yCorner][xCorner][1]);
+	return (xCeiled * gradients[yCorner % kNoiseResolution][xCorner % kNoiseResolution][0] + 
+		yCeiled * gradients[yCorner % kNoiseResolution][xCorner % kNoiseResolution][1]);
 
 }
 
 namespace noise {
+
+	float	fractalBrownMotion(float x, float y, int octaves)
+	{
+		float result = 0.0;
+		float amplitude = 1.0;
+		float frequency = 0.005;
+
+		// result = perlin(x, y);
+
+		for (int i = 0; i < octaves; i++)
+		{
+			result += amplitude * perlin(x * frequency, y * frequency);
+			
+			amplitude *= 0.5;
+			frequency *= 2.0;
+		}
+
+		return (result);
+	}
 
 	float	perlin(float x, float y)
 	{
@@ -96,6 +128,9 @@ namespace noise {
 		float rx = x - x0;
 		float ry = y - y0;
 
+		rx = fade(rx);
+		ry = fade(ry);
+
 		// ...and use it to interpolate the values from the edges
 		float corner1, corner2, value1, value2;
 
@@ -107,7 +142,9 @@ namespace noise {
 		corner2 = gradientScalar(x1, y1, x, y);	// lower - right
 		value2 = lerp(corner1, corner2, rx);
 
-		return (lerp(value1, value2, ry));
+		float result = lerp(value1, value2, ry);
+
+		return (result);
 	}
 
 }

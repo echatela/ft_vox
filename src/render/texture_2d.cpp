@@ -39,10 +39,27 @@ void Texture2D::noise(int res, float f(float x, float y))
 	{
 		for (int y = 0; y < res; y++)
 		{
+			
+			float value = (f(x, y) / 2 + 0.5) * 255;
+
+			if (value > 255/4.f + 30   && value < 255/4.f* 3 - 30)
+				value = 0;
+			else 
+				value = 255;
+
+			// if (value < 125)
+			// 	value = 0;
+			// else// if (value > 255)
+			// 	value = 255;
+			
 			for (int j = 0; j < 3; j++)
 			{
-				float value = (f(x, y) + 1) / 2 * 255;
 
+				
+		
+				// if (value2 > 255/4.f + 30  && value2 < 255/4.f* 3 - 30)
+				// 	value = 0;
+				
 				// std::cout << value << std::endl;
 
 				data[i] = (int)value;
