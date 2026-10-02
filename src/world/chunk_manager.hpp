@@ -9,6 +9,10 @@
 
 #include "world/chunk.hpp"
 
+constexpr int kLoadDistance = 20;
+constexpr auto kLoadRange = kLoadDistance * 2 + 1;
+constexpr auto kLoadCount = kLoadRange * kLoadRange;
+
 class ChunkManager : public Node
 {
 	// TODO: maybe replace by <uint32_t, Chunk> for faster access

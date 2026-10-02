@@ -36,7 +36,7 @@ float temp_noise(float x, float y)
 {
 	// float noise = glm::perlin(glm::vec2({x / 100, y / 100}));
 
-	float noise = noise::fractalBrownMotion((x / 20.f), (y / 20.f), 10);
+	float noise = noise::fractalBrownMotion((x / 4 ), (y / 4));
 	// std::cout << noise << std::endl;
 
 	return (noise);
@@ -55,7 +55,7 @@ void Engine::init()
 
 	Control* noise = new Control(shader, texture, glm::vec2(kNoiseResolution, kNoiseResolution));
 
-	noise->setAnchor(Anchor::CENTER);
+	noise->setAnchor(Anchor::TOP_RIGHT);
 	_root.append("noise", noise);
 }
 

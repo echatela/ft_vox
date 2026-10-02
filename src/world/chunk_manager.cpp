@@ -6,10 +6,6 @@
 #include "scene/material.hpp"
 #include <exception>
 
-constexpr int kLoadDistance = 0;
-constexpr auto kLoadRange = kLoadDistance * 2 + 1;
-constexpr auto kLoadCount = kLoadRange * kLoadRange;
-
 //constexpr int kViewDistance = 5;
 
 // TODO : Destructor should empty node and free map

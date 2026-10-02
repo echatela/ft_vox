@@ -89,12 +89,18 @@ float gradientScalar(int xCorner, int yCorner, float x, float y)
 	float xCeiled = x - xCorner;
 	float yCeiled = y - yCorner;
 
-	return (xCeiled * gradients[yCorner % kNoiseResolution][xCorner % kNoiseResolution][0] + 
-		yCeiled * gradients[yCorner % kNoiseResolution][xCorner % kNoiseResolution][1]);
+	int yIndex = abs(yCorner % kNoiseResolution);
+	int xIndex = abs(xCorner % kNoiseResolution);
+
+	return (xCeiled * gradients[yIndex][xIndex][0] + 
+		yCeiled * gradients[yIndex][xIndex][1]);
 
 }
 
+#include <iostream>
+
 namespace noise {
+
 
 	float	fractalBrownMotion(float x, float y, int octaves)
 	{
@@ -102,16 +108,14 @@ namespace noise {
 		float amplitude = 1.0;
 		float frequency = 0.005;
 
-		// result = perlin(x, y);
-
 		for (int i = 0; i < octaves; i++)
 		{
-			result += amplitude * perlin(x * frequency, y * frequency);
-			
+			float n = amplitude * perlin(x * frequency, y * frequency);
+			result += n;
+
 			amplitude *= 0.5;
 			frequency *= 2.0;
 		}
-
 		return (result);
 	}
 

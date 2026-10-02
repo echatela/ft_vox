@@ -89,6 +89,10 @@ Chunk& Chunk::operator=(const Chunk& rhs)
 }
 
 #include "glm/gtc/noise.hpp"
+#include "noise.hpp"
+
+constexpr auto kWaterLevel = 64;
+// constexpr auto kMountainLevel = 90;
 
 // hard coded generation, will need to implement a seed based generation
 void Chunk::_load()
@@ -100,33 +104,38 @@ void Chunk::_load()
 
 	uint16_t i = 0;
 	// int y = 0;
-	for (vec.y = 0; vec.y < 64; vec.y++)
+	for (vec.y = 0; vec.y < kChunkHeight; vec.y++)
 	{
 		for (vec.z = 0; vec.z < kChunkWidth; vec.z++)
 		{
 			for (vec.x = 0; vec.x < kChunkWidth; vec.x++)
 			{
-				_blocks[i] = kBlockStone;
-				_bitBlocks.set(i, true);
-				i++;
+				glm::vec2 coords = {(float)_pos.x  + vec.x, (float)_pos.y  + vec.z};
 
-				// double noise = glm::perlin(glm::vec2({(vec.x + 1) / 100.f, (vec.z + 1) / 100.f}));
-				// std::cout << noise << "\n";
-			}
-		}
-	}
-	for (; vec.y < 64 + 16; vec.y++)
-	{
-		for (vec.z = 0; vec.z < kChunkWidth; vec.z++)
-		{
-			for (vec.x = 0; vec.x < kChunkWidth; vec.x++)
-			{
-				_blocks[i] = kBlockDirt;
-				_bitBlocks.set(i, true);
-				i++;
+				int noiseHeight = (noise::fractalBrownMotion(coords.x / 4.f, coords.y / 4.f) / 2.f + 0.5f) * 255;
 
-				// double noise = glm::perlin(glm::vec2({(vec.x + 1) / 100.f, (vec.z + 1) / 100.f}));
-				// std::cout << noise << "\n";
+				if (noiseHeight > kWaterLevel)
+				{
+					int noiseBiome = (noise::fractalBrownMotion(coords.x / 4.f, coords.y / 4.f, 1));
+					
+					if (vec.y <= kWaterLevel)
+					{
+						_blocks[i] = kBlockDirt;
+						_bitBlocks[i] = true;
+					}
+
+					else if (vec.y < kWaterLevel + ((noiseHeight - kWaterLevel) * noiseBiome))
+					{
+						_blocks[i] = kBlockStone;
+						_bitBlocks[i] = true;
+					}
+				}
+				else if (vec.y < kWaterLevel)
+				{
+					_blocks[i] = kBlockOakPlanks;
+					_bitBlocks.set(i, true);
+				}
+				i++;
 			}
 		}
 	}
