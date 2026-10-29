@@ -1,8 +1,8 @@
 NAME       := ft_vox
 
-CXX        := c++
-CC         := cc
-CXXSTD     ?= c++17
+CXX        := clang++
+CC         := clang
+CXXSTD     ?= c++26
 
 SRC_DIR    := src
 OBJ_DIR    := obj
@@ -12,15 +12,18 @@ GLAD_DIR   := $(EXT_DIR)/glad
 GLM_DIR    := $(EXT_DIR)/glm
 STB_DIR    := $(EXT_DIR)/stb_image
 
-CXXFLAGS   := -Wall -Wextra -Werror -std=$(CXXSTD) -MMD -MP
-CPPFLAGS   := -I$(SRC_DIR) -I$(GLAD_DIR)/include -I$(GLM_DIR) -I$(STB_DIR)
-LDFLAGS    :=
-LDLIBS     := -ldl -lpthread -lm -lglfw -lGL -lX11 -lXi
+CXXFLAGS   := -Wall -Wextra -Werror -std=$(CXXSTD) -MMD -MP -g3 #-pg #-flto -finline-functions
+CPPFLAGS   := -I$(SRC_DIR) -I$(GLAD_DIR)/include -I$(GLM_DIR) -I$(STB_DIR) 
+LDFLAGS    := #-pg
+LDLIBS     := -lglfw
 
-SRCS       := $(addprefix src/,main.cpp \
-		$(addprefix app/,application.cpp engine.cpp camera.cpp) \
-		$(addprefix platform/,glfw_context.cpp window.cpp glad_context.cpp) \
-		$(addprefix render/,shader.cpp texture.cpp))
+SRCS       := $(addprefix src/, main.cpp time.cpp\
+		$(addprefix app/, engine.cpp) \
+		$(addprefix loader/, resource_manager.cpp) \
+		$(addprefix platform/, glfw_context.cpp window.cpp glad_context.cpp) \
+		$(addprefix render/, shader.cpp a_texture.cpp texture_2d.cpp texture_2d_array.cpp) \
+		$(addprefix scene/, control.cpp label.cpp mesh_2d.cpp node.cpp) \
+		$(addprefix world/, camera.cpp chunk.cpp chunk_manager.cpp))
 OBJS       := $(SRCS:$(SRC_DIR)/%.cpp=$(OBJ_DIR)/%.o)
 GLAD_OBJ   := $(OBJ_DIR)/glad.o
 DEPS       := $(OBJS:.o=.d)
@@ -49,8 +52,7 @@ fclean: clean
 	$(RM) $(NAME)
 	$(RM) compile_commands.json
 
-re: fclean
-	$(MAKE) all
+re: fclean all
 
 cdb:
 	@command -v bear >/dev/null 2>&1 || \

@@ -9,3 +9,11 @@
 # --- Tools ---
 /compile_commands.json
 /.cache/
+
+# --- Utils ---
+todo.txt
+vgcore*
+gmon.out
+out*
+graph*
+callgrind*

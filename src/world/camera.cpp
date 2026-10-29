@@ -1,4 +1,4 @@
-#include "app/camera.hpp"
+#include "world/camera.hpp"
 #include "app/frame.hpp"
 #include "glm/ext/matrix_transform.hpp"
 #include "glm/ext/vector_float3.hpp"
@@ -24,6 +24,16 @@ glm::mat4 Camera::getViewMatrix() const
 	return glm::lookAt(_position, _position + _front, _up);
 }
 
+const glm::vec3& Camera::getPos() const
+{
+	return _position;
+}
+
+void Camera::setPos(const glm::vec3& pos)
+{
+	_position = pos;
+}
+
 void Camera::processInput(const InputIntent& input, float dt)
 {
 	float     velocity = _movementSpeed * dt;
@@ -40,16 +50,22 @@ void Camera::processInput(const InputIntent& input, float dt)
 		dir += _right;
 	if (input.left == true)
 		dir -= _right;
+
+	if (input.up == true)
+		dir.y = 1;
+
 	if (glm::length(dir) > 0.0001f)
 		_position += glm::normalize(dir) * velocity;
+	
 
-	_yaw += input.xOffset * kSensitivity;
-	_pitch += input.yOffset * kSensitivity;
 
-	if (_pitch > 89.0f)
-		_pitch = 89.0f;
-	if (_pitch < -89.0f)
-		_pitch = -89.0f;
+	_yaw += input.xOffset * _mouseSensitivity;
+	_pitch += input.yOffset * _mouseSensitivity;
+
+	if (_pitch > 89.9f)
+		_pitch = 89.9f;
+	if (_pitch < -89.9f)
+		_pitch = -89.9f;
 
 	updateVectors();
 }
@@ -57,6 +73,7 @@ void Camera::processInput(const InputIntent& input, float dt)
 void Camera::updateVectors()
 {
 	glm::vec3 front;
+
 	front.x = cos(glm::radians(_yaw)) * cos(glm::radians(_pitch));
 	front.y = sin(glm::radians(_pitch));
 	front.z = sin(glm::radians(_yaw)) * cos(glm::radians(_pitch));
